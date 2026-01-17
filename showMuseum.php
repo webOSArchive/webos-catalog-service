@@ -151,9 +151,9 @@ include('meta-social-common.php');
 					echo "<div class='legal' style='margin-bottom:10px;'>";
 					echo "Sort: ";
 					if ($_sort == 'alpha') {
-						echo "<strong>Alphabetical</strong> | <a href='{$sortRecUrl}'>Recommended</a>";
+						echo "<b>Alphabetical</b> | <a href='{$sortRecUrl}'>Recommended</a>";
 					} else {
-						echo "<a href='{$sortAlphaUrl}'>Alphabetical</a> | <strong>Recommended</strong>";
+						echo "<a href='{$sortAlphaUrl}'>Alphabetical</a> | <b>Recommended</b>";
 					}
 					echo "</div>";
 				}
