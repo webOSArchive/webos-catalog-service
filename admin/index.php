@@ -75,7 +75,7 @@ include 'includes/header.php';
     <a href="generate-missing.php" class="stat-card warning" style="text-decoration:none;">
         <h3><?php echo number_format($stats['missing_apps']); ?></h3>
         <p>Missing IPKs</p>
-        <small>Click to generate files</small>
+        <small>Click to generate lists</small>
     </a>
     <div class="stat-card">
         <h3><?php echo number_format($stats['metadata_count']); ?></h3>
@@ -92,6 +92,17 @@ include 'includes/header.php';
     <div class="stat-card">
         <h3><?php echo number_format($stats['active_sessions']); ?></h3>
         <p>Active Sessions</p>
+    </div>
+</div>
+
+<div class="card" style="margin-bottom:20px;">
+    <div class="card-header">
+        <h2>Utilities</h2>
+    </div>
+    <div class="card-body">
+        <a href="generate-missing.php" class="btn">Generate Wanted Lists</a>
+        <a href="export-json.php" class="btn">Export JSON</a>
+        <a href="logs.php" class="btn">View Logs</a>
     </div>
 </div>
 
