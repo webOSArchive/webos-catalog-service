@@ -72,10 +72,11 @@ include 'includes/header.php';
         <h3><?php echo number_format($stats['newer_apps']); ?></h3>
         <p>Newer Apps</p>
     </div>
-    <div class="stat-card warning">
+    <a href="generate-missing.php" class="stat-card warning" style="text-decoration:none;">
         <h3><?php echo number_format($stats['missing_apps']); ?></h3>
         <p>Missing IPKs</p>
-    </div>
+        <small>Click to generate files</small>
+    </a>
     <div class="stat-card">
         <h3><?php echo number_format($stats['metadata_count']); ?></h3>
         <p>Metadata Records</p>
