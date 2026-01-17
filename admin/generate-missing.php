@@ -43,9 +43,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate'])) {
         $count = count($missingApps);
         $basePath = __DIR__ . '/..';
 
-        // Check write permissions
-        if (!is_writable($basePath)) {
-            throw new Exception("Directory is not writable: $basePath\nRun: sudo chown www-data:www-data " . realpath($basePath) . "/wanted.* or sudo chmod 775 " . realpath($basePath));
+        // Check write permissions for the specific files
+        $txtPath = $basePath . '/wanted.txt';
+        $csvPath = $basePath . '/wanted.csv';
+
+        // If files exist, check if they're writable; if not, check if directory allows creation
+        if (file_exists($txtPath) && !is_writable($txtPath)) {
+            throw new Exception("wanted.txt is not writable.\nRun: sudo chown www-data:www-data " . realpath($txtPath));
+        }
+        if (file_exists($csvPath) && !is_writable($csvPath)) {
+            throw new Exception("wanted.csv is not writable.\nRun: sudo chown www-data:www-data " . realpath($csvPath));
+        }
+        if (!file_exists($txtPath) && !is_writable($basePath)) {
+            throw new Exception("Cannot create wanted.txt - directory not writable.\nRun: sudo touch $txtPath && sudo chown www-data:www-data $txtPath");
+        }
+        if (!file_exists($csvPath) && !is_writable($basePath)) {
+            throw new Exception("Cannot create wanted.csv - directory not writable.\nRun: sudo touch $csvPath && sudo chown www-data:www-data $csvPath");
         }
 
         // Generate wanted.txt - Simple readable format
@@ -65,13 +78,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate'])) {
             $txtContent .= "\n";
         }
 
-        $txtPath = $basePath . '/wanted.txt';
         if (file_put_contents($txtPath, $txtContent) === false) {
             throw new Exception("Failed to write wanted.txt. Check file permissions.");
         }
 
         // Generate wanted.csv - Full data for analysis
-        $csvPath = $basePath . '/wanted.csv';
         $csvFile = fopen($csvPath, 'w');
         if ($csvFile === false) {
             throw new Exception("Failed to open wanted.csv for writing. Check file permissions.");
