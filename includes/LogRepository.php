@@ -254,21 +254,15 @@ class LogRepository {
             $rank++;
         }
 
-        // Get top OS versions (extract from user agent in client_info)
+        // Get top OS versions (extracted from device_data field, format: "Device/OSVersion/Carrier")
         $stmt = $this->db->query("
             SELECT
-                CASE
-                    WHEN client_info LIKE '%webOS/2%' THEN 'webOS 2.x'
-                    WHEN client_info LIKE '%webOS/1%' THEN 'webOS 1.x'
-                    WHEN client_info LIKE '%webOS/3%' THEN 'webOS 3.x'
-                    WHEN client_info LIKE '%hpwOS/3%' THEN 'hpwOS 3.x'
-                    WHEN client_info LIKE '%LuneOS%' THEN 'LuneOS'
-                    ELSE 'Unknown'
-                END as os_version,
+                SUBSTRING_INDEX(SUBSTRING_INDEX(device_data, '/', 2), '/', -1) as os_version,
                 COUNT(*) as count,
                 COUNT(DISTINCT client_id) as unique_devices
             FROM update_check_logs
-            WHERE client_info IS NOT NULL
+            WHERE device_data IS NOT NULL
+              AND device_data LIKE '%/%'
             GROUP BY os_version
             ORDER BY count DESC
             LIMIT 10
