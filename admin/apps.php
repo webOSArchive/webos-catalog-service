@@ -52,7 +52,7 @@ include 'includes/header.php';
             <select name="status">
                 <option value="">All Statuses</option>
                 <option value="active" <?php echo $status === 'active' ? 'selected' : ''; ?>>Active</option>
-                <option value="newer" <?php echo $status === 'newer' ? 'selected' : ''; ?>>Newer</option>
+                <option value="post_eol" <?php echo $status === 'post_eol' ? 'selected' : ''; ?>>Post-EOL</option>
                 <option value="missing" <?php echo $status === 'missing' ? 'selected' : ''; ?>>Missing</option>
                 <option value="archived" <?php echo $status === 'archived' ? 'selected' : ''; ?>>Archived</option>
             </select>

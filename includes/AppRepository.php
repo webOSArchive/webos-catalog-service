@@ -714,8 +714,12 @@ class AppRepository {
         }
 
         if (!empty($filters['status'])) {
-            $sql .= " AND a.status = ?";
-            $params[] = $filters['status'];
+            if ($filters['status'] === 'post_eol') {
+                $sql .= " AND a.post_shutdown = 1";
+            } else {
+                $sql .= " AND a.status = ?";
+                $params[] = $filters['status'];
+            }
         }
 
         if (!empty($filters['category'])) {
@@ -762,8 +766,12 @@ class AppRepository {
         }
 
         if (!empty($filters['status'])) {
-            $sql .= " AND a.status = ?";
-            $params[] = $filters['status'];
+            if ($filters['status'] === 'post_eol') {
+                $sql .= " AND a.post_shutdown = 1";
+            } else {
+                $sql .= " AND a.status = ?";
+                $params[] = $filters['status'];
+            }
         }
 
         if (!empty($filters['category'])) {
