@@ -2,6 +2,13 @@
 require_once __DIR__ . '/../includes/LogRepository.php';
 
 if (isset($_GET["appid"]) && $_GET["appid"] != "") {
+    $appid = $_GET["appid"];
+
+    // Skip vulnerability probes and invalid app IDs
+    if (isProbeAttempt($appid)) {
+        return;
+    }
+
     $source = "app";
     if (isset($_GET["source"]) && $_GET["source"] != "") {
         $source = urldecode($_GET["source"]);
@@ -13,10 +20,40 @@ if (isset($_GET["appid"]) && $_GET["appid"] != "") {
 
     try {
         $logRepo = new LogRepository();
-        $logRepo->logDownload($_GET["appid"], $source, $ipAddress, $userAgent);
+        $logRepo->logDownload($appid, $source, $ipAddress, $userAgent);
     } catch (Exception $e) {
         error_log("Non-fatal error: " . $_SERVER['SCRIPT_NAME'] . " was unable to log download: " . $e->getMessage(), 0);
     }
+}
+
+function isProbeAttempt($appid) {
+    $appid = strtolower($appid);
+
+    // Block common vulnerability probe patterns
+    $blocked = [
+        '.env', 'eval-stdin.php', 'wp-login.php', 'wp-admin', 'xmlrpc.php',
+        'admin.php', 'shell.php', 'config.php', 'phpinfo.php', 'setup.php'
+    ];
+    if (in_array($appid, $blocked)) {
+        return true;
+    }
+
+    // Block path traversal attempts
+    if (strpos($appid, '../') !== false || strpos($appid, '..\\') !== false) {
+        return true;
+    }
+
+    // Block requests ending in .php (no legitimate app ID ends in .php)
+    if (substr($appid, -4) === '.php') {
+        return true;
+    }
+
+    // Block script injection attempts
+    if (strpos($appid, '<script') !== false || strpos($appid, 'javascript:') !== false) {
+        return true;
+    }
+
+    return false;
 }
 
 function getVisitorIP() {
