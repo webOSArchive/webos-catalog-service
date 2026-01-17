@@ -13,7 +13,7 @@ $error = '';
 // Handle generation request
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate'])) {
     try {
-        // Fetch all missing apps
+        // Fetch all missing apps with their metadata (for filename)
         $stmt = $db->query("
             SELECT
                 a.id,
@@ -32,9 +32,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate'])) {
                 a.touchpad,
                 a.touchpad_exclusive,
                 a.luneos,
-                a.adult
+                a.adult,
+                m.filename
             FROM apps a
             LEFT JOIN categories c ON a.category_id = c.id
+            LEFT JOIN app_metadata m ON a.id = m.app_id
             WHERE a.status = 'missing'
             ORDER BY a.title
         ");
@@ -61,21 +63,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate'])) {
             throw new Exception("Cannot create wanted.csv - directory not writable.\nRun: sudo touch $csvPath && sudo chown www-data:www-data $csvPath");
         }
 
-        // Generate wanted.txt - Simple readable format
-        $txtContent = "webOS App Museum II - Wanted Apps List\n";
-        $txtContent .= "Generated: " . date('Y-m-d H:i:s') . "\n";
-        $txtContent .= "Total Wanted: $count apps\n";
-        $txtContent .= str_repeat("=", 60) . "\n\n";
-
+        // Generate wanted.txt - IPK filenames only (one per line, for Scanner app compatibility)
+        $txtContent = "";
         foreach ($missingApps as $app) {
-            $txtContent .= "ID: {$app['id']}\n";
-            $txtContent .= "Title: {$app['title']}\n";
-            $txtContent .= "Author: {$app['author']}\n";
-            $txtContent .= "Category: {$app['category']}\n";
-            if (!empty($app['vendor_id'])) {
-                $txtContent .= "Vendor ID: {$app['vendor_id']}\n";
+            if (!empty($app['filename'])) {
+                $txtContent .= $app['filename'] . "\n";
             }
-            $txtContent .= "\n";
         }
 
         if (file_put_contents($txtPath, $txtContent) === false) {
@@ -90,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate'])) {
 
         // Header row
         fputcsv($csvFile, [
-            'id', 'title', 'author', 'category', 'vendor_id', 'summary',
+            'id', 'title', 'author', 'category', 'vendor_id', 'filename', 'summary',
             'pixi', 'pre', 'pre2', 'pre3', 'veer', 'touchpad', 'touchpad_exclusive', 'luneos', 'adult',
             'app_icon', 'app_icon_big'
         ]);
@@ -103,6 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate'])) {
                 $app['author'],
                 $app['category'],
                 $app['vendor_id'],
+                $app['filename'],
                 $app['summary'],
                 $app['pixi'] ? 'Yes' : 'No',
                 $app['pre'] ? 'Yes' : 'No',
@@ -120,7 +114,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate'])) {
 
         fclose($csvFile);
 
-        $message = "Successfully generated wanted.txt and wanted.csv with $count apps.";
+        // Count how many had filenames
+        $withFilenames = count(array_filter($missingApps, fn($a) => !empty($a['filename'])));
+        $message = "Successfully generated wanted.txt ($withFilenames IPK filenames) and wanted.csv ($count apps).";
 
     } catch (Exception $e) {
         $error = "Error generating files: " . $e->getMessage();
