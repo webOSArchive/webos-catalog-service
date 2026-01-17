@@ -148,8 +148,8 @@ include('meta-social-common.php');
 					// Sort toggle
 					$sortAlphaUrl = "showMuseum.php?category=" . urlencode($_GET['category']) . "&count=" . $_GET['count'] . "&sort=alpha";
 					$sortRecUrl = "showMuseum.php?category=" . urlencode($_GET['category']) . "&count=" . $_GET['count'] . "&sort=recommended";
-					echo "<div style='margin-bottom:10px;'>";
-					echo "<span class='legal'>Sort: </span>";
+					echo "<div class='legal' style='margin-bottom:10px;'>";
+					echo "Sort: ";
 					if ($_sort == 'alpha') {
 						echo "<strong>Alphabetical</strong> | <a href='{$sortRecUrl}'>Recommended</a>";
 					} else {
