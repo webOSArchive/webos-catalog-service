@@ -72,6 +72,9 @@ CREATE TABLE IF NOT EXISTS apps (
     in_revisionist_history BOOLEAN DEFAULT FALSE,
     in_curators_choice BOOLEAN DEFAULT FALSE,
 
+    -- Post-shutdown flag (community-created apps after platform EOL)
+    post_shutdown BOOLEAN DEFAULT FALSE,
+
     -- Status tracking (replaces separate JSON files)
     -- active = archivedAppData.json (main usable catalog)
     -- archived = masterAppData.json only (historical, no IPK available in museum)

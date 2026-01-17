@@ -41,7 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'adult' => isset($_POST['adult']),
         'in_revisionist_history' => isset($_POST['in_revisionist_history']),
         'in_curators_choice' => isset($_POST['in_curators_choice']),
-        'recommendation_order' => (int)($_POST['recommendation_order'] ?? 0)
+        'recommendation_order' => (int)($_POST['recommendation_order'] ?? 0),
+        'post_shutdown' => isset($_POST['post_shutdown'])
     ];
 
     // Validation
@@ -219,6 +220,11 @@ include 'includes/header.php';
                     <input type="checkbox" name="adult" <?php echo ($app['adult'] ?? $_POST['adult'] ?? false) ? 'checked' : ''; ?>>
                     Adult Content
                 </label>
+                <label>
+                    <input type="checkbox" name="post_shutdown" <?php echo ($app['post_shutdown'] ?? $_POST['post_shutdown'] ?? false) ? 'checked' : ''; ?>>
+                    Post-Shutdown
+                </label>
+                <br><small>Community-created app after platform EOL</small>
             </fieldset>
 
             <fieldset>

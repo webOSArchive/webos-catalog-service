@@ -570,13 +570,13 @@ class AppRepository {
                 id, title, author, summary, app_icon, app_icon_big,
                 category_id, vendor_id, pixi, pre, pre2, pre3, veer,
                 touchpad, touchpad_exclusive, luneos, adult,
-                in_revisionist_history, in_curators_choice, recommendation_order, status
+                in_revisionist_history, in_curators_choice, post_shutdown, recommendation_order, status
             ) VALUES (
                 ?, ?, ?, ?, ?, ?,
                 (SELECT id FROM categories WHERE name = ?),
                 ?, ?, ?, ?, ?, ?,
                 ?, ?, ?, ?,
-                ?, ?, ?, ?
+                ?, ?, ?, ?, ?
             )
         ";
 
@@ -601,6 +601,7 @@ class AppRepository {
             (int)($data['adult'] ?? false),
             (int)($data['in_revisionist_history'] ?? false),
             (int)($data['in_curators_choice'] ?? false),
+            (int)($data['post_shutdown'] ?? false),
             (int)($data['recommendation_order'] ?? 0),
             $data['status'] ?? 'active'
         ]);
@@ -636,6 +637,7 @@ class AppRepository {
                 adult = ?,
                 in_revisionist_history = ?,
                 in_curators_choice = ?,
+                post_shutdown = ?,
                 recommendation_order = ?,
                 status = ?
             WHERE id = ?
@@ -661,6 +663,7 @@ class AppRepository {
             (int)($data['adult'] ?? false),
             (int)($data['in_revisionist_history'] ?? false),
             (int)($data['in_curators_choice'] ?? false),
+            (int)($data['post_shutdown'] ?? false),
             (int)($data['recommendation_order'] ?? 0),
             $data['status'] ?? 'active',
             $id

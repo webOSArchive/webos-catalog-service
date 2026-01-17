@@ -17,7 +17,6 @@ $error = '';
 // Status options matching original files
 $exportOptions = [
     'active' => 'Active Apps (archivedAppData.json format)',
-    'newer' => 'Newer Apps (newerAppData.json format)',
     'missing' => 'Missing Apps (missingAppData.json format)',
     'archived' => 'Archived Only (masterAppData.json exclusives)',
     'all' => 'All Apps (complete catalog)'
@@ -170,7 +169,6 @@ include 'includes/header.php';
         <table class="data-table">
             <tr><th>Original File</th><th>Status</th><th>Description</th></tr>
             <tr><td>archivedAppData.json</td><td>active</td><td>Main catalog - apps with available IPKs</td></tr>
-            <tr><td>newerAppData.json</td><td>newer</td><td>Post-freeze submissions</td></tr>
             <tr><td>missingAppData.json</td><td>missing</td><td>Apps needing IPK recovery</td></tr>
             <tr><td>masterAppData.json</td><td>archived</td><td>Historical reference only</td></tr>
         </table>
