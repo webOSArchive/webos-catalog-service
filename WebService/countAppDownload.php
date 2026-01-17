@@ -32,7 +32,7 @@ function isProbeAttempt($appid) {
     // Block common vulnerability probe patterns
     $blocked = [
         '.env', 'eval-stdin.php', 'wp-login.php', 'wp-admin', 'xmlrpc.php',
-        'admin.php', 'shell.php', 'config.php', 'phpinfo.php', 'setup.php'
+        'admin.php', 'shell.php', 'config.php', 'config', 'phpinfo.php', 'setup.php'
     ];
     if (in_array($appid, $blocked)) {
         return true;
@@ -51,6 +51,14 @@ function isProbeAttempt($appid) {
     // Block script injection attempts
     if (strpos($appid, '<script') !== false || strpos($appid, 'javascript:') !== false) {
         return true;
+    }
+
+    // Block SQL injection attempts
+    $sqlPatterns = ['select', 'union', 'sleep', 'waitfor', 'drop', 'insert', 'update', '--', '/*', '*/'];
+    foreach ($sqlPatterns as $pattern) {
+        if (strpos($appid, $pattern) !== false) {
+            return true;
+        }
     }
 
     return false;

@@ -228,11 +228,15 @@ class LogRepository {
         $stmt = $this->db->query("
             SELECT
                 CASE
-                    WHEN device_data LIKE '%Veer%' THEN 'Veer'
+                    WHEN device_data LIKE '%Veer%' OR device_data LIKE '%P160U%' THEN 'Veer'
                     WHEN device_data LIKE '%TouchPad%' THEN 'TouchPad'
-                    WHEN device_data LIKE '%Prē%' OR device_data LIKE '%Pre2%' THEN 'Pre2'
+                    WHEN device_data LIKE '%Prē%' OR device_data LIKE '%Pre2%' OR device_data LIKE '%Pre/1.2%' THEN 'Pre2'
                     WHEN device_data LIKE '%Pre%' THEN 'Pre'
                     WHEN device_data LIKE '%Pixi%' THEN 'Pixi'
+                    WHEN device_data LIKE 'Emulator%' THEN 'Emulator'
+                    WHEN device_data LIKE '%Web0S%' OR device_data LIKE '%webOS TV%' OR device_data LIKE '%SmartTV%' THEN 'LG webOS TV'
+                    WHEN device_data LIKE '%hp-desktop%' THEN 'HP webOS Desktop'
+                    WHEN device_data LIKE 'Mozilla%' THEN 'Browser'
                     ELSE 'Unknown'
                 END as device_type,
                 COUNT(*) as count,
