@@ -52,6 +52,12 @@ App data is stored in MySQL. Key tables:
 - `missing` - Apps needing IPKs (formerly missingAppData.json)
 - `archived` - Historical reference only (masterAppData.json exclusives)
 
+**Special Flags:**
+- `post_shutdown` - Community-created apps after platform EOL
+- `in_revisionist_history` - Featured in "Revisionist History" virtual category
+- `in_curators_choice` - Featured in "Curator's Choice" virtual category
+- `recommendation_order` - Higher values appear first when sorted by recommendation
+
 ### Repository Layer (includes/)
 
 | File | Purpose |
@@ -83,6 +89,8 @@ CRUD interface for managing catalog data. Secured via nginx basic auth.
 | `categories.php` | Category management |
 | `authors.php` | Author/vendor management |
 | `logs.php` | View download/update logs |
+| `generate-missing.php` | Generate wanted.txt/csv for missing IPKs |
+| `export-json.php` | Export apps as JSON (legacy format) |
 
 **nginx basic auth configuration:**
 ```nginx

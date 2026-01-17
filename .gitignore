@@ -14,6 +14,14 @@ WebService/__museumSessions
 WebService/config.php
 *.log
 
+# Rate limiting files
+__rateLimit/
+WebService/__rateLimit/
+
+# Generated files
+wanted.txt
+wanted.csv
+
 # Exclude files that should come from an archive repo (instead of a code repo)
 #*.ipk
 #com.palm.*
