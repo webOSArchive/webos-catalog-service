@@ -58,12 +58,15 @@ if (isset($app_response) && isset($app_response["data"][0]) && isset($app_respon
 	if ($author_file) {
 		$author_content = stream_get_contents($author_file);
 		fclose($author_file);
-		if (isset($author_content) && $author_content != ""){ 
+		if (isset($author_content) && $author_content != ""){
 			$author_data = json_decode($author_content, true);
 			$favicon_path = $author_path . "/" . $author_data['favicon'];
 		}
 	}
 }
+
+// Set icon for social media meta tags
+$use_icon = isset($author_data['iconBig']) ? $author_path . "/" . $author_data['iconBig'] : "https://appcatalog.webosarchive.org/assets/webos-apps.png";
 
 if ($favicon_search) {	//return just the favicon
 	if (isset($favicon_path)) {

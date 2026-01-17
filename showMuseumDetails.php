@@ -7,7 +7,81 @@
 function showHelp() {
 	alert("Most webOS Devices should use the App Museum II native app to browse and install from the catalog. Older devices that can't run the Museum can Option+Tap (Orange or White Key) or Long Press (if enabled) on the Preware link on this page and copy it to your clipboard. Then you can use the 'Install Package' menu option in Preware to paste in and install the app using that link.");
 }
+
+/* Lightbox for screenshots - ES5 compatible with fallback */
+function openLightbox(src) {
+	try {
+		var overlay = document.getElementById('lightbox-overlay');
+		var img = document.getElementById('lightbox-img');
+		if (!overlay || !img) {
+			return true; /* fallback to normal link */
+		}
+		img.src = src;
+		overlay.style.display = 'block';
+		return false; /* prevent default link behavior */
+	} catch (e) {
+		return true; /* fallback on any error */
+	}
+}
+
+function closeLightbox() {
+	try {
+		var overlay = document.getElementById('lightbox-overlay');
+		if (overlay) {
+			overlay.style.display = 'none';
+		}
+	} catch (e) {
+		/* ignore errors on close */
+	}
+}
+
+/* Close on escape key */
+function handleLightboxKey(e) {
+	e = e || window.event;
+	var key = e.keyCode || e.which;
+	if (key === 27) {
+		closeLightbox();
+	}
+}
+if (document.addEventListener) {
+	document.addEventListener('keydown', handleLightboxKey);
+} else if (document.attachEvent) {
+	document.attachEvent('onkeydown', handleLightboxKey);
+}
 </script>
+<style>
+#lightbox-overlay {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: #000000;
+	background-color: rgba(0, 0, 0, 0.85);
+	text-align: center;
+	z-index: 9999;
+	cursor: pointer;
+}
+#lightbox-overlay img {
+	max-width: 90%;
+	max-height: 90%;
+	margin-top: 2%;
+	border: 2px solid #ffffff;
+}
+#lightbox-close {
+	position: absolute;
+	top: 10px;
+	right: 20px;
+	color: #ffffff;
+	font-size: 30px;
+	font-weight: bold;
+	cursor: pointer;
+}
+#lightbox-close:hover {
+	color: #cccccc;
+}
+</style>
 
 <?php
 $config = include('WebService/config.php');
@@ -129,6 +203,11 @@ include('meta-social-app.php');
 <script src="downloadHelper.php"></script>
 </head>
 <body onload="populateLink()">
+<!-- Lightbox overlay - click anywhere to close -->
+<div id="lightbox-overlay" onclick="closeLightbox()">
+	<span id="lightbox-close" title="Close">&times;</span>
+	<img id="lightbox-img" src="" alt="Screenshot">
+</div>
 <?php include("menu.php") ?>
 <div class="show-museum" style="margin-left:auto;margin-right:auto">
 	<h2><a href="<?php echo ($homePath); ?>"><img src="assets/icon.png" style="height:64px;width:64px;margin-top:-10px;" align="middle"></a> &nbsp;<a href="<?php echo ($homePath); ?>">webOS App Museum II</a></h2>
@@ -195,7 +274,7 @@ include('meta-social-app.php');
 		} else {
 			$use_thumb = $value["thumbnail"];
 		}
-		echo("<a href='" . $use_screenshot . "' target='_blank'><img class='screenshot' src='" . $use_thumb . "' style='width:64px'></a>");
+		echo("<a href='" . $use_screenshot . "' target='_blank' onclick=\"return openLightbox('" . htmlspecialchars($use_screenshot, ENT_QUOTES) . "')\"><img class='screenshot' src='" . $use_thumb . "' style='width:64px'></a>");
 	}
 	?>
 	</td></tr>
