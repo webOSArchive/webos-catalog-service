@@ -86,25 +86,25 @@ class LogRepository {
             $rank++;
         }
 
-        // Get top clients (top 10) based on user agent
+        // Get top clients (top 10) based on user_agent or source field
+        // Historical data has client info in source column, new data uses user_agent
         $stmt = $this->db->query("
             SELECT
                 CASE
-                    WHEN user_agent LIKE '%Windows 10%' THEN 'Windows 10'
-                    WHEN user_agent LIKE '%Windows 7%' THEN 'Windows 7'
-                    WHEN user_agent LIKE '%Linux x86_64%' THEN 'Linux PC'
-                    WHEN user_agent LIKE '%Smart TV%' THEN 'Linux Smart TV'
-                    WHEN user_agent LIKE '%ChromeOS%' THEN 'ChromeOS'
-                    WHEN user_agent LIKE '%Mac%' THEN 'Mac'
-                    WHEN user_agent LIKE '%Android%' THEN 'Android'
-                    WHEN user_agent LIKE '%iPhone%' THEN 'iPhone'
-                    WHEN user_agent LIKE '%webOS%' OR user_agent LIKE '%hpwOS%' THEN 'webOS'
-                    WHEN user_agent LIKE '%LuneOS%' THEN 'LuneOS'
+                    WHEN COALESCE(user_agent, source) LIKE '%Windows NT 10%' OR COALESCE(user_agent, source) LIKE '%Windows 10%' THEN 'Windows 10'
+                    WHEN COALESCE(user_agent, source) LIKE '%Windows NT 6.1%' OR COALESCE(user_agent, source) LIKE '%Windows 7%' THEN 'Windows 7'
+                    WHEN COALESCE(user_agent, source) LIKE '%Linux x86_64%' THEN 'Linux PC'
+                    WHEN COALESCE(user_agent, source) LIKE '%NetCast%' OR COALESCE(user_agent, source) LIKE '%Smart TV%' THEN 'Linux Smart TV'
+                    WHEN COALESCE(user_agent, source) LIKE '%CrOS%' OR COALESCE(user_agent, source) LIKE '%ChromeOS%' THEN 'ChromeOS'
+                    WHEN COALESCE(user_agent, source) LIKE '%Macintosh%' OR COALESCE(user_agent, source) LIKE '%Mac%' THEN 'Mac'
+                    WHEN COALESCE(user_agent, source) LIKE '%Android%' THEN 'Android'
+                    WHEN COALESCE(user_agent, source) LIKE '%iPhone%' THEN 'iPhone'
+                    WHEN COALESCE(user_agent, source) LIKE '%webOS%' OR COALESCE(user_agent, source) LIKE '%hpwOS%' OR LOWER(COALESCE(user_agent, source)) = 'webos' THEN 'webOS'
+                    WHEN COALESCE(user_agent, source) LIKE '%LuneOS%' OR LOWER(COALESCE(user_agent, source)) = 'app' THEN 'LuneOS'
                     ELSE 'Other'
                 END as client_type,
                 COUNT(*) as count
             FROM download_logs
-            WHERE user_agent IS NOT NULL
             GROUP BY client_type
             ORDER BY count DESC
             LIMIT 10
