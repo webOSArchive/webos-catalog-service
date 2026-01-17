@@ -2,28 +2,17 @@
 $config = include('config.php');
 header('Content-Type: application/json');
 include('../common.php');
+require_once __DIR__ . '/../includes/LogRepository.php';
 
 //Load archives
 $fullcatalog = load_catalogs(array("../newerAppData.json", "../archivedAppData.json"));
 
-//Try to prepare the logs
-$logpath = null;
+// Initialize log repository
+$logRepo = null;
 try {
-	clearstatcache();
-	$logpath = "logs";
-        if (!file_exists($logpath)) {
-                mkdir($logpath, 0774, true);
-        }
-        $logpath = getcwd() . "/" . $logpath . "/updatecheck.log";
-        if (!file_exists($logpath)) {
-                $logfile=fopen($logpath, "x");
-                fwrite($logfile, "TimeStamp,IP,AppChecked,DeviceData,ClientInfo".PHP_EOL);
-                fclose($logfile);
-        }
-} catch (exception $e) {
-	//Fail with web server log and move on
-	unset($logpath);
-	error_log("Non-fatal error: " . $_SERVER ['SCRIPT_NAME'] . " was unable to create a log file. Check directory permissions for web server user.", 0);
+    $logRepo = new LogRepository();
+} catch (Exception $e) {
+    error_log("Non-fatal error: " . $_SERVER['SCRIPT_NAME'] . " was unable to connect to database: " . $e->getMessage(), 0);
 }
 
 $found_id = "null";
@@ -63,13 +52,13 @@ if ($search_str == "0" ||	//Treat the museum itself differently
  $search_str == "appmuseumii" ||
  $search_str == "appmuseum.museumapp" )
 {
-	if (isset($logpath)) { $logpath = write_log_data($logpath, "app museum 2", $devicedata, $clientinfo); }
+	if ($logRepo) { logUpdateCheck($logRepo, "app museum 2", $devicedata, $clientinfo); }
 	$found_id = "0";
 	$meta_path = "http://" . $config["metadata_host"] . "/0.json";
 }
 else	//Any other app
 {
-	if (isset($logpath)) { $logpath = write_log_data($logpath, $search_str, $devicedata, $clientinfo); }
+	if ($logRepo) { logUpdateCheck($logRepo, $search_str, $devicedata, $clientinfo); }
 	//strip out version number if present
 	$name_parts = explode("/", $search_str);
 	$search_str = $name_parts[0];
@@ -113,55 +102,30 @@ function get_last_version_note($versionNote){
 	return end($lastVersionNote);
 }
 
-function write_log_data($logpath, $appname, $devicedata, $clientinfo) {
-	if (file_exists($logpath)) {
-		$timestamp = date('Y/m/d H:i:s');
-		$logdata = $timestamp . "," . getVisitorIP() . "," . $appname . "," . $devicedata . "," . $clientinfo . PHP_EOL;
-		file_put_contents($logpath, $logdata, FILE_APPEND);
-		return $logpath;
-	} else {
-		return null;
+function logUpdateCheck($logRepo, $appname, $devicedata, $clientinfo) {
+	try {
+		$ipAddress = getVisitorIP();
+		$logRepo->logUpdateCheck($appname, $devicedata, $clientinfo, $clientinfo, $ipAddress);
+	} catch (Exception $e) {
+		error_log("Non-fatal error logging update check: " . $e->getMessage(), 0);
 	}
 }
 
-function getVisitorIP()
-{
-	$serverIP = explode('.',$_SERVER['SERVER_ADDR']);
-	$localIP  = explode('.',$_SERVER['REMOTE_ADDR']);
-	$isLocal = ( ($_SERVER['SERVER_NAME'] == 'localhost') ||
-		    ($serverIP[0] == $localIP[0]) && 
-		    (in_array($serverIP[0],array('192') ) ||
-		    in_array($serverIP[0],array('127') ) ) 
-	);
-	if($isLocal)
-	{
-		$ip = gethostbyname($config['hostname']);
-	}
-	else 
-	{
-		// Get real visitor IP behind CloudFlare network
-		if (isset($_SERVER["HTTP_CF_CONNECTING_IP"])) {
-				$_SERVER['REMOTE_ADDR'] = $_SERVER["HTTP_CF_CONNECTING_IP"];
-				$_SERVER['HTTP_CLIENT_IP'] = $_SERVER["HTTP_CF_CONNECTING_IP"];
-		}
-		$client  = @$_SERVER['HTTP_CLIENT_IP'];
-		$forward = @$_SERVER['HTTP_X_FORWARDED_FOR'];
-		$remote  = $_SERVER['REMOTE_ADDR'];
-
-		if(filter_var($client, FILTER_VALIDATE_IP))
-		{
-			$ip = $client;
-		}
-		elseif(filter_var($forward, FILTER_VALIDATE_IP))
-		{
-			$ip = $forward;
-		}
-		else
-		{
-			$ip = $remote;
-		}
+function getVisitorIP() {
+	// Get real visitor IP behind CloudFlare network
+	if (isset($_SERVER["HTTP_CF_CONNECTING_IP"])) {
+		return $_SERVER["HTTP_CF_CONNECTING_IP"];
 	}
 
-    return $ip;
+	$client = @$_SERVER['HTTP_CLIENT_IP'];
+	$forward = @$_SERVER['HTTP_X_FORWARDED_FOR'];
+	$remote = $_SERVER['REMOTE_ADDR'];
+
+	if (filter_var($client, FILTER_VALIDATE_IP)) {
+		return $client;
+	} elseif (filter_var($forward, FILTER_VALIDATE_IP)) {
+		return $forward;
+	}
+	return $remote;
 }
 ?>

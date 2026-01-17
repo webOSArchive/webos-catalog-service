@@ -1,34 +1,39 @@
 <?php
+require_once __DIR__ . '/../includes/LogRepository.php';
+
 if (isset($_GET["appid"]) && $_GET["appid"] != "") {
-    //Try to prepare the logs
-    $logpath = null;
-    try {
-        clearstatcache();
-        $logpath = "logs";
-            if (!file_exists($logpath)) {
-                    mkdir($logpath, 0774, true);
-            }
-            $logpath = getcwd() . "/" . $logpath . "/downloadcount.log";
-            if (!file_exists($logpath)) {
-                    $logfile=fopen($logpath, "x");
-                    fwrite($logfile, "TimeStamp,AppId,Source".PHP_EOL);
-                    fclose($logfile);
-            }
-    } catch (exception $e) {
-        //Fail with web server log and move on
-        unset($logpath);
-        error_log("Non-fatal error: " . $_SERVER ['SCRIPT_NAME'] . " was unable to create a log file. Check directory permissions for web server user.", 0);
+    $source = "app";
+    if (isset($_GET["source"]) && $_GET["source"] != "") {
+        $source = urldecode($_GET["source"]);
+        $source = str_replace(",", "", $source);
     }
 
-    if (file_exists($logpath)) {
-        $source = "app";
-        if (isset($_GET["source"]) && $_GET["source"] != "") {
-            $source = urldecode($_GET["source"]);
-            $source = str_replace(",", "", $source);
-        }
-        $timestamp = date('Y/m/d H:i:s');
-        $logdata = $timestamp . "," . $_GET["appid"] . "," . $source . PHP_EOL;
-        file_put_contents($logpath, $logdata, FILE_APPEND);
+    $ipAddress = getVisitorIP();
+    $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : null;
+
+    try {
+        $logRepo = new LogRepository();
+        $logRepo->logDownload($_GET["appid"], $source, $ipAddress, $userAgent);
+    } catch (Exception $e) {
+        error_log("Non-fatal error: " . $_SERVER['SCRIPT_NAME'] . " was unable to log download: " . $e->getMessage(), 0);
     }
+}
+
+function getVisitorIP() {
+    // Get real visitor IP behind CloudFlare network
+    if (isset($_SERVER["HTTP_CF_CONNECTING_IP"])) {
+        return $_SERVER["HTTP_CF_CONNECTING_IP"];
+    }
+
+    $client = @$_SERVER['HTTP_CLIENT_IP'];
+    $forward = @$_SERVER['HTTP_X_FORWARDED_FOR'];
+    $remote = $_SERVER['REMOTE_ADDR'];
+
+    if (filter_var($client, FILTER_VALIDATE_IP)) {
+        return $client;
+    } elseif (filter_var($forward, FILTER_VALIDATE_IP)) {
+        return $forward;
+    }
+    return $remote;
 }
 ?> 
