@@ -1,4 +1,11 @@
 <?php
+/**
+ * Geographic distribution report
+ *
+ * Shows where update checks are coming from (last 12 months)
+ */
+require_once __DIR__ . '/../../includes/Database.php';
+
 if (!isset($config))
     $config = include('../config.php');
 if (!isset($mimeType))
@@ -6,124 +13,121 @@ if (!isset($mimeType))
 else
     error_reporting(E_ERROR | E_PARSE);
 
-returnUpdateDataFormatted($config, $mimeType);
-$excluded = [];
+returnGeoDataFormatted($config, $mimeType);
 
-function returnUpdateDataFormatted($config, $mimeType) {
-    $data = fopen('../logs/updatecheck.log', 'r');
-
+function returnGeoDataFormatted($config, $mimeType) {
+    $db = Database::getInstance()->getConnection();
     $topGeoCount = 15;
-    $count = 0;
-    $startDate = "";
-    $lastDate = "";
-    $geoRegions = array();
-    $ipRegions = array();
-    class GeoRegion
-    {
-        public $regionCode;
-        public $regionName;
-        public $count;
-    }
-    class IPRegion
-    {
-        public $ip;
-        public $regionCode;
-    }
-    class RegionReport
-    {
-        public $firstDate;
-        public $lastDate;
-        public $regionRecords;
-        public $uniqueRegions;
-        public $topRegions = array();
-    }
 
-    //get the log data
-    while($line = fgets($data)) {
-        $line = str_replace("\n", "", $line);
-        $line = stripcslashes($line);
-        $line = str_replace("//", "/", $line);
+    // Get unique IPs from last 12 months with their request counts
+    $stmt = $db->query("
+        SELECT
+            ip_address,
+            COUNT(*) as request_count,
+            MIN(created_at) as first_seen,
+            MAX(created_at) as last_seen
+        FROM update_check_logs
+        WHERE ip_address IS NOT NULL
+          AND ip_address != ''
+          AND created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+        GROUP BY ip_address
+        ORDER BY request_count DESC
+    ");
 
-        if ($count > 0) {   //skip first line
-            $lineParts = explode(",", $line);
-            if (count($lineParts) > 1) {
-                if ($count == 1) {  //the first item has our earliest date
-                    $startDate = $lineParts[0];
-                }
-                $lastDate = $lineParts[0];  //every subsequent item has the latest date (so far)
-                
-                //accumulate (or start) the update check count for this app
-                $IP = $lineParts[1];     //first non-date column is the ip
+    $ipData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                if (!isset($excluded) || !in_array($IP, $excluded)) {  //leave out my IPs
-                    $useCode = "??";
-                    $useName = "Unknown Region";
-                    if (!isset($IPRegions) || !is_array($IPRegions) || !array_key_exists($IP, $IPRegions)) {
-                        //ask server for region info
-                        $regionData = getRegionForIP($IP);
-                        if (isset($regionData)) {
-                            $regionObj = json_decode($regionData);
-                            if (is_object($regionObj)) {
-                                $useCode = $regionObj->country->iso_code;
-                                $useName = $regionObj->country->names->en;    
-                            } else {
-                                //die("could not parse region data");
-                            }
-                        }
-                        $IPRegions[$IP] = $useCode;
-                    } else {
-                        $useCode = $IPRegions[$IP];
-                    }
-                    if (!array_key_exists($useCode, $geoRegions)) {
-                        $geoRegions[$useCode] = new GeoRegion();
-                        $geoRegions[$useCode]->regionCode = $useCode;
-                        $geoRegions[$useCode]->regionName = $useName;
-                        $geoRegions[$useCode]->count = 0;
-                    }
-                    $geoRegions[$useCode]->count++;
+    // Get date range
+    $dateStmt = $db->query("
+        SELECT
+            MIN(created_at) as first_date,
+            MAX(created_at) as last_date,
+            COUNT(*) as total
+        FROM update_check_logs
+        WHERE created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+    ");
+    $dateRange = $dateStmt->fetch(PDO::FETCH_ASSOC);
+
+    // Geolocate unique IPs and aggregate by region
+    $geoRegions = [];
+    $ipCache = [];
+    $totalRecords = 0;
+
+    foreach ($ipData as $row) {
+        $ip = $row['ip_address'];
+        $count = (int)$row['request_count'];
+        $totalRecords += $count;
+
+        // Get region for this IP
+        $useCode = "??";
+        $useName = "Unknown Region";
+
+        if (!isset($ipCache[$ip])) {
+            $regionData = getRegionForIP($ip);
+            if ($regionData) {
+                $regionObj = json_decode($regionData);
+                if (is_object($regionObj) && isset($regionObj->country)) {
+                    $useCode = $regionObj->country->iso_code ?? "??";
+                    $useName = $regionObj->country->names->en ?? "Unknown Region";
                 }
             }
-        }
-        $count++;
-    }
-
-    //format report object
-    $regionReport = new RegionReport();
-
-    arsort($geoRegions);  //sort apps descending by count
-    $i = 1;
-    foreach ($geoRegions as $key => $val) {
-        if ($i <= $topGeoCount) {
-            $thisRegion = new GeoRegion();
-            $thisRegion->regionCode = $val->regionCode;
-            $thisRegion->regionName = $val->regionName;
-            $thisRegion->count = $val->count;
-            $regionReport->topRegions[$i] = $thisRegion;
-            $i++;
+            $ipCache[$ip] = ['code' => $useCode, 'name' => $useName];
         } else {
-            break;
+            $useCode = $ipCache[$ip]['code'];
+            $useName = $ipCache[$ip]['name'];
         }
+
+        // Aggregate by region
+        if (!isset($geoRegions[$useCode])) {
+            $geoRegions[$useCode] = [
+                'regionCode' => $useCode,
+                'regionName' => $useName,
+                'count' => 0
+            ];
+        }
+        $geoRegions[$useCode]['count'] += $count;
     }
 
-    $regionReport->firstDate = $startDate;
-    $regionReport->lastDate = $lastDate;
-    $regionReport->regionRecords = $count;
-    $regionReport->uniqueRegions = count($geoRegions);
+    // Sort by count descending
+    usort($geoRegions, function($a, $b) {
+        return $b['count'] - $a['count'];
+    });
 
-    //return report object as JSON
+    // Build response
+    $topRegions = [];
+    $i = 1;
+    foreach ($geoRegions as $region) {
+        if ($i > $topGeoCount) break;
+        $topRegions[$i] = $region;
+        $i++;
+    }
+
+    $response = [
+        'firstDate' => $dateRange['first_date'],
+        'lastDate' => $dateRange['last_date'],
+        'regionRecords' => $totalRecords,
+        'uniqueRegions' => count($geoRegions),
+        'uniqueIPs' => count($ipData),
+        'topRegions' => $topRegions
+    ];
+
     header("Content-Type: " . $mimeType);
-    echo(json_encode($regionReport));
+    echo json_encode($response);
 }
 
 function getRegionForIP($ip) {
-    $serviceURL = "http://museum.weboslives.eu/dqidqsrwpnhotjldxljdhkxubidheffi/fhlyggephfhwaljgtxwqxmyhuvdexcjr.php?ip=" . $ip;
+    // Skip private/local IPs
+    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
+        return null;
+    }
+
+    $serviceURL = "http://museum.weboslives.eu/dqidqsrwpnhotjldxljdhkxubidheffi/fhlyggephfhwaljgtxwqxmyhuvdexcjr.php?ip=" . urlencode($ip);
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $serviceURL);
     curl_setopt($ch, CURLOPT_HEADER, 0);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 5); // 5 second timeout per request
     $regionData = curl_exec($ch);
     curl_close($ch);
     return $regionData;
 }
-
 ?>
