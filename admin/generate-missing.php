@@ -43,10 +43,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate'])) {
         $count = count($missingApps);
         $basePath = __DIR__ . '/..';
 
-        // Generate missing.txt - Simple readable format
-        $txtContent = "webOS App Museum II - Missing Apps List\n";
+        // Check write permissions
+        if (!is_writable($basePath)) {
+            throw new Exception("Directory is not writable: $basePath\nRun: sudo chown www-data:www-data " . realpath($basePath) . "/wanted.* or sudo chmod 775 " . realpath($basePath));
+        }
+
+        // Generate wanted.txt - Simple readable format
+        $txtContent = "webOS App Museum II - Wanted Apps List\n";
         $txtContent .= "Generated: " . date('Y-m-d H:i:s') . "\n";
-        $txtContent .= "Total Missing: $count apps\n";
+        $txtContent .= "Total Wanted: $count apps\n";
         $txtContent .= str_repeat("=", 60) . "\n\n";
 
         foreach ($missingApps as $app) {
@@ -60,10 +65,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate'])) {
             $txtContent .= "\n";
         }
 
-        file_put_contents($basePath . '/missing.txt', $txtContent);
+        $txtPath = $basePath . '/wanted.txt';
+        if (file_put_contents($txtPath, $txtContent) === false) {
+            throw new Exception("Failed to write wanted.txt. Check file permissions.");
+        }
 
-        // Generate missing.csv - Full data for analysis
-        $csvFile = fopen($basePath . '/missing.csv', 'w');
+        // Generate wanted.csv - Full data for analysis
+        $csvPath = $basePath . '/wanted.csv';
+        $csvFile = fopen($csvPath, 'w');
+        if ($csvFile === false) {
+            throw new Exception("Failed to open wanted.csv for writing. Check file permissions.");
+        }
 
         // Header row
         fputcsv($csvFile, [
@@ -97,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate'])) {
 
         fclose($csvFile);
 
-        $message = "Successfully generated missing.txt and missing.csv with $count apps.";
+        $message = "Successfully generated wanted.txt and wanted.csv with $count apps.";
 
     } catch (Exception $e) {
         $error = "Error generating files: " . $e->getMessage();
@@ -109,10 +121,10 @@ $stats = $db->query("SELECT COUNT(*) as count FROM apps WHERE status = 'missing'
 $missingCount = $stats['count'];
 
 // Check if files exist
-$txtExists = file_exists(__DIR__ . '/../missing.txt');
-$csvExists = file_exists(__DIR__ . '/../missing.csv');
-$txtModified = $txtExists ? date('Y-m-d H:i:s', filemtime(__DIR__ . '/../missing.txt')) : 'N/A';
-$csvModified = $csvExists ? date('Y-m-d H:i:s', filemtime(__DIR__ . '/../missing.csv')) : 'N/A';
+$txtExists = file_exists(__DIR__ . '/../wanted.txt');
+$csvExists = file_exists(__DIR__ . '/../wanted.csv');
+$txtModified = $txtExists ? date('Y-m-d H:i:s', filemtime(__DIR__ . '/../wanted.txt')) : 'N/A';
+$csvModified = $csvExists ? date('Y-m-d H:i:s', filemtime(__DIR__ . '/../wanted.csv')) : 'N/A';
 
 include 'includes/header.php';
 ?>
@@ -127,7 +139,7 @@ include 'includes/header.php';
 <?php endif; ?>
 
 <?php if ($error): ?>
-<div class="alert alert-error"><?php echo htmlspecialchars($error); ?></div>
+<div class="alert alert-error"><pre style="margin:0;white-space:pre-wrap;"><?php echo htmlspecialchars($error); ?></pre></div>
 <?php endif; ?>
 
 <div class="card">
@@ -141,22 +153,22 @@ include 'includes/header.php';
                 <td><strong><?php echo number_format($missingCount); ?></strong> apps</td>
             </tr>
             <tr>
-                <th>missing.txt</th>
+                <th>wanted.txt</th>
                 <td>
                     <?php if ($txtExists): ?>
                         <span style="color: green;">Exists</span> - Last modified: <?php echo $txtModified; ?>
-                        <br><a href="../missing.txt" target="_blank">View file</a>
+                        <br><a href="../wanted.txt" target="_blank">View file</a>
                     <?php else: ?>
                         <span style="color: red;">Not generated</span>
                     <?php endif; ?>
                 </td>
             </tr>
             <tr>
-                <th>missing.csv</th>
+                <th>wanted.csv</th>
                 <td>
                     <?php if ($csvExists): ?>
                         <span style="color: green;">Exists</span> - Last modified: <?php echo $csvModified; ?>
-                        <br><a href="../missing.csv" target="_blank">Download CSV</a>
+                        <br><a href="../wanted.csv" target="_blank">Download CSV</a>
                     <?php else: ?>
                         <span style="color: red;">Not generated</span>
                     <?php endif; ?>
@@ -176,11 +188,11 @@ include 'includes/header.php';
         <h2>File Descriptions</h2>
     </div>
     <div class="card-body">
-        <h3>missing.txt</h3>
-        <p>Human-readable text file listing all missing apps with basic info (ID, title, author, category).
+        <h3>wanted.txt</h3>
+        <p>Human-readable text file listing all wanted/missing apps with basic info (ID, title, author, category).
         Easy to read and share with the community.</p>
 
-        <h3>missing.csv</h3>
+        <h3>wanted.csv</h3>
         <p>Full CSV export with all app data including device compatibility flags.
         Useful for analysis, tracking recovery progress, and importing into spreadsheets.</p>
     </div>
