@@ -61,21 +61,23 @@ foreach ($apps as $app) {
 
     $json = @file_get_contents($url, false, $context);
 
+    $lastModified = null;
+
     if ($json === false) {
-        echo "SKIP: #{$id} '{$title}' - JSON file not found\n";
-        $skipped++;
-        continue;
+        // JSON file not found - use default date
+        $lastModified = '2014-09-06T12:00:00';
+        echo "DEFAULT: #{$id} '{$title}' - JSON not found, using default date\n";
+    } else {
+        $data = json_decode($json, true);
+
+        if (!$data || !isset($data['lastModifiedTime']) || empty($data['lastModifiedTime'])) {
+            // Use default date for apps without lastModifiedTime
+            $lastModified = '2014-09-06T12:00:00';
+            echo "DEFAULT: #{$id} '{$title}' - No date in JSON, using default\n";
+        } else {
+            $lastModified = $data['lastModifiedTime'];
+        }
     }
-
-    $data = json_decode($json, true);
-
-    if (!$data || !isset($data['lastModifiedTime'])) {
-        echo "SKIP: #{$id} '{$title}' - No lastModifiedTime in JSON\n";
-        $skipped++;
-        continue;
-    }
-
-    $lastModified = $data['lastModifiedTime'];
 
     // Convert to MySQL datetime format
     $timestamp = strtotime($lastModified);
