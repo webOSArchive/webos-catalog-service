@@ -47,13 +47,13 @@ if ($_safe != "on")
 	$adult = "&adult=true";
 
 //Support for sort order
-$_sort = "alpha";
+$_sort = "recent";
 if (isset($_COOKIE["sortorder"]))
 	$_sort = $_COOKIE["sortorder"];
 if (isset($_GET['sort'])) {
 	$_sort = $_GET['sort'];
 	$_sort = preg_replace("/[^a-zA-Z]+/", "", $_sort);
-	if ($_sort !== 'recommended') $_sort = 'alpha';
+	if (!in_array($_sort, ['alpha', 'recommended', 'recent'])) $_sort = 'recent';
 	setcookie("sortorder", $_sort, time() + 86400 * 30, "/");
 }
 
@@ -146,15 +146,16 @@ include('meta-social-common.php');
 					$category = preg_replace("/[^a-zA-Z0-9 ]+/", "", $category);
 					echo ("<h3>Category: " . $category . "</h3>");
 					// Sort toggle
+					$sortRecentUrl = "showMuseum.php?category=" . urlencode($_GET['category']) . "&count=" . $_GET['count'] . "&sort=recent";
 					$sortAlphaUrl = "showMuseum.php?category=" . urlencode($_GET['category']) . "&count=" . $_GET['count'] . "&sort=alpha";
 					$sortRecUrl = "showMuseum.php?category=" . urlencode($_GET['category']) . "&count=" . $_GET['count'] . "&sort=recommended";
 					echo "<div class='legal' style='margin-bottom:10px;'>";
 					echo "Sort: ";
-					if ($_sort == 'alpha') {
-						echo "<b>Alphabetical</b> | <a href='{$sortRecUrl}'>Recommended</a>";
-					} else {
-						echo "<a href='{$sortAlphaUrl}'>Alphabetical</a> | <b>Recommended</b>";
-					}
+					echo ($_sort == 'recent') ? "<b>Recently Updated</b>" : "<a href='{$sortRecentUrl}'>Recently Updated</a>";
+					echo " | ";
+					echo ($_sort == 'alpha') ? "<b>Alphabetical</b>" : "<a href='{$sortAlphaUrl}'>Alphabetical</a>";
+					echo " | ";
+					echo ($_sort == 'recommended') ? "<b>Recommended</b>" : "<a href='{$sortRecUrl}'>Recommended</a>";
 					echo "</div>";
 				}
 				if (isset($_GET['search'])) {
