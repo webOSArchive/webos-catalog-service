@@ -14,7 +14,7 @@ if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
 $title = "webOS App Museum II";
 $subtitle = " | webOS Archive";
 $description = "The App Museum is a community project to archive, restore and provide access to the historical catalog of apps for Palm/HP's defunct mobile platform, webOS.";
-$github = "https://github.com/webosarchive/";
+$github = "https://github.com/webOSArchive/webos-catalog-service";
 $homeLink = $PROTOCOL."://appcatalog.webosarchive.org";
 $icon = $homeLink."/assets/icon.png";
 
@@ -86,7 +86,7 @@ echo file_get_contents("https://www.webosarchive.org/menu.php?docRoot=" . $docRo
         </a> | <a href="http://www.webosarchive.org/docs/appstores/">Help</a>
         <br>
         <a class="download-link" href="https://github.com/h8pewou/legacy-webos-feeds/blob/main/README.md#wosa-feed">
-           <img src="assets/preware-icon.png" style="vertical-align:middle" alt="Add to Preware" title="Add to Preware" width="48" height="48"/> Add to Preware</a> | <a href="https://archive.org/details/webosappcatalog"> Download Archive
+           <img src="assets/preware-icon.png" style="vertical-align:middle" alt="Add to Preware" title="Add to Preware" width="48" height="48"/> Add to Preware</a> | <a href="https://archive.org/details/webosappcatalog"> Full Archive
         </a>
         <br>
         <a class="download-link" href="showMuseum.php">
