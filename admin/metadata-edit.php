@@ -24,6 +24,7 @@ if (!$app) {
 }
 
 $metadata = $metaRepo->getForAdmin($id);
+$images = $metaRepo->getImages($id);
 $pageTitle = 'Edit Metadata: ' . $app['title'];
 $errors = [];
 $success = false;
@@ -58,10 +59,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'mediaIcon' => trim($_POST['mediaIcon'] ?? '')
     ];
 
+    // Process screenshots
+    $imageData = [];
+    if (isset($_POST['screenshot']) && is_array($_POST['screenshot'])) {
+        foreach ($_POST['screenshot'] as $order => $screenshot) {
+            $screenshot = trim($screenshot);
+            $thumbnail = trim($_POST['thumbnail'][$order] ?? '');
+            if (!empty($screenshot)) {
+                $imageData[$order] = [
+                    'screenshot' => $screenshot,
+                    'thumbnail' => $thumbnail ?: $screenshot, // Default thumbnail to screenshot if not provided
+                    'orientation' => $_POST['orientation'][$order] ?? 'P',
+                    'device' => $_POST['device'][$order] ?? 'P'
+                ];
+            }
+        }
+    }
+
     try {
         $metaRepo->upsert($id, $data);
+        $metaRepo->updateImages($id, $imageData);
         $success = true;
         $metadata = $metaRepo->getForAdmin($id);
+        $images = $metaRepo->getImages($id);
     } catch (Exception $e) {
         $errors[] = 'Database error: ' . $e->getMessage();
     }
@@ -220,6 +240,67 @@ include 'includes/header.php';
                     <input type="text" name="locale" value="<?php echo htmlspecialchars($metadata['locale'] ?? 'en_US'); ?>">
                     <small>e.g., en_US, de_DE</small>
                 </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Screenshots</legend>
+                <p><small>Enter paths relative to the image host (e.g., "1005819/screenshot1.png") or full URLs.</small></p>
+                <div id="screenshots-container">
+                    <?php
+                    // Convert images array to sequential for easier handling
+                    $imageList = [];
+                    if (!empty($images)) {
+                        foreach ($images as $key => $img) {
+                            $imageList[] = $img;
+                        }
+                    }
+                    // Show at least 3 rows, or more if there are more images
+                    $rowCount = max(3, count($imageList) + 1);
+                    for ($i = 1; $i <= $rowCount; $i++):
+                        $img = $imageList[$i - 1] ?? null;
+                    ?>
+                    <div class="screenshot-row" style="display:grid;grid-template-columns:2fr 2fr 80px 80px;gap:10px;margin-bottom:10px;align-items:end;">
+                        <div class="form-group" style="margin:0;">
+                            <?php if ($i === 1): ?><label>Screenshot Path</label><?php endif; ?>
+                            <input type="text" name="screenshot[<?php echo $i; ?>]" value="<?php echo htmlspecialchars($img['screenshot'] ?? ''); ?>" placeholder="path/to/screenshot.png">
+                        </div>
+                        <div class="form-group" style="margin:0;">
+                            <?php if ($i === 1): ?><label>Thumbnail Path</label><?php endif; ?>
+                            <input type="text" name="thumbnail[<?php echo $i; ?>]" value="<?php echo htmlspecialchars($img['thumbnail'] ?? ''); ?>" placeholder="path/to/thumb.png (optional)">
+                        </div>
+                        <div class="form-group" style="margin:0;">
+                            <?php if ($i === 1): ?><label>Orient.</label><?php endif; ?>
+                            <select name="orientation[<?php echo $i; ?>]">
+                                <option value="P" <?php echo ($img['orientation'] ?? 'P') === 'P' ? 'selected' : ''; ?>>Portrait</option>
+                                <option value="L" <?php echo ($img['orientation'] ?? '') === 'L' ? 'selected' : ''; ?>>Landscape</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin:0;">
+                            <?php if ($i === 1): ?><label>Device</label><?php endif; ?>
+                            <select name="device[<?php echo $i; ?>]">
+                                <option value="P" <?php echo ($img['device'] ?? 'P') === 'P' ? 'selected' : ''; ?>>Phone</option>
+                                <option value="T" <?php echo ($img['device'] ?? '') === 'T' ? 'selected' : ''; ?>>Tablet</option>
+                            </select>
+                        </div>
+                    </div>
+                    <?php endfor; ?>
+                </div>
+                <button type="button" class="btn btn-sm" onclick="addScreenshotRow()">+ Add Screenshot Row</button>
+                <script>
+                var screenshotCount = <?php echo $rowCount; ?>;
+                function addScreenshotRow() {
+                    screenshotCount++;
+                    var container = document.getElementById('screenshots-container');
+                    var row = document.createElement('div');
+                    row.className = 'screenshot-row';
+                    row.style = 'display:grid;grid-template-columns:2fr 2fr 80px 80px;gap:10px;margin-bottom:10px;align-items:end;';
+                    row.innerHTML = '<div class="form-group" style="margin:0;"><input type="text" name="screenshot[' + screenshotCount + ']" placeholder="path/to/screenshot.png"></div>' +
+                        '<div class="form-group" style="margin:0;"><input type="text" name="thumbnail[' + screenshotCount + ']" placeholder="path/to/thumb.png (optional)"></div>' +
+                        '<div class="form-group" style="margin:0;"><select name="orientation[' + screenshotCount + ']"><option value="P">Portrait</option><option value="L">Landscape</option></select></div>' +
+                        '<div class="form-group" style="margin:0;"><select name="device[' + screenshotCount + ']"><option value="P">Phone</option><option value="T">Tablet</option></select></div>';
+                    container.appendChild(row);
+                }
+                </script>
             </fieldset>
 
             <fieldset>
