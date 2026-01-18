@@ -67,15 +67,20 @@ App data is stored in MySQL. Key tables:
 | `getMuseumMaster.php` | 120/hour | Catalog listing |
 | `getMuseumDetails.php` | 200/hour | App details with related apps |
 
+**Sort Options** (for `getMuseumMaster.php` and web frontend):
+- `recent` (default) - By `app_metadata.last_modified_time` descending
+- `alpha` - Alphabetical by title
+- `recommended` - By `apps.recommendation_order` descending
+
 ### Admin UI (admin/)
 
 CRUD interface for managing catalog data. Secured via nginx basic auth.
 
 | Page | Purpose |
 |------|---------|
-| `apps.php` | App list with search/filter |
-| `app-edit.php` | Create/edit apps |
-| `metadata-edit.php` | Edit extended metadata and screenshots |
+| `apps.php` | App list with search/filter/sort (by title, recommendation, or ID) |
+| `app-edit.php` | Create/edit apps (includes recommendation_order) |
+| `metadata-edit.php` | Edit extended metadata, screenshots, and lastModifiedTime |
 
 ### Web Interface
 
