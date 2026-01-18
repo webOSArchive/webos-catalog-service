@@ -30,8 +30,8 @@ class AppRepository {
         } elseif ($sort === 'alpha') {
             $orderBy = 'a.title';
         } else {
-            // Default: recent (by updated_at descending, NULLs last)
-            $orderBy = 'a.updated_at IS NULL, a.updated_at DESC, a.title';
+            // Default: recent (by app's last_modified_time descending, NULLs last)
+            $orderBy = 'm.last_modified_time IS NULL, m.last_modified_time DESC, a.title';
         }
 
         $sql = "
@@ -59,6 +59,7 @@ class AppRepository {
                 a.status
             FROM apps a
             LEFT JOIN categories c ON a.category_id = c.id
+            LEFT JOIN app_metadata m ON a.id = m.app_id
             WHERE a.status IN ($placeholders)
             ORDER BY $orderBy
         ";
@@ -265,6 +266,7 @@ class AppRepository {
                 a.recommendation_order AS recommendationOrder
             FROM apps a
             LEFT JOIN categories c ON a.category_id = c.id
+            LEFT JOIN app_metadata m ON a.id = m.app_id
             WHERE a.status IN ($statusPlaceholders)
         ";
 
@@ -290,8 +292,8 @@ class AppRepository {
         } elseif ($sort === 'alpha') {
             $orderBy = 'a.title';
         } else {
-            // Default: recent (by updated_at descending, NULLs last)
-            $orderBy = 'a.updated_at IS NULL, a.updated_at DESC, a.title';
+            // Default: recent (by app's last_modified_time descending, NULLs last)
+            $orderBy = 'm.last_modified_time IS NULL, m.last_modified_time DESC, a.title';
         }
         $sql .= " ORDER BY $orderBy";
 
