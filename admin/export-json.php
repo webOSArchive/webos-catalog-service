@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['export'])) {
     try {
         // Build query based on status
         if ($status === 'all') {
-            $statuses = ['active', 'newer', 'missing', 'archived'];
+            $statuses = ['active', 'missing', 'archived'];
         } else {
             $statuses = [$status];
         }

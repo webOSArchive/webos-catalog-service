@@ -5,7 +5,7 @@ include('../common.php');
 require_once __DIR__ . '/../includes/LogRepository.php';
 
 //Load archives
-$fullcatalog = load_catalogs(array("../newerAppData.json", "../archivedAppData.json"));
+$fullcatalog = load_catalogs();
 
 // Initialize log repository
 $logRepo = null;

@@ -18,14 +18,20 @@ $stats = [];
 
 // App counts by status
 $stmt = $db->query("SELECT status, COUNT(*) as count FROM apps GROUP BY status");
-$statusCounts = ['active' => 0, 'newer' => 0, 'missing' => 0, 'archived' => 0];
+$statusCounts = ['active' => 0, 'missing' => 0, 'archived' => 0];
 while ($row = $stmt->fetch()) {
-    $statusCounts[$row['status']] = (int)$row['count'];
+    if (isset($statusCounts[$row['status']])) {
+        $statusCounts[$row['status']] = (int)$row['count'];
+    }
 }
+
+// Post-shutdown (community) apps count
+$stmt = $db->query("SELECT COUNT(*) FROM apps WHERE post_shutdown = 1");
+$postShutdownCount = (int)$stmt->fetchColumn();
 
 $stats['total_apps'] = array_sum($statusCounts);
 $stats['active_apps'] = $statusCounts['active'];
-$stats['newer_apps'] = $statusCounts['newer'];
+$stats['post_shutdown_apps'] = $postShutdownCount;
 $stats['missing_apps'] = $statusCounts['missing'];
 
 // Metadata count
@@ -69,8 +75,8 @@ include 'includes/header.php';
         <p>Active Catalog</p>
     </div>
     <div class="stat-card">
-        <h3><?php echo number_format($stats['newer_apps']); ?></h3>
-        <p>Newer Apps</p>
+        <h3><?php echo number_format($stats['post_shutdown_apps']); ?></h3>
+        <p>Post-Shutdown</p>
     </div>
     <a href="generate-missing.php" class="stat-card warning" style="text-decoration:none;">
         <h3><?php echo number_format($stats['missing_apps']); ?></h3>

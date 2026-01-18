@@ -208,7 +208,7 @@ include 'includes/header.php';
                 <select name="status">
                     <?php
                     $currentStatus = $app['status'] ?? $_POST['status'] ?? 'active';
-                    $statuses = ['active' => 'Active', 'newer' => 'Newer', 'missing' => 'Missing', 'archived' => 'Archived'];
+                    $statuses = ['active' => 'Active', 'missing' => 'Missing', 'archived' => 'Archived'];
                     foreach ($statuses as $val => $label):
                     ?>
                     <option value="<?php echo $val; ?>" <?php echo $currentStatus === $val ? 'selected' : ''; ?>>
@@ -216,7 +216,7 @@ include 'includes/header.php';
                     </option>
                     <?php endforeach; ?>
                 </select>
-                <small>Active = Main catalog, Newer = Post-freeze apps, Missing = Needs IPK, Archived = Historical only</small>
+                <small>Active = Main catalog, Missing = Needs IPK, Archived = Historical only. Use "Post-Shutdown" flag for community apps.</small>
             </div>
 
             <div class="form-group">

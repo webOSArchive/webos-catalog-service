@@ -17,11 +17,11 @@ class AppRepository {
     /**
      * Load apps from database - replaces load_catalogs()
      *
-     * @param array $statuses Which statuses to include ['active', 'newer', etc]
+     * @param array $statuses Which statuses to include ['active', 'missing', 'archived']
      * @param string $sort Sort order: 'alpha' (default) or 'recommended'
      * @return array Apps in format matching original JSON structure
      */
-    public function loadCatalog($statuses = ['active', 'newer'], $sort = 'alpha') {
+    public function loadCatalog($statuses = ['active'], $sort = 'alpha') {
         $placeholders = str_repeat('?,', count($statuses) - 1) . '?';
 
         // Determine sort order
@@ -90,7 +90,7 @@ class AppRepository {
      * @param array $statuses Which statuses to search
      * @return array Matching apps
      */
-    public function searchApps($searchStr, $adult = false, $statuses = ['active', 'newer']) {
+    public function searchApps($searchStr, $adult = false, $statuses = ['active']) {
         $searchStr = $this->sanitizeSearch($searchStr);
         if (empty($searchStr)) {
             return [];
@@ -168,7 +168,7 @@ class AppRepository {
      * @param array $statuses Which statuses to search
      * @return array Matching apps
      */
-    public function searchByAuthor($authorStr, $adult = false, $statuses = ['active', 'newer']) {
+    public function searchByAuthor($authorStr, $adult = false, $statuses = ['active']) {
         $authorStr = $this->sanitizeSearch($authorStr);
         if (empty($authorStr)) {
             return [];
@@ -235,7 +235,7 @@ class AppRepository {
      * @param string $sort Sort order: 'alpha' (default) or 'recommended'
      * @return array Filtered apps
      */
-    public function filterByCategory($category, $adult = false, $limit = 0, $statuses = ['active', 'newer'], $sort = 'alpha') {
+    public function filterByCategory($category, $adult = false, $limit = 0, $statuses = ['active'], $sort = 'alpha') {
         $statusPlaceholders = str_repeat('?,', count($statuses) - 1) . '?';
 
         $sql = "
@@ -303,7 +303,7 @@ class AppRepository {
      * @param array $statuses Which statuses to include
      * @return array Apps by this vendor
      */
-    public function getByVendorId($vendorId, $adult = false, $statuses = ['active', 'newer']) {
+    public function getByVendorId($vendorId, $adult = false, $statuses = ['active']) {
         $statusPlaceholders = str_repeat('?,', count($statuses) - 1) . '?';
 
         $sql = "
@@ -427,7 +427,7 @@ class AppRepository {
      * @param array $statuses Which statuses to include
      * @return array|null Random app or null
      */
-    public function getRandom($adult = false, $statuses = ['active', 'newer']) {
+    public function getRandom($adult = false, $statuses = ['active']) {
         $statusPlaceholders = str_repeat('?,', count($statuses) - 1) . '?';
 
         $sql = "
@@ -476,7 +476,7 @@ class AppRepository {
      * @param array $statuses Which statuses to count
      * @return array Category name => count
      */
-    public function getCategoryCounts($adult = false, $statuses = ['active', 'newer']) {
+    public function getCategoryCounts($adult = false, $statuses = ['active']) {
         $statusPlaceholders = str_repeat('?,', count($statuses) - 1) . '?';
 
         $sql = "
@@ -530,7 +530,7 @@ class AppRepository {
      * @return int Count of matching apps
      */
     public function getCount($filters = []) {
-        $statuses = $filters['statuses'] ?? ['active', 'newer'];
+        $statuses = $filters['statuses'] ?? ['active'];
         $statusPlaceholders = str_repeat('?,', count($statuses) - 1) . '?';
 
         $sql = "SELECT COUNT(*) FROM apps a WHERE a.status IN ($statusPlaceholders)";
@@ -803,7 +803,7 @@ class AppRepository {
                 (ar.app_id = ? AND a.id = ar.related_app_id) OR
                 (ar.related_app_id = ? AND a.id = ar.app_id)
             )
-            WHERE a.status IN ('active', 'newer')
+            WHERE a.status = 'active'
             ORDER BY a.title
             LIMIT ?
         ";

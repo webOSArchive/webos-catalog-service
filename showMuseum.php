@@ -61,7 +61,7 @@ if (isset($_GET['sort'])) {
 require_once __DIR__ . '/includes/AppRepository.php';
 $appRepo = new AppRepository();
 $_adult = strpos($adult, 'true') !== false;
-$category_counts = $appRepo->getCategoryCounts($_adult, ['active', 'newer']);
+$category_counts = $appRepo->getCategoryCounts($_adult, ['active']);
 $category_master = array("appCount" => $category_counts);
 $category_list = array_keys($category_counts);
 sort($category_list);
@@ -74,7 +74,7 @@ if (isset($_GET['category']) && isset($_GET['count']))
 	$count = preg_replace("/[^0-9]+/", "", $_GET['count']);
 
 	// Load catalog directly instead of HTTP request
-	$fullcatalog = load_catalogs(array("newerAppData.json", "archivedAppData.json"));
+	$fullcatalog = load_catalogs();
 	$_adult = strpos($adult, 'true') !== false;
 
 	$results = filter_apps_by_category($fullcatalog, $category, $_adult, $count, $_sort);
@@ -85,7 +85,7 @@ elseif (isset($_GET['search']))
 	$search = preg_replace("/[^a-zA-Z0-9 ]+/", "", $_GET['search']);
 	
 	// Load catalog directly instead of HTTP request  
-	$fullcatalog = load_catalogs(array("newerAppData.json", "archivedAppData.json"));
+	$fullcatalog = load_catalogs();
 	$search_str = strtolower($search);
 	$_adult = strpos($adult, 'true') !== false;
 	

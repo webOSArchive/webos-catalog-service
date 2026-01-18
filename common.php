@@ -41,21 +41,19 @@ function render_social($link, $basePath) {
  * @param array $catalogs - Array of catalog file names (used to determine statuses)
  * @return array - Array of apps
  */
-function load_catalogs($catalogs) {
-	// Map old file names to database statuses
+function load_catalogs($catalogs = []) {
+	// Map old file names to database statuses (for backward compatibility)
 	$statuses = [];
 	foreach ($catalogs as $catalog) {
 		$catalog = strtolower(basename($catalog));
 		if (strpos($catalog, 'archived') !== false) $statuses[] = 'active';
-		if (strpos($catalog, 'newer') !== false) $statuses[] = 'newer';
 		if (strpos($catalog, 'master') !== false) $statuses[] = 'archived';
 		if (strpos($catalog, 'missing') !== false) $statuses[] = 'missing';
-		if (strpos($catalog, 'outofdate') !== false) $statuses[] = 'active'; // Old version handling
 	}
 
-	// Default to active + newer if no specific statuses determined
+	// Default to active if no specific statuses determined
 	if (empty($statuses)) {
-		$statuses = ['active', 'newer'];
+		$statuses = ['active'];
 	}
 
 	$repo = new AppRepository();
@@ -100,7 +98,7 @@ function search_apps_by_author($catalog, $search_str, $adult = false) {
  */
 function filter_apps_by_category($catalog, $category, $adult = false, $limit = 0, $sort = 'alpha') {
 	$repo = new AppRepository();
-	return $repo->filterByCategory($category, $adult, $limit, ['active', 'newer'], $sort);
+	return $repo->filterByCategory($category, $adult, $limit, ['active'], $sort);
 }
 
 /**

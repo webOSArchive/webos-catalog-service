@@ -126,11 +126,8 @@ if ($_showOnlyMis) {
 
 $extraData = array();
 
-// Determine which statuses to load based on museum version
-$statuses = ['active', 'newer'];
-if (in_array($_museumVersion, array("0.0.0", "2.8.0", "2.8.1", "2.8.2", "2.9.0"))) {
-	$statuses = ['active']; // Old versions only see active catalog
-}
+// All apps are now in 'active' status (post_shutdown flag indicates community apps)
+$statuses = ['active'];
 
 // Load master data from database
 $masterdata = $appRepo->loadCatalog($statuses, $_sort);

@@ -42,10 +42,13 @@ App data is stored in MySQL. Key tables:
 | `update_check_logs` | Update check tracking |
 
 **App Status Values:**
-- `active` - Main catalog
-- `newer` - Post-freeze submissions
+- `active` - Main catalog (includes all available apps)
 - `missing` - Apps needing IPKs
 - `archived` - Historical reference only
+
+**Content Flags:**
+- `post_shutdown` - Community-created apps after platform EOL
+- `adult` - Adult content
 
 ### Repository Layer (includes/)
 
