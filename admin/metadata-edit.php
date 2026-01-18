@@ -36,6 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'description' => trim($_POST['description'] ?? ''),
         'version' => trim($_POST['version'] ?? ''),
         'versionNote' => trim($_POST['versionNote'] ?? ''),
+        'lastModifiedTime' => trim($_POST['lastModifiedTime'] ?? ''),
         'homeURL' => trim($_POST['homeURL'] ?? ''),
         'supportURL' => trim($_POST['supportURL'] ?? ''),
         'custsupportemail' => trim($_POST['custsupportemail'] ?? ''),
@@ -137,6 +138,18 @@ include 'includes/header.php';
             <div class="form-group">
                 <label>Version Notes / Changelog</label>
                 <textarea name="versionNote" rows="4"><?php echo htmlspecialchars($metadata['version_note'] ?? ''); ?></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Last Modified Time</label>
+                <input type="datetime-local" name="lastModifiedTime" value="<?php
+                    $lmt = $metadata['last_modified_time'] ?? '';
+                    if ($lmt) {
+                        // Convert to datetime-local format (YYYY-MM-DDTHH:MM)
+                        echo date('Y-m-d\TH:i', strtotime($lmt));
+                    }
+                ?>">
+                <small>When the app was last updated (used for "Recently Updated" sort)</small>
             </div>
 
             <div class="form-group">
