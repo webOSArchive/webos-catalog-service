@@ -311,8 +311,8 @@ include('meta-social-app.php');
 <!-- Lightbox overlay - click anywhere to close -->
 <div id="lightbox-overlay" onclick="closeLightbox()">
 	<span id="lightbox-close" title="Close">&times;</span>
-	<span id="lightbox-prev" onclick="prevImage(event)" title="Previous">&#10094;</span>
-	<span id="lightbox-next" onclick="nextImage(event)" title="Next">&#10095;</span>
+	<span id="lightbox-prev" onclick="prevImage(event)" title="Previous">&lsaquo;</span>
+	<span id="lightbox-next" onclick="nextImage(event)" title="Next">&rsaquo;</span>
 	<img id="lightbox-img" src="" alt="Screenshot">
 </div>
 <?php include("menu.php") ?>
