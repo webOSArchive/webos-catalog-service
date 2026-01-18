@@ -24,7 +24,6 @@ $package_mirror_secure = 'appstorage.webosarchive.org/packages';
 return array(
         // Public config (exposed via API)
         'service_host' => 'appcatalog.webosarchive.org',
-        'metadata_host' => 'appmetadata.webosarchive.org',
         'image_host' => select_lb_resource($image_mirrors),
         'package_host' => select_lb_resource($package_mirror_plain),
         'package_host_secure' => $package_mirror_secure,
