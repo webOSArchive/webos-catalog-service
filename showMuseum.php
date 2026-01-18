@@ -144,7 +144,7 @@ include('meta-social-common.php');
 				if (isset($_GET['category'])) {
 					$category = $_GET['category'];
 					$category = preg_replace("/[^a-zA-Z0-9 ]+/", "", $category);
-					echo ("<h3>Category: " . $category . "</h3>");
+					echo ("<h3>Category: " . htmlspecialchars($category) . "</h3>");
 					// Sort toggle
 					$sortRecentUrl = "showMuseum.php?category=" . urlencode($_GET['category']) . "&count=" . $_GET['count'] . "&sort=recent";
 					$sortAlphaUrl = "showMuseum.php?category=" . urlencode($_GET['category']) . "&count=" . $_GET['count'] . "&sort=alpha";
@@ -161,7 +161,7 @@ include('meta-social-common.php');
 				if (isset($_GET['search'])) {
 					$searchTerm = $_GET['search'];
 					$searchTerm = preg_replace("/[^a-zA-Z0-9 ]+/", "", $searchTerm);
-					echo ("<h3>Search Results: '" . $searchTerm . "'</h3>");
+					echo ("<h3>Search Results: '" . htmlspecialchars($searchTerm) . "'</h3>");
 				}
 				echo("<table cellpadding='5'>");
 				foreach($app_response["data"] as $app) {
