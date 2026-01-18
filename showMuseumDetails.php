@@ -157,7 +157,7 @@ if (document.addEventListener) {
 	font-size: 50px;
 	font-weight: bold;
 	cursor: pointer;
-	padding: 10px 15px;
+	padding: 0 15px 20px 15px;
 	background-color: transparent;
 	background-color: rgba(0, 0, 0, 0.3);
 	-webkit-user-select: none;
