@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../includes/LogRepository.php';
+require_once __DIR__ . '/../../includes/AppRepository.php';
 
 if (!isset($config))
     $config = include('../config.php');
@@ -12,13 +13,31 @@ returnDownloadDataFormatted($config, $mimeType);
 
 function returnDownloadDataFormatted($config, $mimeType) {
     $logRepo = new LogRepository();
+    $appRepo = new AppRepository();
     $stats = $logRepo->getDownloadStats();
 
-    // Enrich top apps with app names from metadata
+    // Enrich top apps with app names from database first, fallback to metadata host
     foreach ($stats['topApps'] as $rank => &$app) {
-        $appDetail = getDetailData($config["metadata_host"], $app['appId']);
-        if (is_array($appDetail) && isset($appDetail['publicApplicationId'])) {
-            $app['appName'] = $appDetail['publicApplicationId'];
+        $appName = null;
+
+        // Try database first (faster and more reliable)
+        if (is_numeric($app['appId'])) {
+            $dbApp = $appRepo->getById((int)$app['appId']);
+            if ($dbApp && !empty($dbApp['title'])) {
+                $appName = $dbApp['title'];
+            }
+        }
+
+        // Fallback to external metadata host if not in database
+        if (!$appName) {
+            $appDetail = getDetailData($config["metadata_host"], $app['appId']);
+            if (is_array($appDetail) && isset($appDetail['publicApplicationId'])) {
+                $appName = $appDetail['publicApplicationId'];
+            }
+        }
+
+        if ($appName) {
+            $app['appName'] = $appName;
         }
     }
 
