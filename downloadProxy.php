@@ -5,13 +5,6 @@
  * Proxies downloads from HTTP storage to HTTPS users.
  * Used by web UI only - API clients download directly.
  */
-session_start();
-
-// Validate session exists
-if (!isset($_SESSION['encode_salt'])) {
-    http_response_code(403);
-    die('Invalid session');
-}
 
 // Get encoded URL from request
 $encodedUrl = $_GET['url'] ?? '';
@@ -22,9 +15,12 @@ if (empty($encodedUrl)) {
     die('Missing URL parameter');
 }
 
-// Decode the URL (remove session salt and base64 decode)
-$salt = $_SESSION['encode_salt'];
-$encodedUrl = str_replace($salt, '', $encodedUrl);
+// Load config and get the encoding secret
+$config = include('WebService/config.php');
+$secret = $config['download_secret'] ?? 'webos_archive_default_secret';
+
+// Decode the URL (remove secret and base64 decode)
+$encodedUrl = str_replace($secret, '', $encodedUrl);
 $downloadUrl = base64_decode($encodedUrl);
 
 if (!$downloadUrl) {

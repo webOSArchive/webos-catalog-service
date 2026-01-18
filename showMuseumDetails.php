@@ -182,11 +182,8 @@ $config = include('WebService/config.php');
 include('common.php');
 require_once __DIR__ . '/includes/AppRepository.php';
 require_once __DIR__ . '/includes/MetadataRepository.php';
-session_start();
-if (!isset($_SESSION['encode_salt']))
-{
-	$_SESSION['encode_salt'] = uniqid();
-}
+// Use config-based secret for URL encoding (allows direct links to be shareable)
+$encode_secret = $config['download_secret'] ?? 'webos_archive_default_secret';
 // Find app - use direct ID lookup for numeric IDs, search for text
 $found_app = null;
 $found_id = null;
@@ -275,11 +272,11 @@ if (isset($app_detail["alternateFileName"]) && strpos($app_detail["alternateFile
 //	The complete archive will be posted elsewhere to save my bandwidth
 $downloadURI = base64_encode($plainURI);
 $splitPos = rand(1, strlen($downloadURI) - 2);
-$downloadURI = substr($downloadURI, 0, $splitPos) . $_SESSION['encode_salt'] . substr($downloadURI, $splitPos);
+$downloadURI = substr($downloadURI, 0, $splitPos) . $encode_secret . substr($downloadURI, $splitPos);
 if (isset($altPlainURI)) {
 	$altDownloadURI = base64_encode($altPlainURI);
 	$splitPos = rand(1, strlen($altDownloadURI) - 2);
-	$altDownloadURI = substr($altDownloadURI, 0, $splitPos) . $_SESSION['encode_salt'] . substr($altDownloadURI, $splitPos);
+	$altDownloadURI = substr($altDownloadURI, 0, $splitPos) . $encode_secret . substr($altDownloadURI, $splitPos);
 }
 
 //Figure out where to go back to
