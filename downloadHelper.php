@@ -13,13 +13,13 @@ function populateLink() {
 function getLink(encodedLink, appId)
 {
     countAppDownloads(appId);
-    //This is a simple obfuscation that uses a session variable from PHP
-    //  Please don't try to brute-force download apps -- my bandwidth can't take it
-    //  The entire archive will be available at http://appcatalog.webosarchive.org
-    var encodeSalt = "<?php echo ($_SESSION['encode_salt']) ?>";
-    encodedLink = encodedLink.replace(encodeSalt, "");
-    var downloadURL = atob(encodedLink);
-    window.open(downloadURL);
+    //Use proxy to serve HTTP files over HTTPS
+    //The encoded link includes a session salt for validation
+    var pageParts = window.location.pathname.split("/");
+    var lastPage = pageParts[pageParts.length-1];
+    var urlParts = window.location.href.split(lastPage);
+    var proxyURL = urlParts[0] + 'downloadProxy.php?url=' + encodeURIComponent(encodedLink) + '&appid=' + appId;
+    window.open(proxyURL);
 }
 
 function countAppDownloads(appId) {
