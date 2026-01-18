@@ -9,9 +9,57 @@ require_once __DIR__ . '/Database.php';
 
 class LogRepository {
     private $db;
+    private static $tablesChecked = false;
 
     public function __construct() {
         $this->db = Database::getInstance()->getConnection();
+        $this->ensureTablesExist();
+    }
+
+    /**
+     * Ensure log tables exist - creates them if missing (e.g., after restore without log tables)
+     */
+    private function ensureTablesExist() {
+        // Only check once per request
+        if (self::$tablesChecked) {
+            return;
+        }
+        self::$tablesChecked = true;
+
+        // Create download_logs if missing
+        $this->db->exec("
+            CREATE TABLE IF NOT EXISTS download_logs (
+                id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                app_id INT UNSIGNED NULL,
+                app_identifier VARCHAR(255) NULL,
+                source VARCHAR(255) NULL DEFAULT 'app',
+                ip_address VARCHAR(45) NULL,
+                user_agent TEXT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_app_id (app_id),
+                INDEX idx_app_identifier (app_identifier),
+                INDEX idx_source (source),
+                INDEX idx_created_at (created_at)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+        ");
+
+        // Create update_check_logs if missing
+        $this->db->exec("
+            CREATE TABLE IF NOT EXISTS update_check_logs (
+                id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                app_id INT UNSIGNED NULL,
+                app_name VARCHAR(255) NULL,
+                device_data VARCHAR(500) NULL,
+                client_info VARCHAR(500) NULL,
+                client_id VARCHAR(255) NULL,
+                ip_address VARCHAR(45) NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_app_id (app_id),
+                INDEX idx_app_name (app_name),
+                INDEX idx_client_id (client_id),
+                INDEX idx_created_at (created_at)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+        ");
     }
 
     // ============ Download Logging ============
