@@ -9,7 +9,10 @@ function showHelp() {
 }
 
 /* Lightbox for screenshots - ES5 compatible with fallback */
-function openLightbox(src) {
+var lightboxImages = [];
+var lightboxIndex = 0;
+
+function openLightbox(src, index) {
 	try {
 		var overlay = document.getElementById('lightbox-overlay');
 		var img = document.getElementById('lightbox-img');
@@ -17,6 +20,8 @@ function openLightbox(src) {
 			return true; /* fallback to normal link */
 		}
 		img.src = src;
+		lightboxIndex = index || 0;
+		updateNavVisibility();
 		overlay.style.display = 'block';
 		return false; /* prevent default link behavior */
 	} catch (e) {
@@ -35,12 +40,75 @@ function closeLightbox() {
 	}
 }
 
-/* Close on escape key */
+function prevImage(e) {
+	if (e && e.stopPropagation) {
+		e.stopPropagation();
+	} else if (window.event) {
+		window.event.cancelBubble = true;
+	}
+	try {
+		if (lightboxImages.length > 1 && lightboxIndex > 0) {
+			lightboxIndex--;
+			var img = document.getElementById('lightbox-img');
+			if (img) {
+				img.src = lightboxImages[lightboxIndex];
+				updateNavVisibility();
+			}
+		}
+	} catch (e) {
+		/* ignore errors */
+	}
+}
+
+function nextImage(e) {
+	if (e && e.stopPropagation) {
+		e.stopPropagation();
+	} else if (window.event) {
+		window.event.cancelBubble = true;
+	}
+	try {
+		if (lightboxImages.length > 1 && lightboxIndex < lightboxImages.length - 1) {
+			lightboxIndex++;
+			var img = document.getElementById('lightbox-img');
+			if (img) {
+				img.src = lightboxImages[lightboxIndex];
+				updateNavVisibility();
+			}
+		}
+	} catch (e) {
+		/* ignore errors */
+	}
+}
+
+function updateNavVisibility() {
+	try {
+		var prevBtn = document.getElementById('lightbox-prev');
+		var nextBtn = document.getElementById('lightbox-next');
+		if (prevBtn) {
+			prevBtn.style.visibility = (lightboxIndex > 0) ? 'visible' : 'hidden';
+		}
+		if (nextBtn) {
+			nextBtn.style.visibility = (lightboxIndex < lightboxImages.length - 1) ? 'visible' : 'hidden';
+		}
+	} catch (e) {
+		/* ignore errors */
+	}
+}
+
+/* Handle keyboard navigation: Escape to close, arrows to navigate */
 function handleLightboxKey(e) {
 	e = e || window.event;
 	var key = e.keyCode || e.which;
-	if (key === 27) {
+	var overlay = document.getElementById('lightbox-overlay');
+	if (!overlay || overlay.style.display !== 'block') {
+		return;
+	}
+	if (key === 27) { /* Escape */
 		closeLightbox();
+	} else if (key === 37) { /* Left arrow */
+		prevImage();
+	} else if (key === 39) { /* Right arrow */
+		nextImage();
 	}
 }
 if (document.addEventListener) {
@@ -79,6 +147,32 @@ if (document.addEventListener) {
 	cursor: pointer;
 }
 #lightbox-close:hover {
+	color: #cccccc;
+}
+#lightbox-prev, #lightbox-next {
+	position: absolute;
+	top: 50%;
+	margin-top: -25px;
+	color: #ffffff;
+	font-size: 50px;
+	font-weight: bold;
+	cursor: pointer;
+	padding: 10px 15px;
+	background-color: transparent;
+	background-color: rgba(0, 0, 0, 0.3);
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+#lightbox-prev {
+	left: 10px;
+}
+#lightbox-next {
+	right: 10px;
+}
+#lightbox-prev:hover, #lightbox-next:hover {
+	background-color: rgba(0, 0, 0, 0.6);
 	color: #cccccc;
 }
 </style>
@@ -217,6 +311,8 @@ include('meta-social-app.php');
 <!-- Lightbox overlay - click anywhere to close -->
 <div id="lightbox-overlay" onclick="closeLightbox()">
 	<span id="lightbox-close" title="Close">&times;</span>
+	<span id="lightbox-prev" onclick="prevImage(event)" title="Previous">&#10094;</span>
+	<span id="lightbox-next" onclick="nextImage(event)" title="Next">&#10095;</span>
 	<img id="lightbox-img" src="" alt="Screenshot">
 </div>
 <?php include("menu.php") ?>
@@ -274,6 +370,8 @@ include('meta-social-app.php');
 	<tr><td class="rowTitle">Screenshots</td>
 	<td colspan="2" class="rowDetail">
 	<?php
+	$screenshot_urls = array();
+	$screenshot_index = 0;
 	foreach ($app_detail["images"] as $value) {
 		if (strpos($value["screenshot"], "://") === false) {
 			$use_screenshot = $img_path.strtolower($value["screenshot"]);
@@ -285,9 +383,14 @@ include('meta-social-app.php');
 		} else {
 			$use_thumb = $value["thumbnail"];
 		}
-		echo("<a href='" . $use_screenshot . "' target='_blank' onclick=\"return openLightbox('" . htmlspecialchars($use_screenshot, ENT_QUOTES) . "')\"><img class='screenshot' src='" . $use_thumb . "' style='width:64px'></a>");
+		$screenshot_urls[] = $use_screenshot;
+		echo("<a href='" . $use_screenshot . "' target='_blank' onclick=\"return openLightbox('" . htmlspecialchars($use_screenshot, ENT_QUOTES) . "', " . $screenshot_index . ")\"><img class='screenshot' src='" . $use_thumb . "' style='width:64px'></a>");
+		$screenshot_index++;
 	}
 	?>
+	<script>
+	lightboxImages = <?php echo json_encode($screenshot_urls); ?>;
+	</script>
 	</td></tr>
 	<tr><td class="rowTitle">Home Page</td><td colspan="2" class="rowDetail"><a href="<?php echo $app_detail["homeURL"] ?>" target="_blank"><?php echo $app_detail["homeURL"] ?></a></td></tr>
 	<tr><td class="rowTitle">Support URL</td><td colspan="2" class="rowDetail"><a href="<?php echo $app_detail["supportURL"] ?>" target="_blank"><?php echo $app_detail["supportURL"] ?></a></td></tr>
