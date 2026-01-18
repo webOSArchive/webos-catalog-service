@@ -1,6 +1,7 @@
 <?php
 $config = include('../WebService/config.php');
 include('../common.php');
+require_once __DIR__ . '/../includes/AppRepository.php';
 
 session_start();
 if (!isset($_SESSION['encode_salt']))
@@ -17,9 +18,6 @@ else
 //figure out where images are
 $img_path = $protocol . $config["image_host"] . "/";
 
-//figure out where metadata is
-$author_path = $protocol . $config["service_host"] . "/AuthorMetadata/";
-
 //figure out what they're looking for
 $req = explode('/', $_SERVER['REQUEST_URI']);
 $query = end($req);
@@ -29,20 +27,21 @@ if ($query == "favicon.ico") {	//this is a special case in support of Enyo front
 	$query = end($req);
 	$favicon_search = true;
 }
-//find all the apps directly without HTTP request to avoid rate limiting
-$fullcatalog = load_catalogs(array("../newerAppData.json", "../archivedAppData.json"));
+
+// Search for apps by this author using database
+$appRepo = new AppRepository();
 $search_str = urldecode(strtolower($query));
 $search_str = preg_replace("/[^a-zA-Z0-9 ]+/", "", $search_str);
 
-$results = search_apps_by_author($fullcatalog, $search_str, false);
+$results = $appRepo->searchByAuthor($search_str, false);
 $app_response = create_app_response($results);
 
 //find info about author
-// from query
+// from query (default)
 $author_data = [
 	"author" => mb_convert_case(urldecode($query), MB_CASE_TITLE),
-	"favicon" => "../../favicon.ico",
-	"iconBig" => "../../author.png"
+	"favicon" => null,
+	"iconBig" => null
 ];
 
 // from app results list (better)
@@ -50,37 +49,45 @@ if (isset($app_response) && isset($app_response["data"][0]) && isset($app_respon
 	$author_data["author"] = $app_response["data"][0]["author"];
 }
 
-// from explicit author file (best)
+// from database (best)
 if (isset($app_response) && isset($app_response["data"][0]) && isset($app_response["data"][0]["vendorId"])) {
-	$author_path .= $app_response["data"][0]["vendorId"];
-	//get vendor data (if available)
-	@$author_file = fopen($author_path . "/author.json", "rb");
-	if ($author_file) {
-		$author_content = stream_get_contents($author_file);
-		fclose($author_file);
-		if (isset($author_content) && $author_content != ""){
-			$author_data = json_decode($author_content, true);
-			$favicon_path = $author_path . "/" . $author_data['favicon'];
-		}
+	$vendorId = $app_response["data"][0]["vendorId"];
+	$db_author = $appRepo->getAuthorByVendorId($vendorId);
+	if ($db_author) {
+		$author_data = $db_author;
 	}
 }
 
-// Set icon for social media meta tags
-$use_icon = isset($author_data['iconBig']) ? $author_path . "/" . $author_data['iconBig'] : "https://appcatalog.webosarchive.org/assets/webos-apps.png";
+// Build icon paths for display
+$author_icon_base = $protocol . $config["image_host"] . "/authors/";
+if (isset($app_response["data"][0]["vendorId"])) {
+	$author_icon_base .= $app_response["data"][0]["vendorId"] . "/";
+}
 
-if ($favicon_search) {	//return just the favicon
-	if (isset($favicon_path)) {
-		$image = file_get_contents($favicon_path);
-		header('content-type: image/x-icon');
-		echo $image;
-	} else {
-		http_response_code(404);
+// Set icon for social media meta tags
+$use_icon = "https://appcatalog.webosarchive.org/assets/webos-apps.png";
+if (!empty($author_data['iconBig'])) {
+	$use_icon = $author_icon_base . $author_data['iconBig'];
+}
+
+// Handle favicon request
+if ($favicon_search) {
+	if (!empty($author_data['favicon'])) {
+		$favicon_url = $author_icon_base . $author_data['favicon'];
+		$image = @file_get_contents($favicon_url);
+		if ($image) {
+			header('content-type: image/x-icon');
+			echo $image;
+			exit;
+		}
 	}
+	http_response_code(404);
+	exit;
 }
 ?>
 <html>
 <head>
-<link rel="shortcut icon" href="<?php echo $author_path . "/" . $author_data['favicon']; ?>">
+<link rel="shortcut icon" href="<?php echo !empty($author_data['favicon']) ? $author_icon_base . $author_data['favicon'] : '../favicon.ico'; ?>">
 <meta name="viewport" content="width=760, initial-scale=0.6">
 <?php
 //Figure out where to go back to
@@ -88,18 +95,18 @@ parse_str($_SERVER["QUERY_STRING"], $query);
 unset($query["app"]);
 $homePath = $protocol . $config["service_host"]. "";
 ?>
-<title><?php echo $author_data['author']; ?> - webOS App Museum II</title>
+<title><?php echo htmlspecialchars($author_data['author']); ?> - webOS App Museum II</title>
 <link rel="stylesheet" href="<?php echo $protocol . $config["service_host"]; ?>/webmuseum.css">
 <?php
 //Social media meta
-$protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";  
-$currurl = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];  
+$protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+$currurl = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 ?>
 <meta name="description" content="webOS App Museum II is the definitive historical archive of legacy Palm/HP webOS mobile apps and games!" />
 <link rel="canonical" href="<?php echo $currurl; ?>" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:type" content="website" />
-<meta property="og:title" content="<?php echo $author_data['author']; ?>'s Apps on webOS App Museum II" />
+<meta property="og:title" content="<?php echo htmlspecialchars($author_data['author']); ?>'s Apps on webOS App Museum II" />
 <meta property="og:description" content="webOS App Museum II is the definitive historical archive of legacy Palm/HP webOS mobile apps and games!" />
 <meta property="og:url" content="<?php echo $currurl; ?>" />
 <meta property="og:site_name" content="webOS App Museum" />
@@ -111,7 +118,7 @@ $currurl = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 <meta property="og:image:type" content="image/png" />
 <meta name="author" content="webOS Archive" />
 <meta name="twitter:card" content="summary" />
-<meta name="twitter:title" content="<?php echo $author_data['author']; ?>'s Apps on webOS App Museum II" />
+<meta name="twitter:title" content="<?php echo htmlspecialchars($author_data['author']); ?>'s Apps on webOS App Museum II" />
 <meta name="twitter:description" content="webOS App Museum II is the definitive historical archive of legacy Palm/HP webOS mobile apps and games!" />
 <meta name="twitter:image" content="<?php echo $use_icon; ?>" />
 </head>
@@ -123,33 +130,36 @@ $currurl = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 	<table border="0" style="margin-left:1.3em; width:100%; margin-bottom: 40px;">
 		<tr>
 			<td colspan="2">
-				<h1><?php echo $author_data['author']; ?></h1>
-				<?php if (isset($author_data['summary'])) { echo "<p>" . $author_data['summary'] . "</p>"; } ?>
-				<?php 
-					if (isset($author_data['sponsorMessage'])) { 
-						echo "<p>" . $author_data['sponsorMessage']; 
-						if (isset($author_data['sponsorLink'])) {
-							echo "<br><a href='" . $author_data['sponsorLink']. "'>" . $author_data['sponsorLink'] . "</a>";
+				<h1><?php echo htmlspecialchars($author_data['author']); ?></h1>
+				<?php if (!empty($author_data['summary'])) { echo "<p>" . htmlspecialchars($author_data['summary']) . "</p>"; } ?>
+				<?php
+					if (!empty($author_data['sponsorMessage'])) {
+						echo "<p>" . htmlspecialchars($author_data['sponsorMessage']);
+						if (!empty($author_data['sponsorLink'])) {
+							echo "<br><a href='" . htmlspecialchars($author_data['sponsorLink']). "'>" . htmlspecialchars($author_data['sponsorLink']) . "</a>";
 						}
 						echo "</p>";
-					} 
+					}
 				?>
 				<?php
-					if (isset($author_data['socialLinks'])) {
+					if (!empty($author_data['socialLinks'])) {
 						//Social icons by Shawn Rubel
 						foreach($author_data['socialLinks'] as $social) {
-							echo "<a href='" . $social . "'>" . render_social($social, $protocol . $config["service_host"]) . "</a> ";
+							echo "<a href='" . htmlspecialchars($social) . "'>" . render_social($social, $protocol . $config["service_host"]) . "</a> ";
 						}
 					}
 				?>
 			</td>
 			<td rowspan="2" valign="top">
-				<img src="<?php echo $author_path . "/" . $author_data['iconBig']; ?>" class="appIcon" onerror="this.onerror=null; this.src='../author.png';" >
+				<?php
+				$icon_src = !empty($author_data['iconBig']) ? $author_icon_base . $author_data['iconBig'] : '../author.png';
+				?>
+				<img src="<?php echo $icon_src; ?>" class="appIcon" onerror="this.onerror=null; this.src='../author.png';" >
 			</td>
 		</tr>
 	</table>
 	<div style="margin-left:20px">
-	<h3>Apps by <?php echo $author_data["author"] ?>:</h3>
+	<h3>Apps by <?php echo htmlspecialchars($author_data["author"]); ?>:</h3>
 	<?php
 		echo("<table cellpadding='5'>");
 		if (isset($app_response)) {
@@ -160,8 +170,8 @@ $currurl = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 					$use_img = $app["appIcon"];
 				}
 				echo("<tr><td align='center' valign='top'><a href='{$protocol}{$config["service_host"]}/showMuseumDetails.php?{$_SERVER["QUERY_STRING"]}&app={$app["id"]}'><img style='width:64px; height:64px' src='{$use_img}' border='0'></a>");
-				echo("<td width='100%' style='padding-left: 14px'><b><a href='{$protocol}{$config["service_host"]}/showMuseumDetails.php?{$_SERVER["QUERY_STRING"]}&app={$app["id"]}'>{$app["title"]}</a></b><br/>");
-				echo("<small>" . substr($app["summary"],0, 180) . "...</small><br/>&nbsp;");
+				echo("<td width='100%' style='padding-left: 14px'><b><a href='{$protocol}{$config["service_host"]}/showMuseumDetails.php?{$_SERVER["QUERY_STRING"]}&app={$app["id"]}'>" . htmlspecialchars($app["title"]) . "</a></b><br/>");
+				echo("<small>" . htmlspecialchars(substr($app["summary"] ?? '',0, 180)) . "...</small><br/>&nbsp;");
 				echo("</td></tr>");
 			}
 		}

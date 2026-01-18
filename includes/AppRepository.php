@@ -934,4 +934,33 @@ class AppRepository {
         }
         return $results;
     }
+
+    /**
+     * Get author/vendor data by vendor_id
+     *
+     * @param string $vendorId Vendor ID
+     * @return array|null Author data or null if not found
+     */
+    public function getAuthorByVendorId($vendorId) {
+        $sql = "SELECT * FROM authors WHERE vendor_id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$vendorId]);
+        $result = $stmt->fetch();
+
+        if (!$result) {
+            return null;
+        }
+
+        // Format to match expected structure
+        return [
+            'author' => $result['author_name'],
+            'summary' => $result['summary'],
+            'favicon' => $result['favicon'],
+            'icon' => $result['icon'],
+            'iconBig' => $result['icon_big'],
+            'sponsorMessage' => $result['sponsor_message'],
+            'sponsorLink' => $result['sponsor_link'],
+            'socialLinks' => $result['social_links'] ? json_decode($result['social_links'], true) : null
+        ];
+    }
 }

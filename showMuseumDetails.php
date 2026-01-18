@@ -144,17 +144,8 @@ else
 $metaRepo = new MetadataRepository();
 $app_detail = $metaRepo->getMetadata((int)$found_id);
 
-// Fallback to external metadata host if not in database
-if (!$app_detail) {
-	$meta_path = "http://" . $config["metadata_host"] . "/" . $found_id . ".json";
-	$ctx = stream_context_create(['http' => ['timeout' => 5]]);
-	$meta_file = @fopen($meta_path, "rb", false, $ctx);
-	if ($meta_file) {
-		$content = stream_get_contents($meta_file);
-		fclose($meta_file);
-		$app_detail = json_decode($content, true);
-	}
-}
+// Note: External metadata host fallback removed - all metadata should be in database
+// If an app has no metadata, the page will show with empty fields rather than timing out
 
 //Improve some strings for web output
 $img_path = $PROTOCOL . $config["image_host"] . "/";
