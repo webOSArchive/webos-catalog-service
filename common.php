@@ -38,24 +38,10 @@ function render_social($link, $basePath) {
 /**
  * Load app catalog from database
  *
- * @param array $catalogs - Array of catalog file names (used to determine statuses)
+ * @param array $statuses - Array of statuses to load (default: ['active'])
  * @return array - Array of apps
  */
-function load_catalogs($catalogs = []) {
-	// Map old file names to database statuses (for backward compatibility)
-	$statuses = [];
-	foreach ($catalogs as $catalog) {
-		$catalog = strtolower(basename($catalog));
-		if (strpos($catalog, 'archived') !== false) $statuses[] = 'active';
-		if (strpos($catalog, 'master') !== false) $statuses[] = 'archived';
-		if (strpos($catalog, 'missing') !== false) $statuses[] = 'missing';
-	}
-
-	// Default to active if no specific statuses determined
-	if (empty($statuses)) {
-		$statuses = ['active'];
-	}
-
+function load_catalogs($statuses = ['active']) {
 	$repo = new AppRepository();
 	return $repo->loadCatalog(array_unique($statuses));
 }
