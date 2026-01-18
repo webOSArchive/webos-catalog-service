@@ -15,7 +15,7 @@ $query = str_replace("+", "", $query);
 $dest_page = $protocol. $config["service_host"];
 
 //get the results directly without HTTP request to avoid rate limiting
-$fullcatalog = load_catalogs(array("../newerAppData.json", "../archivedAppData.json"));
+$fullcatalog = load_catalogs();
 $search_str = urldecode(strtolower($query));
 $search_str = preg_replace("/[^a-zA-Z0-9 ]+/", "", $search_str);
 
@@ -24,7 +24,6 @@ $app_response = create_app_response($results);
 
 //send them to result if exact match, or search page if not
 $dest_page = $protocol. $config["service_host"];
-echo "count: " . count($app_response['data']);
 if (isset($app_response) && isset($app_response['data'][0]) && count($app_response['data']) == 1) {
     $dest_page .= "/showMuseumDetails.php?app=" . $app_response['data'][0]['id'];
 } else {
