@@ -87,6 +87,7 @@ if (document.addEventListener) {
 $config = include('WebService/config.php');
 include('common.php');
 require_once __DIR__ . '/includes/AppRepository.php';
+require_once __DIR__ . '/includes/MetadataRepository.php';
 session_start();
 if (!isset($_SESSION['encode_salt']))
 {
@@ -119,16 +120,19 @@ if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
 else
     $PROTOCOL = "http://";
 
-// Get app detail data directly from metadata host to avoid rate limiting
-$meta_path = "http://" . $config["metadata_host"] . "/" . $found_id . ".json";
+// Get app detail data from database first, fallback to metadata host
+$metaRepo = new MetadataRepository();
+$app_detail = $metaRepo->getMetadata((int)$found_id);
 
-$meta_file = fopen($meta_path, "rb");
-if ($meta_file) {
-	$content = stream_get_contents($meta_file);
-	fclose($meta_file);
-	$app_detail = json_decode($content, true);
-} else {
-	$app_detail = null;
+// Fallback to external metadata host if not in database
+if (!$app_detail) {
+	$meta_path = "http://" . $config["metadata_host"] . "/" . $found_id . ".json";
+	$meta_file = @fopen($meta_path, "rb");
+	if ($meta_file) {
+		$content = stream_get_contents($meta_file);
+		fclose($meta_file);
+		$app_detail = json_decode($content, true);
+	}
 }
 
 //Improve some strings for web output
