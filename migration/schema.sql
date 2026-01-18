@@ -234,6 +234,19 @@ CREATE TABLE IF NOT EXISTS admin_audit_log (
     INDEX idx_audit_record (table_name, record_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- App relationships (bidirectional related apps)
+CREATE TABLE IF NOT EXISTS app_relationships (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    app_id INT UNSIGNED NOT NULL,
+    related_app_id INT UNSIGNED NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE KEY unique_relationship (app_id, related_app_id),
+    CONSTRAINT fk_app_rel_app FOREIGN KEY (app_id) REFERENCES apps(id) ON DELETE CASCADE,
+    CONSTRAINT fk_app_rel_related FOREIGN KEY (related_app_id) REFERENCES apps(id) ON DELETE CASCADE,
+    INDEX idx_related_app (related_app_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Create a view for easy catalog querying (mimics original JSON structure)
 CREATE OR REPLACE VIEW v_catalog_apps AS
 SELECT

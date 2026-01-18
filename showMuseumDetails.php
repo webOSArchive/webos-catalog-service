@@ -86,6 +86,7 @@ if (document.addEventListener) {
 <?php
 $config = include('WebService/config.php');
 include('common.php');
+require_once __DIR__ . '/includes/AppRepository.php';
 session_start();
 if (!isset($_SESSION['encode_salt']))
 {
@@ -283,6 +284,30 @@ include('meta-social-app.php');
 	<tr><td class="rowTitle">File Size</td><td colspan="2" class="rowDetail"><?php echo round($app_detail["appSize"]/1024,2) ?> KB</td></tr>
 	<tr><td class="rowTitle" class="rowDetail">License</td><td colspan="2"><?php echo $app_detail["licenseURL"] ?></td></tr>
 	<tr><td class="rowTitle" class="rowDetail">Copyright</td><td colspan="2"><?php echo $app_detail["copyright"] ?></td></tr>
+	<?php
+	// Get and display related apps
+	$appRepo = new AppRepository();
+	$relatedApps = $appRepo->getRelatedApps($found_id, 6);
+	if (!empty($relatedApps)):
+	?>
+	<tr><td class="rowTitle">Related Apps</td>
+	<td colspan="2" class="rowDetail">
+	<?php
+	foreach ($relatedApps as $related) {
+		if (strpos($related["appIcon"], "://") === false) {
+			$related_icon = $img_path.strtolower($related["appIcon"]);
+		} else {
+			$related_icon = $related["appIcon"];
+		}
+		$related_url = "showMuseumDetails.php?" . $_SERVER["QUERY_STRING"] . "&app=" . $related["id"];
+		echo "<a href='" . htmlspecialchars($related_url) . "' style='display:inline-block;text-align:center;margin:5px 10px 5px 0;vertical-align:top;width:80px;'>";
+		echo "<img src='" . htmlspecialchars($related_icon) . "' style='width:64px;height:64px;border:0;' onerror=\"this.src='assets/icon.png';\"><br>";
+		echo "<small>" . htmlspecialchars($related["title"]) . "</small>";
+		echo "</a>";
+	}
+	?>
+	</td></tr>
+	<?php endif; ?>
 	</table>
 	<?php
 	include 'footer.php';

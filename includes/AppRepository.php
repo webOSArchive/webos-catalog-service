@@ -785,6 +785,124 @@ class AppRepository {
         return (int)$stmt->fetchColumn();
     }
 
+    // ============ Related Apps Methods ============
+
+    /**
+     * Get related apps for an app (bidirectional)
+     *
+     * @param int $appId App ID
+     * @param int $limit Maximum number of related apps
+     * @return array Related apps with basic info
+     */
+    public function getRelatedApps($appId, $limit = 10) {
+        $sql = "
+            SELECT a.id, a.title, a.author,
+                   a.app_icon as appIcon, a.app_icon_big as appIconBig
+            FROM app_relationships ar
+            JOIN apps a ON (
+                (ar.app_id = ? AND a.id = ar.related_app_id) OR
+                (ar.related_app_id = ? AND a.id = ar.app_id)
+            )
+            WHERE a.status IN ('active', 'newer')
+            ORDER BY a.title
+            LIMIT ?
+        ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$appId, $appId, $limit]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Get IDs of related apps (for admin UI)
+     *
+     * @param int $appId App ID
+     * @return array Array of related app IDs
+     */
+    public function getRelatedAppIds($appId) {
+        $sql = "
+            SELECT
+                CASE
+                    WHEN ar.app_id = ? THEN ar.related_app_id
+                    ELSE ar.app_id
+                END as related_id
+            FROM app_relationships ar
+            WHERE ar.app_id = ? OR ar.related_app_id = ?
+        ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$appId, $appId, $appId]);
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Add a related app (bidirectional - stores with smaller ID first)
+     *
+     * @param int $appId First app ID
+     * @param int $relatedAppId Second app ID
+     * @return bool Success
+     */
+    public function addRelatedApp($appId, $relatedAppId) {
+        if ($appId == $relatedAppId) {
+            return false; // Can't relate app to itself
+        }
+
+        // Always store with smaller ID first to prevent duplicates
+        $first = min($appId, $relatedAppId);
+        $second = max($appId, $relatedAppId);
+
+        $sql = "INSERT IGNORE INTO app_relationships (app_id, related_app_id) VALUES (?, ?)";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([$first, $second]);
+    }
+
+    /**
+     * Remove a related app relationship
+     *
+     * @param int $appId First app ID
+     * @param int $relatedAppId Second app ID
+     * @return bool Success
+     */
+    public function removeRelatedApp($appId, $relatedAppId) {
+        $sql = "
+            DELETE FROM app_relationships
+            WHERE (app_id = ? AND related_app_id = ?)
+               OR (app_id = ? AND related_app_id = ?)
+        ";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([$appId, $relatedAppId, $relatedAppId, $appId]);
+    }
+
+    /**
+     * Set related apps for an app (replaces all existing)
+     *
+     * @param int $appId App ID
+     * @param array $relatedIds Array of related app IDs
+     * @return bool Success
+     */
+    public function setRelatedApps($appId, $relatedIds) {
+        $this->db->beginTransaction();
+        try {
+            // Remove all existing relationships for this app
+            $sql = "DELETE FROM app_relationships WHERE app_id = ? OR related_app_id = ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$appId, $appId]);
+
+            // Add new relationships
+            foreach ($relatedIds as $relatedId) {
+                if ($relatedId != $appId) {
+                    $this->addRelatedApp($appId, $relatedId);
+                }
+            }
+
+            $this->db->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            return false;
+        }
+    }
+
     // ============ Helper Methods ============
 
     /**

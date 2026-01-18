@@ -12,6 +12,7 @@
  */
 
 require_once __DIR__ . '/../includes/MetadataRepository.php';
+require_once __DIR__ . '/../includes/AppRepository.php';
 include('ratelimit.php');
 
 // Rate limit: 200 requests per hour for app details
@@ -55,6 +56,10 @@ if (!$metadata) {
 	echo json_encode(['error' => 'App not found']);
 	exit;
 }
+
+// Add related apps
+$appRepo = new AppRepository();
+$metadata['relatedApps'] = $appRepo->getRelatedApps((int)$id, 10);
 
 // Return data - with or without compression based on appIds parameter
 if (!isset($_REQUEST['appIds']) || $_REQUEST['appIds'] !== "random") {

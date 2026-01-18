@@ -19,6 +19,16 @@ $success = false;
 // Get categories
 $categories = $repo->getCategories();
 
+// Get related apps (for existing apps)
+$relatedApps = [];
+$relatedAppIds = [];
+if ($id) {
+    $relatedAppIds = $repo->getRelatedAppIds($id);
+    if (!empty($relatedAppIds)) {
+        $relatedApps = $repo->getByIds($relatedAppIds, true); // true = include adult
+    }
+}
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = [
@@ -87,6 +97,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } catch (Exception $e) {
             $errors[] = 'Database error: ' . $e->getMessage();
         }
+    }
+}
+
+// Handle related app actions (add/remove)
+if ($id && isset($_GET['action'])) {
+    if ($_GET['action'] === 'add_related' && isset($_GET['related_id'])) {
+        $relatedId = (int)$_GET['related_id'];
+        if ($relatedId > 0 && $relatedId !== $id) {
+            $repo->addRelatedApp($id, $relatedId);
+        }
+        header("Location: app-edit.php?id=$id#related-apps");
+        exit;
+    }
+    if ($_GET['action'] === 'remove_related' && isset($_GET['related_id'])) {
+        $relatedId = (int)$_GET['related_id'];
+        $repo->removeRelatedApp($id, $relatedId);
+        header("Location: app-edit.php?id=$id#related-apps");
+        exit;
+    }
+}
+
+// Refresh related apps after actions
+if ($id) {
+    $relatedAppIds = $repo->getRelatedAppIds($id);
+    if (!empty($relatedAppIds)) {
+        $relatedApps = $repo->getByIds($relatedAppIds, true);
+    } else {
+        $relatedApps = [];
     }
 }
 
@@ -248,6 +286,59 @@ include 'includes/header.php';
                     <small>Higher number = higher recommendation. 0 = not featured.</small>
                 </div>
             </fieldset>
+
+            <?php if (!$isNew): ?>
+            <fieldset id="related-apps">
+                <legend>Related Apps</legend>
+                <?php if (!empty($relatedApps)): ?>
+                <table class="admin-table" style="margin-bottom:15px;">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($relatedApps as $related): ?>
+                        <tr>
+                            <td><?php echo $related['id']; ?></td>
+                            <td><a href="app-edit.php?id=<?php echo $related['id']; ?>"><?php echo htmlspecialchars($related['title']); ?></a></td>
+                            <td><?php echo htmlspecialchars($related['author']); ?></td>
+                            <td>
+                                <a href="app-edit.php?id=<?php echo $id; ?>&action=remove_related&related_id=<?php echo $related['id']; ?>"
+                                   class="btn btn-sm btn-danger"
+                                   onclick="return confirm('Remove this related app?');">Remove</a>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+                <?php else: ?>
+                <p><em>No related apps linked yet.</em></p>
+                <?php endif; ?>
+
+                <div class="form-group" style="margin:0;">
+                    <label>Add Related App by ID</label>
+                    <div style="display:flex;gap:10px;align-items:center;">
+                        <input type="number" id="add_related_id" min="1" placeholder="Enter App ID" style="width:150px;">
+                        <button type="button" class="btn btn-sm" onclick="addRelatedApp()">Add</button>
+                    </div>
+                    <small>Enter the ID of an app to link as related. Relationships are bidirectional.</small>
+                </div>
+                <script>
+                function addRelatedApp() {
+                    var relatedId = document.getElementById('add_related_id').value;
+                    if (relatedId && relatedId > 0) {
+                        window.location.href = 'app-edit.php?id=<?php echo $id; ?>&action=add_related&related_id=' + relatedId;
+                    } else {
+                        alert('Please enter a valid App ID');
+                    }
+                }
+                </script>
+            </fieldset>
+            <?php endif; ?>
 
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary"><?php echo $isNew ? 'Create App' : 'Save Changes'; ?></button>
