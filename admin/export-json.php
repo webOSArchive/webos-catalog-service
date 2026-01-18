@@ -5,6 +5,7 @@
  * Exports apps in the original JSON format used by the legacy files.
  * Can export by status or all apps.
  */
+require_once __DIR__ . '/includes/security.php';
 require_once __DIR__ . '/../includes/Database.php';
 require_once __DIR__ . '/../includes/AppRepository.php';
 

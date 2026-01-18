@@ -2,6 +2,7 @@
 /**
  * Authors/Vendors Management Page
  */
+require_once __DIR__ . '/includes/security.php';
 $pageTitle = 'Authors';
 require_once __DIR__ . '/../includes/Database.php';
 
