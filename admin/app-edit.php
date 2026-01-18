@@ -12,6 +12,14 @@ $id = isset($_GET['id']) ? (int)$_GET['id'] : null;
 $app = $id ? $repo->getById($id) : null;
 $isNew = !$app;
 
+// Get suggested next ID for new apps
+$suggestedId = null;
+if ($isNew) {
+    $stmt = $db->query("SELECT MAX(id) + 1 AS next_id FROM apps");
+    $result = $stmt->fetch();
+    $suggestedId = $result['next_id'] ?? 1;
+}
+
 $pageTitle = $isNew ? 'Add New App' : 'Edit App';
 $errors = [];
 $success = false;
@@ -162,8 +170,8 @@ include 'includes/header.php';
             <?php if ($isNew): ?>
             <div class="form-group">
                 <label>App ID *</label>
-                <input type="number" name="id" value="<?php echo htmlspecialchars($_POST['id'] ?? ''); ?>" required min="1">
-                <small>Unique numeric identifier for this app (must not already exist)</small>
+                <input type="number" name="id" value="<?php echo htmlspecialchars($_POST['id'] ?? $suggestedId ?? ''); ?>" required min="1">
+                <small>Suggested next ID: <?php echo $suggestedId; ?> (must not already exist)</small>
             </div>
             <?php endif; ?>
 
