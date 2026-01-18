@@ -54,7 +54,7 @@ if ($search_str == "0" ||	//Treat the museum itself differently
 {
 	if ($logRepo) { logUpdateCheck($logRepo, "app museum 2", $devicedata, $clientinfo); }
 	$found_id = "0";
-	$meta_path = "http://" . $config["metadata_host"] . "/0.json";
+	$meta_path = __DIR__ . '/../0.json';
 }
 else	//Any other app
 {

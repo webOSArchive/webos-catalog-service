@@ -4,10 +4,7 @@ $config = include('WebService/config.php');
 //Get the app info
 $download_path = "";
 
-$meta_path = "http://" . $config["metadata_host"] . "/0.json";
-$meta_file = fopen($meta_path, "rb");
-$content = stream_get_contents($meta_file);
-fclose($meta_file);
+$content = file_get_contents(__DIR__ . '/0.json');
 $outputObj = json_decode($content, true);
 
 $attachment_location = $download_path . $outputObj["filename"];
