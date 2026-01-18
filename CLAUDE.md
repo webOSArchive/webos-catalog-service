@@ -74,7 +74,7 @@ App data is stored in MySQL. Key tables:
 
 ### Admin UI (admin/)
 
-CRUD interface for managing catalog data. Secured via nginx basic auth.
+CRUD interface for managing catalog data. Secured via nginx basic auth + CSRF protection (Referer header validation in `includes/security.php`).
 
 | Page | Purpose |
 |------|---------|
