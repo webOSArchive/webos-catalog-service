@@ -24,6 +24,7 @@
  *   museumVersion - Client version for backward compatibility
  *   useAppId     - Use appIds list mode
  *   appIds       - Comma-separated app IDs or "random"
+ *   sort         - Sort order: 'recent' (default), 'alpha', or 'recommended'
  *
  * Response format (must be maintained for backward compatibility):
  * {
@@ -103,7 +104,7 @@ $_showOnlyMis = isset($_REQUEST['show_only_missing']) ? $_REQUEST['show_only_mis
 $_adult       = isset($_REQUEST['adult']) ? filter_var($_REQUEST['adult'], FILTER_VALIDATE_BOOLEAN) : false;
 $_onlyLuneOS  = isset($_REQUEST['onlyLuneOS']) ? $_REQUEST['onlyLuneOS'] : false;
 $_museumVersion = isset($_REQUEST['museumVersion']) ? $_REQUEST['museumVersion'] : "0.0.0";
-$_sort        = isset($_REQUEST['sort']) && $_REQUEST['sort'] === 'recommended' ? 'recommended' : 'alpha';
+$_sort        = isset($_REQUEST['sort']) && in_array($_REQUEST['sort'], ['alpha', 'recommended', 'recent']) ? $_REQUEST['sort'] : 'recent';
 
 // Convert string booleans
 if (gettype($_useAppId) === "string") { $_useAppId = strtolower($_useAppId) === "true"; }

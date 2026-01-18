@@ -18,16 +18,21 @@ class AppRepository {
      * Load apps from database - replaces load_catalogs()
      *
      * @param array $statuses Which statuses to include ['active', 'missing', 'archived']
-     * @param string $sort Sort order: 'alpha' (default) or 'recommended'
+     * @param string $sort Sort order: 'recent' (default), 'alpha', or 'recommended'
      * @return array Apps in format matching original JSON structure
      */
-    public function loadCatalog($statuses = ['active'], $sort = 'alpha') {
+    public function loadCatalog($statuses = ['active'], $sort = 'recent') {
         $placeholders = str_repeat('?,', count($statuses) - 1) . '?';
 
         // Determine sort order
-        $orderBy = ($sort === 'recommended')
-            ? 'a.recommendation_order DESC, a.title'
-            : 'a.title';
+        if ($sort === 'recommended') {
+            $orderBy = 'a.recommendation_order DESC, a.title';
+        } elseif ($sort === 'alpha') {
+            $orderBy = 'a.title';
+        } else {
+            // Default: recent (by updated_at descending)
+            $orderBy = 'a.updated_at DESC, a.title';
+        }
 
         $sql = "
             SELECT
@@ -232,10 +237,10 @@ class AppRepository {
      * @param bool $adult Whether to include adult content
      * @param int $limit Max results (0 for unlimited)
      * @param array $statuses Which statuses to include
-     * @param string $sort Sort order: 'alpha' (default) or 'recommended'
+     * @param string $sort Sort order: 'recent' (default), 'alpha', or 'recommended'
      * @return array Filtered apps
      */
-    public function filterByCategory($category, $adult = false, $limit = 0, $statuses = ['active'], $sort = 'alpha') {
+    public function filterByCategory($category, $adult = false, $limit = 0, $statuses = ['active'], $sort = 'recent') {
         $statusPlaceholders = str_repeat('?,', count($statuses) - 1) . '?';
 
         $sql = "
@@ -280,9 +285,14 @@ class AppRepository {
         }
 
         // Determine sort order
-        $orderBy = ($sort === 'recommended')
-            ? 'a.recommendation_order DESC, a.title'
-            : 'a.title';
+        if ($sort === 'recommended') {
+            $orderBy = 'a.recommendation_order DESC, a.title';
+        } elseif ($sort === 'alpha') {
+            $orderBy = 'a.title';
+        } else {
+            // Default: recent (by updated_at descending)
+            $orderBy = 'a.updated_at DESC, a.title';
+        }
         $sql .= " ORDER BY $orderBy";
 
         if ($limit > 0) {
