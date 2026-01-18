@@ -29,6 +29,10 @@ return array(
         'package_host_secure' => $package_mirror_secure,
         'contact_email' => 'webosarchive@gmail.com',
 
+        // Download URL encoding secret (NOT exposed via API)
+        // Used to obfuscate download URLs - change this to a random string
+        'download_secret' => 'change_this_to_random_string',
+
         // Database credentials (NOT exposed via API - filtered in getConfig.php)
         'db_host' => 'localhost',
         'db_name' => 'webos_catalog',

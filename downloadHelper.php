@@ -1,6 +1,5 @@
 <?PHP
 header('Content-Type: application/javascript');
-session_start();
 ?>
 function populateLink() {
     var linkTD = document.getElementById("tdDownloadLink");
@@ -14,7 +13,6 @@ function getLink(encodedLink, appId)
 {
     countAppDownloads(appId);
     //Use proxy to serve HTTP files over HTTPS
-    //The encoded link includes a session salt for validation
     var pageParts = window.location.pathname.split("/");
     var lastPage = pageParts[pageParts.length-1];
     var urlParts = window.location.href.split(lastPage);
