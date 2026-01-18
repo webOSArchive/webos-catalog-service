@@ -709,6 +709,7 @@ class AppRepository {
                 c.name AS category,
                 a.status,
                 a.adult,
+                a.recommendation_order,
                 a.updated_at
             FROM apps a
             LEFT JOIN categories c ON a.category_id = c.id
@@ -739,7 +740,18 @@ class AppRepository {
             $params[] = $filters['category'];
         }
 
-        $sql .= " ORDER BY a.title";
+        // Determine sort order
+        $sort = $filters['sort'] ?? 'title';
+        switch ($sort) {
+            case 'recommendation':
+                $sql .= " ORDER BY a.recommendation_order DESC, a.title";
+                break;
+            case 'id':
+                $sql .= " ORDER BY a.id DESC";
+                break;
+            default:
+                $sql .= " ORDER BY a.title";
+        }
 
         $page = max(1, (int)($filters['page'] ?? 1));
         $perPage = (int)($filters['perPage'] ?? 50);

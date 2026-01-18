@@ -13,6 +13,7 @@ $repo = new AppRepository();
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $status = isset($_GET['status']) ? $_GET['status'] : '';
 $category = isset($_GET['category']) ? $_GET['category'] : '';
+$sort = isset($_GET['sort']) ? $_GET['sort'] : 'title';
 $page = max(1, isset($_GET['page']) ? (int)$_GET['page'] : 1);
 $perPage = 50;
 
@@ -21,6 +22,7 @@ $apps = $repo->adminSearch([
     'search' => $search,
     'status' => $status,
     'category' => $category,
+    'sort' => $sort,
     'page' => $page,
     'perPage' => $perPage
 ]);
@@ -66,6 +68,12 @@ include 'includes/header.php';
                 <?php endforeach; ?>
             </select>
 
+            <select name="sort">
+                <option value="title" <?php echo $sort === 'title' ? 'selected' : ''; ?>>Sort: Title</option>
+                <option value="recommendation" <?php echo $sort === 'recommendation' ? 'selected' : ''; ?>>Sort: Recommendation</option>
+                <option value="id" <?php echo $sort === 'id' ? 'selected' : ''; ?>>Sort: ID (newest)</option>
+            </select>
+
             <button type="submit" class="btn">Search</button>
             <?php if ($search || $status || $category): ?>
             <a href="apps.php" class="btn">Clear</a>
@@ -84,6 +92,7 @@ include 'includes/header.php';
                     <th>Title</th>
                     <th>Author</th>
                     <th>Category</th>
+                    <th>Rec.</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
@@ -91,7 +100,7 @@ include 'includes/header.php';
             <tbody>
                 <?php if (empty($apps)): ?>
                 <tr>
-                    <td colspan="7" style="text-align:center;padding:40px;color:#7f8c8d;">
+                    <td colspan="8" style="text-align:center;padding:40px;color:#7f8c8d;">
                         No apps found matching your criteria.
                     </td>
                 </tr>
@@ -107,6 +116,7 @@ include 'includes/header.php';
                     <td><?php echo htmlspecialchars($app['title']); ?></td>
                     <td><?php echo htmlspecialchars($app['author']); ?></td>
                     <td><?php echo htmlspecialchars($app['category'] ?? '-'); ?></td>
+                    <td><?php echo (int)$app['recommendation_order']; ?></td>
                     <td><span class="status-badge status-<?php echo $app['status']; ?>"><?php echo $app['status']; ?></span></td>
                     <td>
                         <a href="app-edit.php?id=<?php echo $app['id']; ?>" class="btn btn-sm">Edit</a>
@@ -128,6 +138,7 @@ include 'includes/header.php';
     if ($search) $queryParams['search'] = $search;
     if ($status) $queryParams['status'] = $status;
     if ($category) $queryParams['category'] = $category;
+    if ($sort && $sort !== 'title') $queryParams['sort'] = $sort;
     $queryString = http_build_query($queryParams);
     ?>
 
