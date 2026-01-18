@@ -79,10 +79,10 @@ function search_apps_by_author($catalog, $search_str, $adult = false) {
  * @param string $category - Category to filter by ('All' for no filter)
  * @param bool $adult - Whether to include adult content
  * @param int $limit - Maximum number of results (0 for no limit)
- * @param string $sort - Sort order: 'alpha' (default) or 'recommended'
+ * @param string $sort - Sort order: 'recent' (default), 'alpha', or 'recommended'
  * @return array - Filtered apps
  */
-function filter_apps_by_category($catalog, $category, $adult = false, $limit = 0, $sort = 'alpha') {
+function filter_apps_by_category($catalog, $category, $adult = false, $limit = 0, $sort = 'recent') {
 	$repo = new AppRepository();
 	return $repo->filterByCategory($category, $adult, $limit, ['active'], $sort);
 }

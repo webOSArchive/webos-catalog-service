@@ -30,8 +30,8 @@ class AppRepository {
         } elseif ($sort === 'alpha') {
             $orderBy = 'a.title';
         } else {
-            // Default: recent (by updated_at descending)
-            $orderBy = 'a.updated_at DESC, a.title';
+            // Default: recent (by updated_at descending, NULLs last)
+            $orderBy = 'a.updated_at IS NULL, a.updated_at DESC, a.title';
         }
 
         $sql = "
@@ -290,8 +290,8 @@ class AppRepository {
         } elseif ($sort === 'alpha') {
             $orderBy = 'a.title';
         } else {
-            // Default: recent (by updated_at descending)
-            $orderBy = 'a.updated_at DESC, a.title';
+            // Default: recent (by updated_at descending, NULLs last)
+            $orderBy = 'a.updated_at IS NULL, a.updated_at DESC, a.title';
         }
         $sql .= " ORDER BY $orderBy";
 
