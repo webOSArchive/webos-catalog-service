@@ -93,23 +93,43 @@ if (!isset($_SESSION['encode_salt']))
 {
 	$_SESSION['encode_salt'] = uniqid();
 }
-//Load catalogs
-$fullcatalog = load_catalogs(array("newerAppData.json", "archivedAppData.json"));
+// Find app - use direct ID lookup for numeric IDs, search for text
+$found_app = null;
+$found_id = null;
+$appRepo = new AppRepository();
 
-$found_id = "null";
 if (isset($_GET["app"])) {
 	$search_str = $_GET["app"];
-	$search_str = urldecode(strtolower($search_str));
-	$search_str = preg_replace("/[^a-zA-Z0-9 ]+/", "", $search_str);
-	
-	// Use common search function to find the app
-	$results = search_apps($fullcatalog, $search_str, true); // Include adult content for details page
-	if (count($results) > 0) {
-		$found_app = $results[0]; // Get first match
-		$found_id = $found_app["id"];
+	$search_str = urldecode($search_str);
+
+	// If numeric, do direct ID lookup (much faster)
+	if (is_numeric($search_str)) {
+		$found_app = $appRepo->getById((int)$search_str);
+		if ($found_app) {
+			// Normalize field names to match expected format
+			$found_app['appIconBig'] = $found_app['app_icon_big'] ?? '';
+			$found_app['Pre'] = $found_app['pre'] ?? false;
+			$found_app['Pixi'] = $found_app['pixi'] ?? false;
+			$found_app['Pre2'] = $found_app['pre2'] ?? false;
+			$found_app['Pre3'] = $found_app['pre3'] ?? false;
+			$found_app['Veer'] = $found_app['veer'] ?? false;
+			$found_app['TouchPad'] = $found_app['touchpad'] ?? false;
+			$found_app['LuneOS'] = $found_app['luneos'] ?? false;
+			$found_id = $found_app['id'];
+		}
+	} else {
+		// Text search - sanitize and search
+		$search_str = strtolower($search_str);
+		$search_str = preg_replace("/[^a-zA-Z0-9 ]+/", "", $search_str);
+		$results = $appRepo->searchApps($search_str, true); // Include adult content
+		if (count($results) > 0) {
+			$found_app = $results[0];
+			$found_id = $found_app["id"];
+		}
 	}
 }
-if ($found_id == "null") {
+
+if (!$found_app) {
 	echo("ERROR: No matching app found");
 	die;
 }
@@ -127,7 +147,8 @@ $app_detail = $metaRepo->getMetadata((int)$found_id);
 // Fallback to external metadata host if not in database
 if (!$app_detail) {
 	$meta_path = "http://" . $config["metadata_host"] . "/" . $found_id . ".json";
-	$meta_file = @fopen($meta_path, "rb");
+	$ctx = stream_context_create(['http' => ['timeout' => 5]]);
+	$meta_file = @fopen($meta_path, "rb", false, $ctx);
 	if ($meta_file) {
 		$content = stream_get_contents($meta_file);
 		fclose($meta_file);
