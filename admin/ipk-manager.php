@@ -50,16 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['ipk_file']) && $azur
 
         // Upload to Azure
         if (empty($errors)) {
-            $blobName = trim($_POST['blob_name'] ?? '');
-            if (empty($blobName)) {
-                $blobName = $originalName;
-            }
-
-            // Ensure .ipk extension on custom names
-            if (strtolower(pathinfo($blobName, PATHINFO_EXTENSION)) !== 'ipk') {
-                $blobName .= '.ipk';
-            }
-
+            $blobName = $originalName;
             $content = file_get_contents($_FILES['ipk_file']['tmp_name']);
             $azure = AzureBlobService::getInstance();
 
@@ -145,11 +136,6 @@ include 'includes/header.php';
                     <label>IPK File</label>
                     <input type="file" name="ipk_file" accept=".ipk" required>
                     <small>Select a .ipk file to upload (max 50MB)</small>
-                </div>
-                <div class="form-group">
-                    <label>Custom Blob Name (optional)</label>
-                    <input type="text" name="blob_name" placeholder="e.g., myapp_1.0.0_arm.ipk">
-                    <small>Leave empty to use the uploaded filename</small>
                 </div>
             </fieldset>
             <div class="form-actions">
