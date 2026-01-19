@@ -19,6 +19,12 @@ You can use this app on a Pre3 or Touchpad, or access the catalog in a browser a
 3. Configure external hosts for images and packages
 4. Secure the `/admin` path with nginx basic auth
 
+## Data
+
+1. Museum Database is periodically backed-up in Releases on this GitHub repo
+2. IPKs are backed-up at archive.org: https://archive.org/details/webosappcatalog
+3. AppImages are backed-up at archive.org: https://archive.org/details/webosappcatalog-supplementary
+
 ## Architecture
 
 ### Database
