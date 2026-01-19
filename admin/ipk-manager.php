@@ -137,6 +137,7 @@ include 'includes/header.php';
                     <input type="file" name="ipk_file" accept=".ipk" required>
                     <small>Select a .ipk file to upload (max 50MB)</small>
                 </div>
+                <p style="font-size:0.85em;color:#7f8c8d;margin:0;">Note: Uploading a file with the same name will overwrite the existing file.</p>
             </fieldset>
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">Upload IPK</button>
