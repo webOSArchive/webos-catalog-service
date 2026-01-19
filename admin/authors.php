@@ -18,6 +18,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $summary = trim($_POST['summary'] ?? '');
         $icon = trim($_POST['icon'] ?? '');
         $iconBig = trim($_POST['icon_big'] ?? '');
+        $favicon = trim($_POST['favicon'] ?? '');
+        $sponsorMessage = trim($_POST['sponsor_message'] ?? '');
+        $sponsorLink = trim($_POST['sponsor_link'] ?? '');
         $socialLinks = trim($_POST['social_links'] ?? '');
 
         if (empty($vendorId)) {
@@ -30,8 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         if (empty($errors)) {
             try {
                 $stmt = $db->prepare("
-                    INSERT INTO authors (vendor_id, author_name, summary, icon, icon_big, social_links)
-                    VALUES (?, ?, ?, ?, ?, ?)
+                    INSERT INTO authors (vendor_id, author_name, summary, icon, icon_big, favicon, sponsor_message, sponsor_link, social_links)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ");
                 $stmt->execute([
                     $vendorId,
@@ -39,6 +42,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     $summary ?: null,
                     $icon ?: null,
                     $iconBig ?: null,
+                    $favicon ?: null,
+                    $sponsorMessage ?: null,
+                    $sponsorLink ?: null,
                     $socialLinks ?: null
                 ]);
                 $success = true;
@@ -58,6 +64,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $summary = trim($_POST['summary'] ?? '');
         $icon = trim($_POST['icon'] ?? '');
         $iconBig = trim($_POST['icon_big'] ?? '');
+        $favicon = trim($_POST['favicon'] ?? '');
+        $sponsorMessage = trim($_POST['sponsor_message'] ?? '');
+        $sponsorLink = trim($_POST['sponsor_link'] ?? '');
         $socialLinks = trim($_POST['social_links'] ?? '');
 
         if (empty($authorName)) {
@@ -68,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             try {
                 $stmt = $db->prepare("
                     UPDATE authors
-                    SET author_name = ?, summary = ?, icon = ?, icon_big = ?, social_links = ?
+                    SET author_name = ?, summary = ?, icon = ?, icon_big = ?, favicon = ?, sponsor_message = ?, sponsor_link = ?, social_links = ?
                     WHERE vendor_id = ?
                 ");
                 $stmt->execute([
@@ -76,6 +85,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     $summary ?: null,
                     $icon ?: null,
                     $iconBig ?: null,
+                    $favicon ?: null,
+                    $sponsorMessage ?: null,
+                    $sponsorLink ?: null,
                     $socialLinks ?: null,
                     $vendorId
                 ]);
@@ -190,21 +202,39 @@ include 'includes/header.php';
                 <textarea name="summary" rows="3"><?php echo htmlspecialchars($editAuthor['summary'] ?? ''); ?></textarea>
             </div>
 
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:15px;">
                 <div class="form-group" style="margin:0;">
                     <label>Icon Path</label>
-                    <input type="text" name="icon" value="<?php echo htmlspecialchars($editAuthor['icon'] ?? ''); ?>">
+                    <input type="text" name="icon" value="<?php echo htmlspecialchars($editAuthor['icon'] ?? ''); ?>" placeholder="icon.jpg">
+                    <small>Filename in /authors/{vendor_id}/</small>
                 </div>
                 <div class="form-group" style="margin:0;">
                     <label>Icon Big Path</label>
-                    <input type="text" name="icon_big" value="<?php echo htmlspecialchars($editAuthor['icon_big'] ?? ''); ?>">
+                    <input type="text" name="icon_big" value="<?php echo htmlspecialchars($editAuthor['icon_big'] ?? ''); ?>" placeholder="iconBig.png">
+                    <small>Filename in /authors/{vendor_id}/</small>
+                </div>
+                <div class="form-group" style="margin:0;">
+                    <label>Favicon Path</label>
+                    <input type="text" name="favicon" value="<?php echo htmlspecialchars($editAuthor['favicon'] ?? ''); ?>" placeholder="favicon.ico">
+                    <small>Filename in /authors/{vendor_id}/</small>
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+                <div class="form-group" style="margin:0;">
+                    <label>Sponsor Message</label>
+                    <input type="text" name="sponsor_message" value="<?php echo htmlspecialchars($editAuthor['sponsor_message'] ?? ''); ?>" placeholder="Like my apps? Buy me a coffee!">
+                </div>
+                <div class="form-group" style="margin:0;">
+                    <label>Sponsor Link</label>
+                    <input type="text" name="sponsor_link" value="<?php echo htmlspecialchars($editAuthor['sponsor_link'] ?? ''); ?>" placeholder="https://...">
                 </div>
             </div>
 
             <div class="form-group">
                 <label>Social Links (JSON)</label>
-                <textarea name="social_links" rows="3" placeholder='{"website": "https://...", "twitter": "@..."}'><?php echo htmlspecialchars($editAuthor['social_links'] ?? ''); ?></textarea>
-                <small>Optional JSON object with social media links</small>
+                <textarea name="social_links" rows="3" placeholder='["https://github.com/...", "https://twitter.com/..."]'><?php echo htmlspecialchars($editAuthor['social_links'] ?? ''); ?></textarea>
+                <small>JSON array of social media URLs</small>
             </div>
 
             <div class="form-actions">
