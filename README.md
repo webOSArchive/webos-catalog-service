@@ -19,6 +19,23 @@ You can use this app on a Pre3 or Touchpad, or access the catalog in a browser a
 3. Configure external hosts for images and packages
 4. Secure the `/admin` path with nginx basic auth
 
+### Upload Limits (for IPK management)
+
+To allow larger file uploads via the admin interface, configure both PHP and nginx:
+
+**PHP** (php.ini or pool config like `/etc/php-fpm.d/www.conf`):
+```ini
+upload_max_filesize = 200M
+post_max_size = 210M
+```
+
+**nginx** (server or http block):
+```nginx
+client_max_body_size 200M;
+```
+
+Restart both services after changes. Adjust the size values as needed for your largest IPKs.
+
 ## Data
 
 1. Museum Database is periodically backed-up in Releases on this GitHub repo

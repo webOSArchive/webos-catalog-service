@@ -40,11 +40,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['ipk_file']) && $azur
             }
         }
 
-        // Validate file size (50MB limit)
+        // Validate file size (200MB limit)
         if (empty($errors)) {
-            $maxSize = 50 * 1024 * 1024; // 50MB
+            $maxSize = 200 * 1024 * 1024; // 200MB
             if ($_FILES['ipk_file']['size'] > $maxSize) {
-                $errors[] = 'File too large. Maximum size is 50MB.';
+                $errors[] = 'File too large. Maximum size is 200MB.';
             }
         }
 
@@ -135,7 +135,7 @@ include 'includes/header.php';
                 <div class="form-group">
                     <label>IPK File</label>
                     <input type="file" name="ipk_file" accept=".ipk" required>
-                    <small>Select a .ipk file to upload (max 50MB)</small>
+                    <small>Select a .ipk file to upload (max 200MB)</small>
                 </div>
                 <p style="font-size:0.85em;color:#7f8c8d;margin:0;">Note: Uploading a file with the same name will overwrite the existing file.</p>
             </fieldset>
@@ -151,7 +151,7 @@ include 'includes/header.php';
     <div class="card-body">
         <form method="get" class="search-form">
             <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Filter by filename prefix...">
-            <button type="submit" class="btn">Search</button>
+            <button type="submit" class="btn">Filter</button>
             <?php if ($search): ?>
             <a href="ipk-manager.php" class="btn">Clear</a>
             <?php endif; ?>
