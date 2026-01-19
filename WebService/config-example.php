@@ -37,6 +37,11 @@ return array(
         'db_host' => 'localhost',
         'db_name' => 'webos_catalog',
         'db_user' => 'catalog_user',
-        'db_pass' => 'change_this_password'
+        'db_pass' => 'change_this_password',
+
+        // Azure Blob Storage (NOT exposed via API)
+        // Connection string format: DefaultEndpointsProtocol=https;AccountName=xxx;AccountKey=xxx;EndpointSuffix=core.windows.net
+        'azure_connection_string' => '',
+        'azure_container_name' => 'ipk-packages'
 );
 ?>

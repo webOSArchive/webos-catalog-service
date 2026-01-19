@@ -32,6 +32,7 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
             <li><a href="apps.php" class="<?php echo $currentPage === 'apps' ? 'active' : ''; ?>">Apps</a></li>
             <li><a href="categories.php" class="<?php echo $currentPage === 'categories' ? 'active' : ''; ?>">Categories</a></li>
             <li><a href="authors.php" class="<?php echo $currentPage === 'authors' ? 'active' : ''; ?>">Authors</a></li>
+            <li><a href="ipk-manager.php" class="<?php echo $currentPage === 'ipk-manager' ? 'active' : ''; ?>">IPKs</a></li>
             <li><a href="logs.php" class="<?php echo $currentPage === 'logs' ? 'active' : ''; ?>">Logs</a></li>
         </ul>
         <div class="nav-actions">
