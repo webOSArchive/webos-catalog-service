@@ -56,7 +56,8 @@ class AppRepository {
                 a.recommendation_order AS recommendationOrder,
                 a.in_revisionist_history AS inRevisionistHistory,
                 a.in_curators_choice AS inCuratorsChoice,
-                a.status
+                a.status,
+                m.star_rating AS starRating
             FROM apps a
             LEFT JOIN categories c ON a.category_id = c.id
             LEFT JOIN app_metadata m ON a.id = m.app_id
