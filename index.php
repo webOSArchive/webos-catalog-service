@@ -51,7 +51,7 @@ if (strpos($outputObj["filename"], "://") === false) {
   <meta name="twitter:description" content="<?php echo $description; ?>">
 
   <title><?php echo $title . $subtitle; ?></title>
-  
+
   <link id="favicon" rel="icon" type="image/png" sizes="64x64" href="<?php echo $icon;?>">
   <link href="<?php echo $PROTOCOL . "://www.webosarchive.org/app-template/"?>web.css" rel="stylesheet" type="text/css" >
   <style>
@@ -77,7 +77,7 @@ echo file_get_contents("https://www.webosarchive.org/menu.php?docRoot=" . $docRo
       <h1><img src="<?php echo $icon;?>" width="60" height="60" alt=""/><?php echo $title; ?></h1>
       <p><?php echo $description; ?></p>
       <p>The recovered catalog items are stored on the <a href="https://archive.org/details/@webos_archive">Internet Archive</a>, and can be browsed a number of ways... </p>
-      <div style="font-size:-1">
+      <div style="font-size:0.95em">
 
         <a class="download-link" href="showMuseum.php">
            <img src="assets/browser-icon.png" style="vertical-align:middle" alt="Browse Online" title="Browse Online" width="48" height="48"/> Browse Online </a>
@@ -97,8 +97,8 @@ echo file_get_contents("https://www.webosarchive.org/menu.php?docRoot=" . $docRo
     </div>
     <div id="hero">
       <img src="hero.png" width="480" alt="<?php echo $title ?>" />
-      <p style="font-size:-1">Catalog metadata is available on <?php echo "<a href='" . $github . "'>GitHub</a>"?> | <a href="https://appcatalog.webosarchive.org/WebService/reports/">View Stats</a></p>
-      <small><i>Many items are still missing! If you have an old device or personal archive, check the <a href="wanted.txt">wanted</a> <a href="wanted.csv">list</a>, or run the <a href="https://appcatalog.webosarchive.org/app/webOSAppScanner">App Scanner</a> on your device, and <a href="mailto:webosarchive@gmail.com">email us</a> if you have any matches!</i></small></p>
+      <p style="font-size:1.1em">Catalog metadata is available on <?php echo "<a href='" . $github . "'>GitHub</a>"?> | <a href="https://appcatalog.webosarchive.org/WebService/reports/">View Stats</a></p>
+      <p style="font-size:0.98em"><i>Many items are still missing! If you have an old device or personal archive, check the <a href="wanted.txt">wanted</a> <a href="wanted.csv">list</a>, or run the <a href="https://appcatalog.webosarchive.org/app/webOSAppScanner">App Scanner</a> on your device, and <a href="mailto:webosarchive@gmail.com">email us</a> if you have any matches!</i></p>
     </div>
   </div>
   <div id="footer">
