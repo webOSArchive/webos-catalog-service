@@ -77,25 +77,23 @@ echo file_get_contents("https://www.webosarchive.org/menu.php?docRoot=" . $docRo
       <h1><img src="<?php echo $icon;?>" width="60" height="60" alt=""/><?php echo $title; ?></h1>
       <p><?php echo $description; ?></p>
       <p>The recovered catalog items are stored on the <a href="https://archive.org/details/@webos_archive">Internet Archive</a>, and can be browsed a number of ways... </p>
-      <p style="font-size:smaller">
+      <div style="font-size:-1">
 
         <a class="download-link" href="showMuseum.php">
-           <img src="assets/browser-icon.png" style="vertical-align:middle" alt="Browse Online" title="Browse Online" width="48" height="48"/> Browse Online </a> | <a href="https://weboslives.eu/feeds/">Alternate Site
-		    </a><br>
-        <a class="download-link" href="https://github.com/h8pewou/legacy-webos-feeds/blob/main/README.md#wosa-feed">
-           <a href="https://archive.org/details/webosappcatalog"> Download Complete Archive
-        </a>
+           <img src="assets/browser-icon.png" style="vertical-align:middle" alt="Browse Online" title="Browse Online" width="48" height="48"/> Browse Online </a>
+           | <a class="download-link" href="https://weboslives.eu/feeds/">Alternate Site</a>
+           | <a class="download-link" href="https://archive.org/details/webosappcatalog"> Full Archive</a>
         <br><br>
-        Install on Device | <a href="http://www.webosarchive.org/docs/appstores/">Help</a><br>
-        <a class="download-link"><img src="assets/appcatalog.png" style="vertical-align:middle" alt="HP App Catalog" title="HP App Catalog" width="48" height="48"/> Restored App Catalog - TouchPad (3.0.5)</a><br>
-        <a class="download-link"><img src="assets/appcatalog.png" style="vertical-align:middle" alt="HP App Catalog" title="HP App Catalog" width="48" height="48"/> Restored App Catalog - Phones (2.2.4)</a><br>
-        <a class="download-link"><img src="assets/preware-icon.png" style="vertical-align:middle" alt="Add to Preware" title="Add to Preware" width="48" height="48"/> Add to Preware - Older Phones</a><br>
+        <div style="font-weight:bold; margin-bottom:8px;">Install on Device | <a href="http://www.webosarchive.org/docs/appstores/">Help</a><br></div>
+        <a class="download-link" href="AppPackages/com.palm.app.enyo-findapps_6.0.2900_all.ipk"><img src="assets/hp-appcatalog.png" style="vertical-align:middle" alt="HP App Catalog" t>
+        <a class="download-link" href="AppPackages/com.palm.app.findapps_3.0.23300_all.ipk"><img src="assets/palm-appcatalog.png" style="vertical-align:middle" alt="HP App Catalog" tit>
+        <a class="download-link" href="https://github.com/h8pewou/legacy-webos-feeds/blob/main/README.md#wosa-feed"><img src="assets/preware-icon.png" style="vertical-align:middle" alt>
 
         <a class="download-link" href="<?php echo $use_uri?>">
         <img src="assets/icon.png" style="vertical-align:middle" alt="App Museum for LuneOS" title="App Museum for LuneOS" width="48" height="48"/> App Museum (Enyo/LuneOS)
         </a>
 
-      </p>
+      </div>
     </div>
     <div id="hero">
       <img src="hero.png" width="480" alt="<?php echo $title ?>" />
