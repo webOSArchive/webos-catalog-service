@@ -1,0 +1,16 @@
+{
+  "publicApplicationId": "com.palm.app.enyo-findapps",
+  "description": "HP App Catalog for Mojo",
+  "version": "3.0.23300",
+  "versionNote": "Initial restoration",
+  "homeURL": "http://www.webosarchive.org",
+  "supportURL": "http://appcatalog.webosarchive.org",
+  "custsupportemail": "webosarchive@gmail.com",
+  "custsupportphonenum": "",
+  "copyright": "webOS Archive",
+  "licenseURL": "MIT",
+  "locale": "en_US",
+  "lastModifiedTime": "2026-06-10T01:15:19-04:00",
+  "filename": "http://appcatalog.webosarchive.org/AppPackages/com.palm.app.findapps_3.0.23300_all.ipk",
+  "originalFileName": "com.palm.app.findapps_3.0.23300_all.ipk"
+}
