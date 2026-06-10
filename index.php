@@ -89,6 +89,10 @@ echo file_get_contents("https://www.webosarchive.org/menu.php?docRoot=" . $docRo
         </a> | <a href="http://www.webosarchive.org/docs/appstores/">Help</a>
         <br>
 
+        <img src="assets/appcatalog.png" style="vertical-align:middle" alt="HP App Catalog" title="HP App Catalog" width="48" height="48"/> Restored App Catalog 
+        <a class="download-link" href="<?php echo $use_uri?>">TouchPad (3.0.5)</a> | <a>Phones (2.2.4)</a>
+        <br>
+
         Restored Clients: 
           <a class="download-link" href="showMuseum.php">webOS 2.2.4 (Phones)</a> | <a class="download-link" href="showMuseum.php">webOS 3.x (TouchPad)</a>
         <br>
