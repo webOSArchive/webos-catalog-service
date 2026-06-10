@@ -85,9 +85,9 @@ echo file_get_contents("https://www.webosarchive.org/menu.php?docRoot=" . $docRo
            | <a class="download-link" href="https://archive.org/details/webosappcatalog"> Full Archive</a>
         <br><br>
         <div style="font-weight:bold; margin-bottom:8px;">Install on Device | <a href="http://www.webosarchive.org/docs/appstores/">Help</a><br></div>
-        <a class="download-link" href="AppPackages/com.palm.app.enyo-findapps_6.0.2900_all.ipk"><img src="assets/hp-appcatalog.png" style="vertical-align:middle" alt="HP App Catalog" t>
-        <a class="download-link" href="AppPackages/com.palm.app.findapps_3.0.23300_all.ipk"><img src="assets/palm-appcatalog.png" style="vertical-align:middle" alt="HP App Catalog" tit>
-        <a class="download-link" href="https://github.com/h8pewou/legacy-webos-feeds/blob/main/README.md#wosa-feed"><img src="assets/preware-icon.png" style="vertical-align:middle" alt>
+        <a class="download-link" href="AppPackages/com.palm.app.enyo-findapps_6.0.2900_all.ipk"><img src="assets/hp-appcatalog.png" style="vertical-align:middle" alt="HP App Catalog for TouchPad"" title="HP App Catalog for TouchPad">Touchpad</a><br>
+        <a class="download-link" href="AppPackages/com.palm.app.findapps_3.0.23300_all.ipk"><img src="assets/palm-appcatalog.png" style="vertical-align:middle" alt="HP App Catalog" title="HP App Catalog for Phones">Phones</a><br>
+        <a class="download-link" href="https://github.com/h8pewou/legacy-webos-feeds/blob/main/README.md#wosa-feed"><img src="assets/preware-icon.png" style="vertical-align:middle" alt="PreWare Feed for Old Phones">Old Phones</a><br>
 
         <a class="download-link" href="<?php echo $use_uri?>">
         <img src="assets/icon.png" style="vertical-align:middle" alt="App Museum for LuneOS" title="App Museum for LuneOS" width="48" height="48"/> App Museum (Enyo/LuneOS)
