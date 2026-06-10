@@ -76,19 +76,26 @@ echo file_get_contents("https://www.webosarchive.org/menu.php?docRoot=" . $docRo
     <div id="content" align="left">
       <h1><img src="<?php echo $icon;?>" width="60" height="60" alt=""/><?php echo $title; ?></h1>
       <p><?php echo $description; ?></p>
-      <p>The recovered catalog items are stored on the <a href="https://archive.org/details/@webos_archive">Internet Archive</a>, and can be browsed on the web, or on-device via Preware or a native client. </p>
+      <p>The recovered catalog items are stored on the <a href="https://archive.org/details/@webos_archive">Internet Archive</a>, and can be browsed a number of ways... </p>
       <p>
+
+        <a class="download-link" href="showMuseum.php">
+           <img src="assets/browser-icon.png" style="vertical-align:middle" alt="Browse Online" title="Browse Online" width="48" height="48"/> Browse Online </a> | <a href="https://weboslives.eu/feeds/">Alternate Site
+		    </a>
+        <br>
+
         <a class="download-link" href="<?php echo $use_uri?>">
-          <img src="assets/icon.png" style="vertical-align:middle" alt="Download for webOS" title="Download for webOS" width="48" height="48"/> Download for webOS
+          <img src="assets/icon.png" style="vertical-align:middle" alt="App Museum for webOS" title="App Museum for webOS" width="48" height="48"/> App Museum for webOS
         </a> | <a href="http://www.webosarchive.org/docs/appstores/">Help</a>
         <br>
+
+        Restored Clients: 
+          <a class="download-link" href="showMuseum.php">webOS 2.2.4 (Phones)</a> | <a class="download-link" href="showMuseum.php">webOS 3.x (TouchPad)</a>
+        <br>
+
         <a class="download-link" href="https://github.com/h8pewou/legacy-webos-feeds/blob/main/README.md#wosa-feed">
            <img src="assets/preware-icon.png" style="vertical-align:middle" alt="Add to Preware" title="Add to Preware" width="48" height="48"/> Add to Preware</a> | <a href="https://archive.org/details/webosappcatalog"> Full Archive
         </a>
-        <br>
-        <a class="download-link" href="showMuseum.php">
-           <img src="assets/browser-icon.png" style="vertical-align:middle" alt="Browse Online" title="Browse Online" width="48" height="48"/> Browse Online </a> | <a href="https://weboslives.eu/feeds/">Alternate Site
-		</a>
       </p>
     </div>
     <div id="hero">
