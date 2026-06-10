@@ -66,6 +66,12 @@ App data is stored in MySQL. Key tables:
 | `getSearchResults.php` | 60/hour | App/author search |
 | `getMuseumMaster.php` | 120/hour | Catalog listing |
 | `getMuseumDetails.php` | 200/hour | App details with related apps |
+| `countAppDownload.php` | — | Logs a download to `download_logs` (no body returned) |
+| `getLatestVersionInfo.php` | — | Update check; museum app reads `0.json`, other apps read `getMuseumDetails.php` |
+
+**`download_logs.source`** identifies the client: web frontend (unset/`app`), on-device Museum app (`webos` / `luneos`), and the patched HP first-party clients (`webos-appcatalog-enyo` for TouchPad, `webos-appcatalog-mojo` for phones). Use these to separate device installs from web in most-downloaded reports.
+
+The patched HP clients also self-update from static manifests at the domain root — `appcatalog-touchpad.json` and `appcatalog-phones.json` (latest `version`, `versionNote`, IPK `filename`) — served over **HTTP** since legacy devices can't do modern TLS.
 
 **Sort Options** (for `getMuseumMaster.php` and web frontend):
 - `recent` (default) - By `app_metadata.last_modified_time` descending
