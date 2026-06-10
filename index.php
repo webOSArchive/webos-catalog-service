@@ -82,17 +82,16 @@ echo file_get_contents("https://www.webosarchive.org/menu.php?docRoot=" . $docRo
         <a class="download-link" href="showMuseum.php">
            <img src="assets/browser-icon.png" style="vertical-align:middle" alt="Browse Online" title="Browse Online" width="48" height="48"/> Browse Online </a> | <a href="https://weboslives.eu/feeds/">Alternate Site
 		    </a>
-        <br>
+        <p><br></p>
+        Install on Device | <a href="http://www.webosarchive.org/docs/appstores/">Help</a>
 
-        On Device:<br> 
-         <img src="assets/appcatalog.png" style="vertical-align:middle" alt="HP App Catalog" title="HP App Catalog" width="48" height="48"/> Restored App Catalog <a class="download-link" href="<?php echo $use_uri?>">TouchPad (3.0.5)</a><br>
-         <img src="assets/appcatalog.png" style="vertical-align:middle" alt="HP App Catalog" title="HP App Catalog" width="48" height="48"/> Restored App Catalog <a>Phones (on webOS 2.2.4)</a><br>
-         <img src="assets/preware-icon.png" style="vertical-align:middle" alt="Add to Preware" title="Add to Preware" width="48" height="48"/> Add to Preware</a>
-        <br>
+        <a class="download-link"><img src="assets/appcatalog.png" style="vertical-align:middle" alt="HP App Catalog" title="HP App Catalog" width="48" height="48"/> Restored App Catalog - TouchPad (3.0.5)</a><br>
+        <a class="download-link"><img src="assets/appcatalog.png" style="vertical-align:middle" alt="HP App Catalog" title="HP App Catalog" width="48" height="48"/> Restored App Catalog - Phones (2.2.4)</a><br>
+        <a class="download-link"><img src="assets/preware-icon.png" style="vertical-align:middle" alt="Add to Preware" title="Add to Preware" width="48" height="48"/> Add to Preware - Older Phones</a><br>
 
         <a class="download-link" href="<?php echo $use_uri?>">
-          <img src="assets/icon.png" style="vertical-align:middle" alt="App Museum for webOS" title="App Museum for LuneOS" width="48" height="48"/> App Museum for LuneOS
-        </a> | <a href="http://www.webosarchive.org/docs/appstores/">Help</a>
+        <img src="assets/icon.png" style="vertical-align:middle" alt="App Museum for LuneOS" title="App Museum for LuneOS" width="48" height="48"/> App Museum (Enyo/LuneOS)
+        </a>
         <br>
 
         <a class="download-link" href="https://github.com/h8pewou/legacy-webos-feeds/blob/main/README.md#wosa-feed">
