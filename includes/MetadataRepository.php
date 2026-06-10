@@ -26,7 +26,8 @@ class MetadataRepository {
                 m.*,
                 a.title,
                 a.author,
-                a.touchpad_exclusive
+                a.touchpad_exclusive,
+                a.vendor_id
             FROM app_metadata m
             JOIN apps a ON m.app_id = a.id
             WHERE m.app_id = ?
@@ -71,6 +72,7 @@ class MetadataRepository {
             'filename' => $metadata['filename'],
             'free' => (bool)$metadata['free'],
             'touchpad_exclusive' => (bool)$metadata['touchpad_exclusive'],
+            'vendorId' => $metadata['vendor_id'],
             'images' => $images,
             'originalFileName' => $metadata['original_filename'],
             'starRating' => $metadata['star_rating'] ? (int)$metadata['star_rating'] : null
