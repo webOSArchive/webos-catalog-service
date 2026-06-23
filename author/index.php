@@ -100,7 +100,8 @@ $homePath = $protocol . $config["service_host"]. "";
 <?php
 //Social media meta
 $protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
-$currurl = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+// Escape host + request URI before reflecting into meta tag URLs (prevents reflected XSS)
+$currurl = htmlspecialchars($protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'], ENT_QUOTES);
 ?>
 <meta name="description" content="webOS App Museum II is the definitive historical archive of legacy Palm/HP webOS mobile apps and games!" />
 <link rel="canonical" href="<?php echo $currurl; ?>" />
@@ -162,6 +163,8 @@ $currurl = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 	<h3>Apps by <?php echo htmlspecialchars($author_data["author"]); ?>:</h3>
 	<?php
 		echo("<table cellpadding='5'>");
+		// Escape the raw query string for safe use inside HTML href attributes (prevents reflected XSS)
+		$qs = htmlspecialchars($_SERVER["QUERY_STRING"], ENT_QUOTES);
 		if (isset($app_response)) {
 			foreach($app_response["data"] as $app) {
 				if (strpos($app["appIcon"], "://") === false) {
@@ -169,8 +172,8 @@ $currurl = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 				} else {
 					$use_img = $app["appIcon"];
 				}
-				echo("<tr><td align='center' valign='top'><a href='{$protocol}{$config["service_host"]}/showMuseumDetails.php?{$_SERVER["QUERY_STRING"]}&app={$app["id"]}'><img style='width:64px; height:64px' src='{$use_img}' border='0'></a>");
-				echo("<td width='100%' style='padding-left: 14px'><b><a href='{$protocol}{$config["service_host"]}/showMuseumDetails.php?{$_SERVER["QUERY_STRING"]}&app={$app["id"]}'>" . htmlspecialchars($app["title"]) . "</a></b><br/>");
+				echo("<tr><td align='center' valign='top'><a href='{$protocol}{$config["service_host"]}/showMuseumDetails.php?{$qs}&app={$app["id"]}'><img style='width:64px; height:64px' src='{$use_img}' border='0'></a>");
+				echo("<td width='100%' style='padding-left: 14px'><b><a href='{$protocol}{$config["service_host"]}/showMuseumDetails.php?{$qs}&app={$app["id"]}'>" . htmlspecialchars($app["title"]) . "</a></b><br/>");
 				echo("<small>" . htmlspecialchars(substr($app["summary"] ?? '',0, 180)) . "...</small><br/>&nbsp;");
 				echo("</td></tr>");
 			}
