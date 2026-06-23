@@ -27,24 +27,45 @@ if (isset($_GET["appid"]) && $_GET["appid"] != "") {
 }
 
 function isProbeAttempt($appid) {
-    $appid = strtolower($appid);
+    $appid = strtolower(trim($appid));
 
-    // Block common vulnerability probe patterns
-    $blocked = [
-        '.env', 'eval-stdin.php', 'wp-login.php', 'wp-admin', 'xmlrpc.php',
-        'admin.php', 'shell.php', 'config.php', 'config', 'phpinfo.php', 'setup.php'
-    ];
-    if (in_array($appid, $blocked)) {
+    // Empty or null-byte injected identifiers are never legitimate
+    if ($appid === '' || strpos($appid, "\0") !== false) {
+        return true;
+    }
+
+    // Legitimate app IDs never contain path separators. Scanners requesting
+    // files/paths (e.g. app/config/parameters.yml) get filtered here.
+    if (strpos($appid, '/') !== false || strpos($appid, '\\') !== false) {
         return true;
     }
 
     // Block path traversal attempts
-    if (strpos($appid, '../') !== false || strpos($appid, '..\\') !== false) {
+    if (strpos($appid, '..') !== false) {
         return true;
     }
 
-    // Block requests ending in .php (no legitimate app ID ends in .php)
-    if (substr($appid, -4) === '.php') {
+    // Block requests for files by extension. No legitimate app ID is a
+    // filename, so anything ending in a known file extension is a scanner
+    // probing for source/config/secret files (parameters.yml, .env, config.php,
+    // settings.ini, backup.sql, .git, etc.).
+    $blockedExtensions = [
+        '.php', '.yml', '.yaml', '.env', '.ini', '.conf', '.config', '.json',
+        '.xml', '.sql', '.bak', '.old', '.swp', '.lock', '.sh', '.git',
+        '.asp', '.aspx', '.jsp', '.cgi', '.pl', '.py'
+    ];
+    foreach ($blockedExtensions as $ext) {
+        if (substr($appid, -strlen($ext)) === $ext) {
+            return true;
+        }
+    }
+
+    // Block known probe filenames/keywords (extension-less variants)
+    $blocked = [
+        '.env', 'eval-stdin', 'wp-login', 'wp-admin', 'xmlrpc',
+        'admin', 'shell', 'config', 'phpinfo', 'setup', 'parameters'
+    ];
+    if (in_array($appid, $blocked)) {
         return true;
     }
 
