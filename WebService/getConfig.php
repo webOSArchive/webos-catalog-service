@@ -2,10 +2,19 @@
 $config = include('config.php');
 header('Content-Type: application/json');
 
-// Filter out database credentials - these should never be exposed
-$publicConfig = array_filter($config, function($key) {
-    return strpos($key, 'db_') !== 0;
-}, ARRAY_FILTER_USE_KEY);
+// Only expose an explicit allowlist of public values. Everything else
+// (db_* credentials, download_secret, azure_connection_string, etc.) is a
+// secret and must never be returned. Using an allowlist instead of a denylist
+// ensures any future config key is private by default.
+$publicKeys = [
+    'service_host',
+    'image_host',
+    'package_host',
+    'package_host_secure',
+    'contact_email',
+];
+
+$publicConfig = array_intersect_key($config, array_flip($publicKeys));
 
 echo(json_encode($publicConfig));
 ?>

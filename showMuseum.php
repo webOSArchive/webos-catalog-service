@@ -164,6 +164,8 @@ include('meta-social-common.php');
 					echo ("<h3>Search Results: '" . htmlspecialchars($searchTerm) . "'</h3>");
 				}
 				echo("<table cellpadding='5'>");
+				// Escape the raw query string for safe use inside HTML href attributes (prevents reflected XSS)
+				$qs = htmlspecialchars($_SERVER["QUERY_STRING"], ENT_QUOTES);
 				foreach($app_response["data"] as $app) {
 					if (strpos($app["appIcon"], "://") === false) {
 						$use_img = $img_path.strtolower($app["appIcon"]);
@@ -171,8 +173,8 @@ include('meta-social-common.php');
 						$use_img = $app["appIcon"];
 					}
 
-					echo("<tr><td align='center' valign='top'><a href='showMuseumDetails.php?{$_SERVER["QUERY_STRING"]}&app={$app["id"]}'><img style='width:64px; height:64px' src='{$use_img}' border='0'></a>");
-					echo("<td width='100%' style='padding-left: 14px'><b><a href='showMuseumDetails.php?{$_SERVER["QUERY_STRING"]}&app={$app["id"]}'>{$app["title"]}</a></b><br/>");
+					echo("<tr><td align='center' valign='top'><a href='showMuseumDetails.php?{$qs}&app={$app["id"]}'><img style='width:64px; height:64px' src='{$use_img}' border='0'></a>");
+					echo("<td width='100%' style='padding-left: 14px'><b><a href='showMuseumDetails.php?{$qs}&app={$app["id"]}'>{$app["title"]}</a></b><br/>");
 					echo("<small>" . substr($app["summary"],0, 180) . "...</small><br/>&nbsp;");
 					echo("</td></tr>");
 				}

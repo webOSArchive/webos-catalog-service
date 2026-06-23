@@ -3,8 +3,10 @@
 //  put global config here, subdirectories are supported, but no trailing slashes
 //  you must host these repositories over HTTPS AND HTTP without redirecting to HTTPS
 //  (you can use the Upgrade-Insecure-Requests header in your server config to serve HTTPS to modern web clients)
-//  Note: Public config values (service_host, etc.) are exposed via getConfig.php API
-//        Database credentials (db_*) are NOT exposed - they are filtered out in getConfig.php
+//  Note: getConfig.php exposes ONLY an explicit allowlist of public values
+//        (service_host, image_host, package_host, package_host_secure, contact_email).
+//        Everything else here (db_*, download_secret, azure_connection_string) is secret
+//        and is never returned by the API.
 
 // Define function before use, with guard to prevent redeclaration
 if (!function_exists('select_lb_resource')) {

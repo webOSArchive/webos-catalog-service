@@ -71,7 +71,7 @@ else	//Any other app
 	}
 
 	if ($found_id == "null") {
-		echo "{\"error\": \"No matching app found for " . $search_str . "\"}";
+		echo json_encode(["error" => "No matching app found for " . $search_str]);
 		die;
 	}
 	$meta_path = "http://" . $config["service_host"] . "/WebService/getMuseumDetails.php?id=" . $found_id;
