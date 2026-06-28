@@ -542,10 +542,13 @@ class AppRepository {
             SELECT c.name, COUNT(*) as count
             FROM apps a
             LEFT JOIN categories c ON a.category_id = c.id
+            LEFT JOIN app_metadata m ON a.id = m.app_id
             WHERE a.status IN ($statusPlaceholders)
+              AND {$this->notFutureDatedClause()}
         ";
 
         $params = $statuses;
+        $params[] = $this->publishCutoff();
 
         if (!$adult) {
             $sql .= " AND a.adult = FALSE";
@@ -564,19 +567,20 @@ class AppRepository {
             }
         }
 
-        // Get missing count
-        $missingStmt = $this->db->query("SELECT COUNT(*) FROM apps WHERE status = 'missing'");
+        // Get missing count (also exclude future-dated apps to match the listing)
+        $missingStmt = $this->db->prepare("SELECT COUNT(*) FROM apps a LEFT JOIN app_metadata m ON a.id = m.app_id WHERE a.status = 'missing' AND {$this->notFutureDatedClause()}");
+        $missingStmt->execute([$this->publishCutoff()]);
         $counts['Missing Apps'] = (int)$missingStmt->fetchColumn();
 
         // Get virtual category counts (not added to All since they overlap with real categories)
-        $adultClause = $adult ? "" : " AND adult = FALSE";
+        $adultClause = $adult ? "" : " AND a.adult = FALSE";
 
-        $rhStmt = $this->db->prepare("SELECT COUNT(*) FROM apps WHERE in_revisionist_history = TRUE AND status IN ($statusPlaceholders)" . $adultClause);
-        $rhStmt->execute($statuses);
+        $rhStmt = $this->db->prepare("SELECT COUNT(*) FROM apps a LEFT JOIN app_metadata m ON a.id = m.app_id WHERE a.in_revisionist_history = TRUE AND a.status IN ($statusPlaceholders)" . $adultClause . " AND {$this->notFutureDatedClause()}");
+        $rhStmt->execute(array_merge($statuses, [$this->publishCutoff()]));
         $counts['Revisionist History'] = (int)$rhStmt->fetchColumn();
 
-        $ccStmt = $this->db->prepare("SELECT COUNT(*) FROM apps WHERE in_curators_choice = TRUE AND status IN ($statusPlaceholders)" . $adultClause);
-        $ccStmt->execute($statuses);
+        $ccStmt = $this->db->prepare("SELECT COUNT(*) FROM apps a LEFT JOIN app_metadata m ON a.id = m.app_id WHERE a.in_curators_choice = TRUE AND a.status IN ($statusPlaceholders)" . $adultClause . " AND {$this->notFutureDatedClause()}");
+        $ccStmt->execute(array_merge($statuses, [$this->publishCutoff()]));
         $counts["Curator's Choice"] = (int)$ccStmt->fetchColumn();
 
         return $counts;
