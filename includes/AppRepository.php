@@ -15,6 +15,38 @@ class AppRepository {
     }
 
     /**
+     * SQL WHERE fragment that hides apps scheduled for the future.
+     *
+     * An app whose app_metadata.last_modified_time is later than the server's
+     * current time is treated as not-yet-published and excluded from
+     * client-facing browse/search results. Apps with no metadata row (NULL
+     * last_modified_time) are always shown.
+     *
+     * Requires app_metadata to be joined with the given alias. The clause
+     * contains one placeholder; bind publishCutoff() at that position.
+     *
+     * @param string $alias Table alias used for app_metadata in the query
+     * @return string SQL fragment (no leading AND)
+     */
+    private function notFutureDatedClause($alias = 'm') {
+        return "($alias.last_modified_time IS NULL OR $alias.last_modified_time <= ?)";
+    }
+
+    /**
+     * Cutoff timestamp for notFutureDatedClause().
+     *
+     * Uses the PHP server clock so legacy clients (which can't be trusted to
+     * know the date) never influence visibility. Formatted identically to how
+     * MetadataRepository::upsert() writes last_modified_time, so the comparison
+     * is timezone-consistent regardless of the MySQL session time_zone.
+     *
+     * @return string Current server time as 'Y-m-d H:i:s'
+     */
+    private function publishCutoff() {
+        return date('Y-m-d H:i:s');
+    }
+
+    /**
      * Load apps from database - replaces load_catalogs()
      *
      * @param array $statuses Which statuses to include ['active', 'missing', 'archived']
@@ -63,11 +95,12 @@ class AppRepository {
             LEFT JOIN categories c ON a.category_id = c.id
             LEFT JOIN app_metadata m ON a.id = m.app_id
             WHERE a.status IN ($placeholders)
+              AND {$this->notFutureDatedClause()}
             ORDER BY $orderBy
         ";
 
         $stmt = $this->db->prepare($sql);
-        $stmt->execute($statuses);
+        $stmt->execute(array_merge($statuses, [$this->publishCutoff()]));
 
         // Convert boolean fields from int to bool for JSON compatibility
         $results = [];
@@ -128,6 +161,7 @@ class AppRepository {
                 a.adult AS Adult
             FROM apps a
             LEFT JOIN categories c ON a.category_id = c.id
+            LEFT JOIN app_metadata m ON a.id = m.app_id
             WHERE a.status IN ($statusPlaceholders)
         ";
 
@@ -145,6 +179,10 @@ class AppRepository {
         $params[] = is_numeric($searchStr) ? (int)$searchStr : 0;
         $params[] = "%{$searchStr}%";
         $params[] = "%{$searchStr}%";
+
+        // Hide apps scheduled for the future (server clock)
+        $sql .= " AND " . $this->notFutureDatedClause();
+        $params[] = $this->publishCutoff();
 
         if (!$adult) {
             $sql .= " AND a.adult = FALSE";
@@ -205,6 +243,7 @@ class AppRepository {
                 a.adult AS Adult
             FROM apps a
             LEFT JOIN categories c ON a.category_id = c.id
+            LEFT JOIN app_metadata m ON a.id = m.app_id
             WHERE a.status IN ($statusPlaceholders)
               AND (
                   LOWER(a.author) = LOWER(?)
@@ -212,13 +251,15 @@ class AppRepository {
                   OR LOWER(REPLACE(a.author, ' ', '')) = LOWER(?)
                   OR LOWER(REPLACE(a.author, ' ', '')) LIKE LOWER(?)
               )
+              AND {$this->notFutureDatedClause()}
         ";
 
         $params = array_merge($statuses, [
             $authorStr,
             "%{$authorStr}%",
             $authorStr,
-            "%{$authorStr}%"
+            "%{$authorStr}%",
+            $this->publishCutoff()
         ]);
 
         if (!$adult) {
@@ -287,6 +328,10 @@ class AppRepository {
         if (!$adult) {
             $sql .= " AND a.adult = FALSE";
         }
+
+        // Hide apps scheduled for the future (server clock)
+        $sql .= " AND " . $this->notFutureDatedClause();
+        $params[] = $this->publishCutoff();
 
         // Determine sort order
         if ($sort === 'recommended') {
