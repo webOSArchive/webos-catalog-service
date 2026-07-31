@@ -24,6 +24,42 @@ function repositionArrayElement(array &$array, $value, int $order): void
 	$array = array_merge($p2, $p1, $array);
 }
 
+// Render a page navigation bar for a paginated category listing.
+// $category and $count are the RAW request values (urlencoded here),
+// matching how the sort-toggle links are built, and $sort is carried
+// through so pagination never drops the chosen sort order.
+function render_pager($category, $count, $sort, $page, $totalPages): void
+{
+	if ($totalPages < 2) return;
+	$base = "showMuseum.php?category=" . urlencode($category)
+		. "&count=" . urlencode($count) . "&sort=" . urlencode($sort);
+	$link = function ($p, $label, $cls = "") use ($base) {
+		return "<a class='" . $cls . "' href='"
+			. htmlspecialchars($base . "&page=" . (int)$p, ENT_QUOTES)
+			. "'>" . $label . "</a>";
+	};
+	echo "<div class='mm-pager'>";
+	if ($page > 1) echo $link($page - 1, "&lsaquo; Prev", "mm-pg-nav");
+	$window = 2;
+	$start = max(1, $page - $window);
+	$end = min($totalPages, $page + $window);
+	if ($start > 1) {
+		echo $link(1, "1");
+		if ($start > 2) echo "<span class='mm-pg-ellipsis'>&hellip;</span>";
+	}
+	for ($p = $start; $p <= $end; $p++) {
+		echo ($p == $page)
+			? "<span class='mm-pg-cur'>" . $p . "</span>"
+			: $link($p, (string)$p);
+	}
+	if ($end < $totalPages) {
+		if ($end < $totalPages - 1) echo "<span class='mm-pg-ellipsis'>&hellip;</span>";
+		echo $link($totalPages, (string)$totalPages);
+	}
+	if ($page < $totalPages) echo $link($page + 1, "Next &rsaquo;", "mm-pg-nav");
+	echo "</div>";
+}
+
 //Figure out what protocol the client wanted
 if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
     $PROTOCOL = "https://";
@@ -77,8 +113,25 @@ if (isset($_GET['category']) && isset($_GET['count']))
 	$fullcatalog = load_catalogs();
 	$_adult = strpos($adult, 'true') !== false;
 
-	$results = filter_apps_by_category($fullcatalog, $category, $_adult, $count, $_sort);
-	$app_response = array('data' => $results);
+	// Fetch the full, sorted category set. Sorting is done in SQL
+	// (ORDER BY), so slicing into pages below preserves the chosen
+	// sort order (recent / alpha / recommended).
+	$results = filter_apps_by_category($fullcatalog, $category, $_adult, 0, $_sort);
+
+	// Paginate categories with more than PAGE_SIZE apps
+	$PAGE_SIZE = 150;
+	$totalApps = count($results);
+	$totalPages = max(1, (int)ceil($totalApps / $PAGE_SIZE));
+	$page = 1;
+	if (isset($_GET['page'])) {
+		$page = (int)preg_replace("/[^0-9]+/", "", $_GET['page']);
+	}
+	if ($page < 1) $page = 1;
+	if ($page > $totalPages) $page = $totalPages;
+	$isPaginated = ($totalApps > $PAGE_SIZE);
+	$app_response = array('data' => $isPaginated
+		? array_slice($results, ($page - 1) * $PAGE_SIZE, $PAGE_SIZE)
+		: $results);
 }
 elseif (isset($_GET['search']))
 {
@@ -163,6 +216,14 @@ include('meta-social-common.php');
 					echo "<span class='mm-sep'>&middot;</span>";
 					echo ($_sort == 'recommended') ? "<b>Recommended</b>" : "<a href='{$sortRecUrl}'>Recommended</a>";
 					echo "</div>";
+					// Pagination summary + top nav (only for large categories)
+					if (!empty($isPaginated)) {
+						$from = ($page - 1) * $PAGE_SIZE + 1;
+						$to = min($totalApps, $page * $PAGE_SIZE);
+						echo "<div class='mm-pgsummary'>Showing " . $from . "&ndash;" . $to
+							. " of " . $totalApps . " apps</div>";
+						render_pager($_GET['category'], $_GET['count'], $_sort, $page, $totalPages);
+					}
 				}
 				if (isset($_GET['search'])) {
 					$searchTerm = $_GET['search'];
@@ -185,6 +246,10 @@ include('meta-social-common.php');
 					echo     "<span class='mm-app-summary'>" . htmlspecialchars(substr($app["summary"], 0, 180)) . "&hellip;</span>";
 					echo   "</span>";
 					echo "</a>";
+				}
+				// Pagination nav at the bottom of the list
+				if (!empty($isPaginated)) {
+					render_pager($_GET['category'], $_GET['count'], $_sort, $page, $totalPages);
 				}
 				include 'footer.php';
 			}

@@ -243,6 +243,51 @@ img {
 }
 
 /* ============================================================
+   Pagination (large categories)
+   ============================================================ */
+.mm-pgsummary {
+	color: #6b7280;
+	font-size: 13px;
+	margin: 0 0 12px 0;
+}
+.mm-pager {
+	margin: 16px 0 4px 0;
+	text-align: center;
+}
+.mm-pager a,
+.mm-pager .mm-pg-cur {
+	display: inline-block;
+	min-width: 20px;
+	padding: 7px 11px;
+	margin: 2px;
+	font-size: 14px;
+	border: 1px solid #e4e6eb;
+	border-radius: 8px;
+	-webkit-border-radius: 8px;
+	color: #3e0bf9;
+	-webkit-transition: background-color 0.12s ease;
+	transition: background-color 0.12s ease;
+}
+.mm-pager a:hover {
+	background-color: #f0f1f5;
+	text-decoration: none;
+}
+.mm-pager .mm-pg-cur {
+	background-color: #3e0bf9;
+	border-color: #3e0bf9;
+	color: #ffffff;
+	font-weight: bold;
+}
+.mm-pager .mm-pg-nav {
+	font-weight: bold;
+}
+.mm-pager .mm-pg-ellipsis {
+	display: inline-block;
+	padding: 7px 2px;
+	color: #9aa0af;
+}
+
+/* ============================================================
    Empty / search landing state
    ============================================================ */
 .mm-landing {
