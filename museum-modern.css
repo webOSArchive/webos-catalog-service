@@ -74,6 +74,13 @@ img {
 .mm-head a {
 	color: #14151c;
 }
+/* Title link: no underline on hover — tint the wordmark purple instead */
+.mm-head a:hover {
+	text-decoration: none;
+}
+.mm-head a:hover .mm-title {
+	color: #3e0bf9;
+}
 .mm-head .mm-head-icon {
 	display: table-cell;
 	width: 44px;
