@@ -211,12 +211,16 @@ img {
 	vertical-align: top;
 }
 .mm-app .mm-app-icon {
-	width: 64px;
+	/* 64px icon + 14px gutter. box-sizing is border-box, so the
+	   width must include the padding or the global img{max-width}
+	   rule squishes the icon to the content box (50px). */
+	width: 78px;
 	padding-right: 14px;
 }
 .mm-app .mm-app-icon img {
 	width: 64px;
 	height: 64px;
+	max-width: none; /* never let the icon shrink below 64x64 */
 	border-radius: 13px;
 	-webkit-border-radius: 13px;
 	background-color: #f0f1f5;
