@@ -136,6 +136,10 @@ class AppRepository {
         if (empty($searchStr)) {
             return [];
         }
+        // Alphanumeric-only form of the query (no spaces or punctuation) so a
+        // title with punctuation (e.g. "Blue Defense: Second Wave!") still
+        // matches when the query has been stripped to "bluedefensesecondwave".
+        $normStr = preg_replace('/[^a-z0-9]/', '', $searchStr);
 
         $statusPlaceholders = str_repeat('?,', count($statuses) - 1) . '?';
 
@@ -168,13 +172,14 @@ class AppRepository {
         $params = $statuses;
 
         // Build search conditions. Matches title (exact / partial /
-        // space-insensitive), exact ID, author, the short summary, and
-        // the full description (app_metadata.description via join m).
+        // alphanumeric-only so punctuation in a title doesn't block the
+        // match), exact ID, author, the short summary, and the full
+        // description (app_metadata.description via join m).
         $sql .= " AND (
             LOWER(a.title) = LOWER(?)
             OR a.id = ?
             OR LOWER(a.title) LIKE LOWER(?)
-            OR LOWER(REPLACE(a.title, ' ', '')) LIKE LOWER(?)
+            OR {$this->alnumOnly('a.title')} LIKE ?
             OR LOWER(a.author) LIKE LOWER(?)
             OR LOWER(a.summary) LIKE LOWER(?)
             OR LOWER(m.description) LIKE LOWER(?)
@@ -182,8 +187,8 @@ class AppRepository {
 
         $params[] = $searchStr;
         $params[] = is_numeric($searchStr) ? (int)$searchStr : 0;
-        $params[] = "%{$searchStr}%";
-        $params[] = "%{$searchStr}%";
+        $params[] = "%{$searchStr}%"; // title partial
+        $params[] = "%{$normStr}%";   // title, alphanumeric-only
         $params[] = "%{$searchStr}%"; // author
         $params[] = "%{$searchStr}%"; // summary
         $params[] = "%{$searchStr}%"; // description
@@ -196,21 +201,23 @@ class AppRepository {
             $sql .= " AND a.adult = FALSE";
         }
 
-        // Order by relevance: exact title, then ID, then a title match,
-        // then an author match, then everything else (summary/description).
+        // Order by relevance: exact title, then ID, then a title match, then
+        // an alphanumeric-only title match, then author, then everything else.
         $sql .= " ORDER BY
             CASE
                 WHEN LOWER(a.title) = LOWER(?) THEN 1
                 WHEN a.id = ? THEN 2
                 WHEN LOWER(a.title) LIKE LOWER(?) THEN 3
-                WHEN LOWER(a.author) LIKE LOWER(?) THEN 4
-                ELSE 5
+                WHEN {$this->alnumOnly('a.title')} LIKE ? THEN 4
+                WHEN LOWER(a.author) LIKE LOWER(?) THEN 5
+                ELSE 6
             END,
             a.title";
 
         $params[] = $searchStr;
         $params[] = is_numeric($searchStr) ? (int)$searchStr : 0;
         $params[] = "%{$searchStr}%"; // title match rank
+        $params[] = "%{$normStr}%";   // alphanumeric-only title match rank
         $params[] = "%{$searchStr}%"; // author match rank
 
         $stmt = $this->db->prepare($sql);
@@ -1005,6 +1012,21 @@ class AppRepository {
         $str = urldecode(strtolower($str));
         $str = preg_replace("/[^a-zA-Z0-9 ]+/", "", $str);
         return trim($str);
+    }
+
+    /**
+     * Build a SQL expression that lowercases $col and strips every ASCII
+     * non-alphanumeric character, so a punctuation-free query can match a
+     * title like "Blue Defense: Second Wave!". Uses nested REPLACE (not
+     * REGEXP_REPLACE) so it works on older MySQL/MariaDB too. The characters
+     * are constants quoted via PDO::quote(), so there is no injection risk.
+     */
+    private function alnumOnly($col) {
+        $expr = $col;
+        foreach (str_split(' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~') as $ch) {
+            $expr = "REPLACE($expr, " . $this->db->quote($ch) . ", '')";
+        }
+        return "LOWER($expr)";
     }
 
     /**
