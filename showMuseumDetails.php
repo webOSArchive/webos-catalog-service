@@ -399,19 +399,6 @@ function mm_dev_on($app, $key) {
 		</script>
 		<?php } ?>
 
-		<div class="mm-rows">
-			<div class="mm-row"><span class="mm-label">Museum ID</span><span class="mm-value"><?php echo htmlspecialchars($found_app["id"]) ?></span></div>
-			<div class="mm-row"><span class="mm-label">Application ID</span><span class="mm-value"><?php echo htmlspecialchars($app_detail["publicApplicationId"] ?? "") ?></span></div>
-			<div class="mm-row"><span class="mm-label">Share Link</span><span class="mm-value"><a href="<?php echo htmlspecialchars($share_url, ENT_QUOTES) ?>"><?php echo htmlspecialchars($share_url) ?></a></span></div>
-			<div class="mm-row"><span class="mm-label">Author</span><span class="mm-value"><a href="<?php echo htmlspecialchars($author_url, ENT_QUOTES) ?>"><?php echo htmlspecialchars($found_app["author"]) ?></a></span></div>
-			<div class="mm-row"><span class="mm-label">Version</span><span class="mm-value"><?php echo htmlspecialchars($app_detail["version"] ?? "") ?></span></div>
-			<div class="mm-row"><span class="mm-label">Home Page</span><span class="mm-value"><a href="<?php echo htmlspecialchars($app_detail["homeURL"] ?? "", ENT_QUOTES) ?>" target="_blank"><?php echo htmlspecialchars($app_detail["homeURL"] ?? "") ?></a></span></div>
-			<div class="mm-row"><span class="mm-label">Support URL</span><span class="mm-value"><a href="<?php echo htmlspecialchars($app_detail["supportURL"] ?? "", ENT_QUOTES) ?>" target="_blank"><?php echo htmlspecialchars($app_detail["supportURL"] ?? "") ?></a></span></div>
-			<div class="mm-row"><span class="mm-label">File Size</span><span class="mm-value"><?php echo round(($app_detail["appSize"] ?? 0)/1024,2) ?> KB</span></div>
-			<div class="mm-row"><span class="mm-label">License</span><span class="mm-value"><?php echo htmlspecialchars($app_detail["licenseURL"] ?? "") ?></span></div>
-			<div class="mm-row"><span class="mm-label">Copyright</span><span class="mm-value"><?php echo htmlspecialchars($app_detail["copyright"] ?? "") ?></span></div>
-		</div>
-
 		<div class="mm-section-title">Device Support</div>
 		<ul class="mm-devices">
 			<?php
@@ -426,6 +413,19 @@ function mm_dev_on($app, $key) {
 			}
 			?>
 		</ul>
+
+		<div class="mm-rows">
+			<div class="mm-row"><span class="mm-label">Museum ID</span><span class="mm-value"><?php echo htmlspecialchars($found_app["id"]) ?></span></div>
+			<div class="mm-row"><span class="mm-label">Application ID</span><span class="mm-value"><?php echo htmlspecialchars($app_detail["publicApplicationId"] ?? "") ?></span></div>
+			<div class="mm-row"><span class="mm-label">Share Link</span><span class="mm-value"><a href="<?php echo htmlspecialchars($share_url, ENT_QUOTES) ?>"><?php echo htmlspecialchars($share_url) ?></a></span></div>
+			<div class="mm-row"><span class="mm-label">Author</span><span class="mm-value"><a href="<?php echo htmlspecialchars($author_url, ENT_QUOTES) ?>"><?php echo htmlspecialchars($found_app["author"]) ?></a></span></div>
+			<div class="mm-row"><span class="mm-label">Version</span><span class="mm-value"><?php echo htmlspecialchars($app_detail["version"] ?? "") ?></span></div>
+			<div class="mm-row"><span class="mm-label">Home Page</span><span class="mm-value"><a href="<?php echo htmlspecialchars($app_detail["homeURL"] ?? "", ENT_QUOTES) ?>" target="_blank"><?php echo htmlspecialchars($app_detail["homeURL"] ?? "") ?></a></span></div>
+			<div class="mm-row"><span class="mm-label">Support URL</span><span class="mm-value"><a href="<?php echo htmlspecialchars($app_detail["supportURL"] ?? "", ENT_QUOTES) ?>" target="_blank"><?php echo htmlspecialchars($app_detail["supportURL"] ?? "") ?></a></span></div>
+			<div class="mm-row"><span class="mm-label">File Size</span><span class="mm-value"><?php echo round(($app_detail["appSize"] ?? 0)/1024,2) ?> KB</span></div>
+			<div class="mm-row"><span class="mm-label">License</span><span class="mm-value"><?php echo htmlspecialchars($app_detail["licenseURL"] ?? "") ?></span></div>
+			<div class="mm-row"><span class="mm-label">Copyright</span><span class="mm-value"><?php echo htmlspecialchars($app_detail["copyright"] ?? "") ?></span></div>
+		</div>
 
 		<?php
 		// Get and display related apps
