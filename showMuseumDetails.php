@@ -310,7 +310,7 @@ function mm_dev_on($app, $key) {
 	return isset($app[$key]) && !empty($app[$key]);
 }
 ?>
-<title><?php echo $found_app["title"] ?> - webOS App Museum II</title>
+<title><?php echo $found_app["title"] ?> - webOS App Museum</title>
 <link rel="stylesheet" href="museum-modern.css">
 <script src="downloadHelper.php"></script>
 </head>
@@ -325,8 +325,8 @@ function mm_dev_on($app, $key) {
 <?php include("menu.php") ?>
 <div class="mm-wrap">
 	<div class="mm-head">
-		<a class="mm-head-icon" href="<?php echo ($homePath); ?>"><img src="assets/icon.png" alt="webOS App Museum II"></a>
-		<a class="mm-head-text" href="<?php echo ($homePath); ?>"><span class="mm-title">webOS App Museum II</span><span class="mm-sub">A historical archive of Palm / HP webOS apps</span></a>
+		<a class="mm-head-icon" href="<?php echo ($homePath); ?>"><img src="assets/icon.png" alt="webOS App Museum"></a>
+		<a class="mm-head-text" href="<?php echo ($homePath); ?>"><span class="mm-title">webOS App Museum</span><span class="mm-sub">A historical archive of Palm / HP webOS apps</span></a>
 	</div>
 
 	<div class="mm-detail">
@@ -371,34 +371,6 @@ function mm_dev_on($app, $key) {
 			<div class="mm-desc"><?php echo $app_detail["versionNote"]; ?></div>
 		<?php } ?>
 
-		<div class="mm-rows">
-			<div class="mm-row"><span class="mm-label">Museum ID</span><span class="mm-value"><?php echo htmlspecialchars($found_app["id"]) ?></span></div>
-			<div class="mm-row"><span class="mm-label">Application ID</span><span class="mm-value"><?php echo htmlspecialchars($app_detail["publicApplicationId"] ?? "") ?></span></div>
-			<div class="mm-row"><span class="mm-label">Share Link</span><span class="mm-value"><a href="<?php echo htmlspecialchars($share_url, ENT_QUOTES) ?>"><?php echo htmlspecialchars($share_url) ?></a></span></div>
-			<div class="mm-row"><span class="mm-label">Author</span><span class="mm-value"><a href="<?php echo htmlspecialchars($author_url, ENT_QUOTES) ?>"><?php echo htmlspecialchars($found_app["author"]) ?></a></span></div>
-			<div class="mm-row"><span class="mm-label">Version</span><span class="mm-value"><?php echo htmlspecialchars($app_detail["version"] ?? "") ?></span></div>
-			<div class="mm-row"><span class="mm-label">Home Page</span><span class="mm-value"><a href="<?php echo htmlspecialchars($app_detail["homeURL"] ?? "", ENT_QUOTES) ?>" target="_blank"><?php echo htmlspecialchars($app_detail["homeURL"] ?? "") ?></a></span></div>
-			<div class="mm-row"><span class="mm-label">Support URL</span><span class="mm-value"><a href="<?php echo htmlspecialchars($app_detail["supportURL"] ?? "", ENT_QUOTES) ?>" target="_blank"><?php echo htmlspecialchars($app_detail["supportURL"] ?? "") ?></a></span></div>
-			<div class="mm-row"><span class="mm-label">File Size</span><span class="mm-value"><?php echo round(($app_detail["appSize"] ?? 0)/1024,2) ?> KB</span></div>
-			<div class="mm-row"><span class="mm-label">License</span><span class="mm-value"><?php echo htmlspecialchars($app_detail["licenseURL"] ?? "") ?></span></div>
-			<div class="mm-row"><span class="mm-label">Copyright</span><span class="mm-value"><?php echo htmlspecialchars($app_detail["copyright"] ?? "") ?></span></div>
-		</div>
-
-		<div class="mm-section-title">Device Support</div>
-		<ul class="mm-devices">
-			<?php
-			$device_labels = array(
-				"Pre" => "Pre", "Pixi" => "Pixi", "Pre2" => "Pre2",
-				"Veer" => "Veer", "Pre3" => "Pre3", "TouchPad" => "TouchPad", "LuneOS" => "LuneOS"
-			);
-			foreach ($device_labels as $key => $label) {
-				$on = mm_dev_on($found_app, $key);
-				$icon = $on ? "assets/true.png" : "assets/false.png";
-				echo "<li class='" . ($on ? "mm-dev-yes" : "") . "'><img src='" . $icon . "' alt=''>" . htmlspecialchars($label) . "</li>";
-			}
-			?>
-		</ul>
-
 		<?php if (!empty($app_detail["images"])) { ?>
 		<div class="mm-section-title">Screenshots</div>
 		<div class="mm-shots">
@@ -426,6 +398,34 @@ function mm_dev_on($app, $key) {
 		lightboxImages = <?php echo json_encode($screenshot_urls); ?>;
 		</script>
 		<?php } ?>
+
+		<div class="mm-rows">
+			<div class="mm-row"><span class="mm-label">Museum ID</span><span class="mm-value"><?php echo htmlspecialchars($found_app["id"]) ?></span></div>
+			<div class="mm-row"><span class="mm-label">Application ID</span><span class="mm-value"><?php echo htmlspecialchars($app_detail["publicApplicationId"] ?? "") ?></span></div>
+			<div class="mm-row"><span class="mm-label">Share Link</span><span class="mm-value"><a href="<?php echo htmlspecialchars($share_url, ENT_QUOTES) ?>"><?php echo htmlspecialchars($share_url) ?></a></span></div>
+			<div class="mm-row"><span class="mm-label">Author</span><span class="mm-value"><a href="<?php echo htmlspecialchars($author_url, ENT_QUOTES) ?>"><?php echo htmlspecialchars($found_app["author"]) ?></a></span></div>
+			<div class="mm-row"><span class="mm-label">Version</span><span class="mm-value"><?php echo htmlspecialchars($app_detail["version"] ?? "") ?></span></div>
+			<div class="mm-row"><span class="mm-label">Home Page</span><span class="mm-value"><a href="<?php echo htmlspecialchars($app_detail["homeURL"] ?? "", ENT_QUOTES) ?>" target="_blank"><?php echo htmlspecialchars($app_detail["homeURL"] ?? "") ?></a></span></div>
+			<div class="mm-row"><span class="mm-label">Support URL</span><span class="mm-value"><a href="<?php echo htmlspecialchars($app_detail["supportURL"] ?? "", ENT_QUOTES) ?>" target="_blank"><?php echo htmlspecialchars($app_detail["supportURL"] ?? "") ?></a></span></div>
+			<div class="mm-row"><span class="mm-label">File Size</span><span class="mm-value"><?php echo round(($app_detail["appSize"] ?? 0)/1024,2) ?> KB</span></div>
+			<div class="mm-row"><span class="mm-label">License</span><span class="mm-value"><?php echo htmlspecialchars($app_detail["licenseURL"] ?? "") ?></span></div>
+			<div class="mm-row"><span class="mm-label">Copyright</span><span class="mm-value"><?php echo htmlspecialchars($app_detail["copyright"] ?? "") ?></span></div>
+		</div>
+
+		<div class="mm-section-title">Device Support</div>
+		<ul class="mm-devices">
+			<?php
+			$device_labels = array(
+				"Pre" => "Pre", "Pixi" => "Pixi", "Pre2" => "Pre2",
+				"Veer" => "Veer", "Pre3" => "Pre3", "TouchPad" => "TouchPad", "LuneOS" => "LuneOS"
+			);
+			foreach ($device_labels as $key => $label) {
+				$on = mm_dev_on($found_app, $key);
+				$icon = $on ? "assets/true.png" : "assets/false.png";
+				echo "<li class='" . ($on ? "mm-dev-yes" : "") . "'><img src='" . $icon . "' alt=''>" . htmlspecialchars($label) . "</li>";
+			}
+			?>
+		</ul>
 
 		<?php
 		// Get and display related apps

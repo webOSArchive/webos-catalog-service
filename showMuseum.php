@@ -101,7 +101,7 @@ if (isset($app_response))
 //Add social media meta tags
 include('meta-social-common.php');
 ?>
-<title>webOS App Museum II - Web Catalog</title>
+<title>webOS App Museum - Web Catalog</title>
 <link rel="stylesheet" href="museum-modern.css">
 <link href="<?php echo $PROTOCOL . "://www.webosarchive.org/app-template/"?>web.css" rel="stylesheet" type="text/css" >
 <script>
@@ -117,8 +117,8 @@ include('meta-social-common.php');
 
 <div class="mm-wrap">
 	<div class="mm-head">
-		<a class="mm-head-icon" href="<?php echo ($homePath); ?>"><img src="assets/icon.png" alt="webOS App Museum II"></a>
-		<a class="mm-head-text" href="<?php echo ($homePath); ?>"><span class="mm-title">webOS App Museum II</span><span class="mm-sub">A historical archive of Palm / HP webOS apps</span></a>
+		<a class="mm-head-icon" href="<?php echo ($homePath); ?>"><img src="assets/icon.png" alt="webOS App Museum"></a>
+		<a class="mm-head-text" href="<?php echo ($homePath); ?>"><span class="mm-title">webOS App Museum</span><span class="mm-sub">A historical archive of Palm / HP webOS apps</span></a>
 	</div>
 
 	<div class="mm-layout">
@@ -143,6 +143,7 @@ include('meta-social-common.php');
 		</div>
 
 		<div class="mm-main">
+			<div class="mm-main-card">
 			<?php
 			if (isset($app_response) && count($app_response["data"]) > 0)
 			{
@@ -211,8 +212,8 @@ include('meta-social-common.php');
 						<div class="mm-safe">
 							Safe Search:
 							<select id="chkSafe" name="safe" onchange="changeSearchFilter()">
-								<option value="on" <?php if ($_safe == "on") { echo "selected"; }?>>Moderate</option>
-								<option value="off" <?php if ($_safe == "off") { echo "selected"; }?>>Off</option>
+								<option value="on" <?php if ($_safe == "on") { echo "selected"; }?>>Enabled</option>
+								<option value="off" <?php if ($_safe == "off") { echo "selected"; }?>>Disabled</option>
 							</select>
 						</div>
 					</form>
@@ -221,6 +222,7 @@ include('meta-social-common.php');
 				include 'footer.php';
 			}
 			?>
+			</div>
 		</div>
 	</div>
 </div>

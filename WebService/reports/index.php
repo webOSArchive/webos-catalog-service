@@ -3,7 +3,7 @@ $mimeType = "text/html";
 ?>
 <html>
     <head>
-        <title>webOS Archive - App Museum II Stats</title>
+        <title>webOS Archive - App Museum Stats</title>
         <script>
             //TODO: this would be better as a web service call
             const downloadReport = <?php include('getdownloaddata.php'); ?>;

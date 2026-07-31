@@ -1,5 +1,5 @@
 /* ============================================================
-   webOS App Museum II - Modern responsive theme
+   webOS App Museum - Modern responsive theme
    ------------------------------------------------------------
    Compatibility notes (must run on ~2011 webOS WebKit 534):
      - Mobile-first: base rules target small screens; wide
@@ -156,8 +156,13 @@ img {
 	color: #6f74d6;
 }
 
-/* App list panel */
-.mm-main {
+/* App list panel.
+   .mm-main is a structural wrapper/table-cell (it carries the gutter
+   between the rail and the card on wide screens); .mm-main-card is the
+   actual white card. Keeping them separate means the gutter is empty
+   page background instead of an inset transparent border, which
+   otherwise leaves the rounded border and the white fill misaligned. */
+.mm-main-card {
 	background-color: #ffffff;
 	border: 1px solid #e4e6eb;
 	border-radius: 10px;
@@ -551,11 +556,9 @@ img {
 	.mm-layout .mm-cats {
 		width: 240px;
 	}
-	/* fake gutter between the two table cells */
+	/* gutter between the rail and the card = empty page background */
 	.mm-layout .mm-main {
-		border-left: 16px solid transparent;
-		background-clip: padding-box;
-		-webkit-background-clip: padding-box;
+		padding-left: 16px;
 	}
 
 	/* Detail hero becomes icon-left / info-right */
