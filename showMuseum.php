@@ -168,13 +168,11 @@ include('meta-social-common.php');
 		if (document.documentElement.clientWidth >= 700) return; /* wide screens keep the rail open */
 		var box = document.getElementById('mmCats');
 		if (!box) return;
-		var label = document.getElementById('mmCatsLabel');
+		/* CSS swaps the caret direction and the open/selected labels off this class */
 		if (box.className.indexOf('mm-collapsed') === -1) {
 			box.className += ' mm-collapsed';
-			if (label) label.textContent = box.getAttribute('data-collapsed-label');
 		} else {
 			box.className = box.className.replace(' mm-collapsed', '');
-			if (label) label.textContent = box.getAttribute('data-open-label');
 		}
 	}
 </script>
@@ -199,8 +197,8 @@ include('meta-social-common.php');
 		$collapsedCatLabel = ($selectedCatName !== '') ? $selectedCatName : 'Categories';
 	?>
 	<div class="mm-layout">
-		<div class="mm-cats" id="mmCats" data-open-label="Categories" data-collapsed-label="<?php echo htmlspecialchars($collapsedCatLabel, ENT_QUOTES); ?>">
-			<h4 class="mm-cats-toggle" onclick="toggleCats()"><span id="mmCatsLabel" class="mm-cats-label">Categories</span><span class="mm-cats-caret"></span></h4>
+		<div class="mm-cats<?php echo isset($_GET['category']) ? ' mm-collapsed' : ''; ?>" id="mmCats">
+			<h4 class="mm-cats-toggle" onclick="toggleCats()"><span class="mm-cats-label-open">Categories</span><span class="mm-cats-label-sel"><?php echo htmlspecialchars($collapsedCatLabel); ?></span><span class="mm-cats-caret"></span></h4>
 			<div class="mm-cats-list">
 			<?php
 				repositionArrayElement($category_list, "Revisionist History", 1);

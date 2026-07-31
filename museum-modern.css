@@ -169,6 +169,16 @@ img {
 .mm-cats.mm-collapsed h4 {
 	margin-bottom: 0;
 }
+/* Heading text: 'Categories' when open, the selected category when collapsed */
+.mm-cats-label-sel {
+	display: none;
+}
+.mm-cats.mm-collapsed .mm-cats-label-open {
+	display: none;
+}
+.mm-cats.mm-collapsed .mm-cats-label-sel {
+	display: inline;
+}
 
 .mm-cat {
 	display: block;
@@ -657,6 +667,12 @@ img {
 	}
 	.mm-cats.mm-collapsed .mm-cats-list {
 		display: block;
+	}
+	.mm-cats.mm-collapsed .mm-cats-label-open {
+		display: inline;
+	}
+	.mm-cats.mm-collapsed .mm-cats-label-sel {
+		display: none;
 	}
 
 	/* gutter between the rail and the card = empty page background */
