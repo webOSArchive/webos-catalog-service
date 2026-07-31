@@ -227,7 +227,7 @@ class AppRepository {
      * @param array $statuses Which statuses to search
      * @return array Matching apps
      */
-    public function searchByAuthor($authorStr, $adult = false, $statuses = ['active']) {
+    public function searchByAuthor($authorStr, $adult = false, $statuses = ['active'], $sort = 'alpha') {
         $authorStr = $this->sanitizeSearch($authorStr);
         if (empty($authorStr)) {
             return [];
@@ -279,7 +279,12 @@ class AppRepository {
             $sql .= " AND a.adult = FALSE";
         }
 
-        $sql .= " ORDER BY a.title";
+        // Sort order (default alpha; 'recent' mirrors filterByCategory)
+        if ($sort === 'recent') {
+            $sql .= " ORDER BY m.last_modified_time IS NULL, m.last_modified_time DESC, a.title";
+        } else {
+            $sql .= " ORDER BY a.title";
+        }
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute($params);
