@@ -28,7 +28,7 @@ function repositionArrayElement(array &$array, $value, int $order): void
 // $category and $count are the RAW request values (urlencoded here),
 // matching how the sort-toggle links are built, and $sort is carried
 // through so pagination never drops the chosen sort order.
-function render_pager($category, $count, $sort, $page, $totalPages): void
+function render_pager($category, $count, $sort, $page, $totalPages, $extraClass = ""): void
 {
 	if ($totalPages < 2) return;
 	$base = "showMuseum.php?category=" . urlencode($category)
@@ -38,7 +38,7 @@ function render_pager($category, $count, $sort, $page, $totalPages): void
 			. htmlspecialchars($base . "&page=" . (int)$p, ENT_QUOTES)
 			. "'>" . $label . "</a>";
 	};
-	echo "<div class='mm-pager'>";
+	echo "<div class='mm-pager" . ($extraClass !== "" ? " " . $extraClass : "") . "'>";
 	if ($page > 1) echo $link($page - 1, "&lsaquo; Prev", "mm-pg-nav");
 	$window = 2;
 	$start = max(1, $page - $window);
@@ -222,7 +222,7 @@ include('meta-social-common.php');
 						$to = min($totalApps, $page * $PAGE_SIZE);
 						echo "<div class='mm-pgsummary'>Showing " . $from . "&ndash;" . $to
 							. " of " . $totalApps . " apps</div>";
-						render_pager($_GET['category'], $_GET['count'], $_sort, $page, $totalPages);
+						render_pager($_GET['category'], $_GET['count'], $_sort, $page, $totalPages, 'mm-pager-top');
 					}
 				}
 				if (isset($_GET['search'])) {

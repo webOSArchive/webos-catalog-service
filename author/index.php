@@ -88,7 +88,7 @@ if ($favicon_search) {
 <html>
 <head>
 <link rel="shortcut icon" href="<?php echo !empty($author_data['favicon']) ? $author_icon_base . $author_data['favicon'] : '../favicon.ico'; ?>">
-<meta name="viewport" content="width=760, initial-scale=0.6">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <?php
 //Figure out where to go back to
 parse_str($_SERVER["QUERY_STRING"], $query);
@@ -96,7 +96,7 @@ unset($query["app"]);
 $homePath = $protocol . $config["service_host"]. "";
 ?>
 <title><?php echo htmlspecialchars($author_data['author']); ?> - webOS App Museum</title>
-<link rel="stylesheet" href="<?php echo $protocol . $config["service_host"]; ?>/webmuseum.css">
+<link rel="stylesheet" href="<?php echo $protocol . $config["service_host"]; ?>/museum-modern.css">
 <?php
 //Social media meta
 $protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
@@ -125,66 +125,72 @@ $currurl = htmlspecialchars($protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUES
 </head>
 <body>
 <?php include("../menu.php") ?>
-<div class="show-museum" style="margin-right:1.3em">
-	<h2><a href="<?php echo ($homePath); ?>"><img src="<?php echo $protocol . $config["service_host"]; ?>/assets/icon.png" style="height:64px;width:64px;margin-top:-10px;" align="middle"></a> &nbsp;<a href="<?php echo ($homePath); ?>">webOS App Museum</a></h2>
-	<br>
-	<table border="0" style="margin-left:1.3em; width:100%; margin-bottom: 40px;">
-		<tr>
-			<td colspan="2">
+<div class="mm-wrap">
+	<div class="mm-head">
+		<a class="mm-head-icon" href="<?php echo ($homePath); ?>"><img src="<?php echo $protocol . $config["service_host"]; ?>/assets/icon.png" alt="webOS App Museum"></a>
+		<a class="mm-head-text" href="<?php echo ($homePath); ?>"><span class="mm-title">webOS App Museum</span><span class="mm-sub">A historical archive of Palm / HP webOS apps</span></a>
+	</div>
+
+	<div class="mm-detail">
+		<div class="mm-hero">
+			<div class="mm-hero-icon">
+				<?php $icon_src = !empty($author_data['iconBig']) ? $author_icon_base . $author_data['iconBig'] : '../author.png'; ?>
+				<img src="<?php echo htmlspecialchars($icon_src, ENT_QUOTES); ?>" alt="<?php echo htmlspecialchars($author_data['author'], ENT_QUOTES); ?>" onerror="this.onerror=null; this.src='../author.png';">
+			</div>
+			<div class="mm-hero-info">
 				<h1><?php echo htmlspecialchars($author_data['author']); ?></h1>
-				<?php if (!empty($author_data['summary'])) { echo "<p>" . htmlspecialchars($author_data['summary']) . "</p>"; } ?>
+				<?php if (!empty($author_data['summary'])) { echo "<div class='mm-desc' style='margin-bottom:10px;'>" . htmlspecialchars($author_data['summary']) . "</div>"; } ?>
 				<?php
 					if (!empty($author_data['sponsorMessage'])) {
-						echo "<p>" . htmlspecialchars($author_data['sponsorMessage']);
+						echo "<div class='mm-desc' style='margin-bottom:10px;'>" . htmlspecialchars($author_data['sponsorMessage']);
 						if (!empty($author_data['sponsorLink'])) {
-							echo "<br><a href='" . htmlspecialchars($author_data['sponsorLink']). "'>" . htmlspecialchars($author_data['sponsorLink']) . "</a>";
+							echo "<br><a href='" . htmlspecialchars($author_data['sponsorLink'], ENT_QUOTES) . "'>" . htmlspecialchars($author_data['sponsorLink']) . "</a>";
 						}
-						echo "</p>";
+						echo "</div>";
 					}
 				?>
 				<?php
 					if (!empty($author_data['socialLinks'])) {
 						//Social icons by Shawn Rubel
+						echo "<div style='margin-top:8px;'>";
 						foreach($author_data['socialLinks'] as $social) {
-							echo "<a href='" . htmlspecialchars($social) . "'>" . render_social($social, $protocol . $config["service_host"]) . "</a> ";
+							echo "<a href='" . htmlspecialchars($social, ENT_QUOTES) . "'>" . render_social($social, $protocol . $config["service_host"]) . "</a> ";
 						}
+						echo "</div>";
 					}
 				?>
-			</td>
-			<td rowspan="2" valign="top">
-				<?php
-				$icon_src = !empty($author_data['iconBig']) ? $author_icon_base . $author_data['iconBig'] : '../author.png';
-				?>
-				<img src="<?php echo $icon_src; ?>" class="appIcon" onerror="this.onerror=null; this.src='../author.png';" >
-			</td>
-		</tr>
-	</table>
-	<div style="margin-left:20px">
-	<h3>Apps by <?php echo htmlspecialchars($author_data["author"]); ?>:</h3>
-	<?php
-		echo("<table cellpadding='5'>");
+			</div>
+		</div>
+
+		<div class="mm-section-title">Apps by <?php echo htmlspecialchars($author_data["author"]); ?></div>
+		<?php
 		// Escape the raw query string for safe use inside HTML href attributes (prevents reflected XSS)
 		$qs = htmlspecialchars($_SERVER["QUERY_STRING"], ENT_QUOTES);
-		if (isset($app_response)) {
+		$svc = $protocol . $config["service_host"];
+		$appCount = (isset($app_response) && !empty($app_response["data"])) ? count($app_response["data"]) : 0;
+		if ($appCount > 0) {
 			foreach($app_response["data"] as $app) {
 				if (strpos($app["appIcon"], "://") === false) {
 					$use_img = $img_path.strtolower($app["appIcon"]);
 				} else {
 					$use_img = $app["appIcon"];
 				}
-				echo("<tr><td align='center' valign='top'><a href='{$protocol}{$config["service_host"]}/showMuseumDetails.php?{$qs}&app={$app["id"]}'><img style='width:64px; height:64px' src='{$use_img}' border='0'></a>");
-				echo("<td width='100%' style='padding-left: 14px'><b><a href='{$protocol}{$config["service_host"]}/showMuseumDetails.php?{$qs}&app={$app["id"]}'>" . htmlspecialchars($app["title"]) . "</a></b><br/>");
-				echo("<small>" . htmlspecialchars(substr($app["summary"] ?? '',0, 180)) . "...</small><br/>&nbsp;");
-				echo("</td></tr>");
+				$detailUrl = $svc . "/showMuseumDetails.php?{$qs}&app={$app["id"]}";
+				echo "<a class='mm-app' href='" . htmlspecialchars($detailUrl, ENT_QUOTES) . "'>";
+				echo   "<span class='mm-app-icon'><img src='" . htmlspecialchars($use_img, ENT_QUOTES) . "' alt='' onerror=\"this.src='" . htmlspecialchars($svc, ENT_QUOTES) . "/assets/icon.png';\"></span>";
+				echo   "<span class='mm-app-body'>";
+				echo     "<span class='mm-app-title'>" . htmlspecialchars($app["title"]) . "</span>";
+				echo     "<span class='mm-app-summary'>" . htmlspecialchars(substr($app["summary"] ?? '', 0, 180)) . "&hellip;</span>";
+				echo   "</span>";
+				echo "</a>";
 			}
+		} else {
+			echo "<p class='mm-noresult'>No apps found for this author.</p>";
 		}
-		echo("</table>");
-	?>
+		?>
+
+		<?php include '../footer.php'; ?>
 	</div>
-	<?php
-	include '../footer.php';
-	?>
-	<div style="display:none;margin-top:18px">
 </div>
 </body>
 </html>
