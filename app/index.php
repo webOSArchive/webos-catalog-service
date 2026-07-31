@@ -22,10 +22,22 @@ $search_str = preg_replace("/[^a-zA-Z0-9 ]+/", "", $search_str);
 $results = search_apps($fullcatalog, $search_str, false);
 $app_response = create_app_response($results);
 
-//send them to result if exact match, or search page if not
+//send them to result if it's the only or an exact-title match, else the search page
 $dest_page = $protocol. $config["service_host"];
-if (isset($app_response) && isset($app_response['data'][0]) && count($app_response['data']) == 1) {
-    $dest_page .= "/showMuseumDetails.php?app=" . $app_response['data'][0]['id'];
+// Search now also matches author/summary/description, so a title slug can return
+// several apps. Still deep-link when the top result's title matches the requested
+// slug (searchApps ranks an exact title first, so data[0] is that match).
+$topId = null;
+if (isset($app_response['data'][0])) {
+    $normalize = function ($s) { return preg_replace('/[^a-z0-9]+/', '', strtolower($s)); };
+    $wanted = $normalize($search_str);
+    $topTitle = $normalize($app_response['data'][0]['title'] ?? '');
+    if (count($app_response['data']) == 1 || ($wanted !== '' && $topTitle === $wanted)) {
+        $topId = $app_response['data'][0]['id'];
+    }
+}
+if ($topId !== null) {
+    $dest_page .= "/showMuseumDetails.php?app=" . $topId;
 } else {
     $dest_page .= "/showMuseum.php?search=" . $query;
 }
