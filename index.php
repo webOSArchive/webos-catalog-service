@@ -11,7 +11,7 @@ if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
 }
 
 //App Details
-$title = "webOS App Museum II";
+$title = "webOS App Museum";
 $subtitle = " | webOS Archive";
 $description = "The App Museum is a community project to archive, restore and provide access to the historical catalog of apps for Palm/HP's defunct mobile platform, webOS.";
 $github = "https://github.com/webOSArchive/webos-catalog-service";

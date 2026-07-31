@@ -3,10 +3,10 @@ header('Content-Type: application/javascript');
 ?>
 function populateLink() {
     var linkTD = document.getElementById("tdDownloadLink");
-    linkTD.innerHTML = "<a href=\"javascript:getLink('" + linkTD.getAttribute("data-encoded-uri") + "', " + linkTD.getAttribute("data-app-id") + ")\">Direct Link</a>";
+    linkTD.innerHTML = "<a href=\"javascript:getLink('" + linkTD.getAttribute("data-encoded-uri") + "', " + linkTD.getAttribute("data-app-id") + ")\">Direct Download</a>";
     var linkAltTD = document.getElementById("tdAltDownloadLink");
     if (linkAltTD)
-        linkAltTD.innerHTML = "<a href=\"javascript:getLink('" + linkAltTD.getAttribute("data-encoded-uri") + "', " + linkAltTD.getAttribute("data-app-id") + ")\">Direct Link</a>";
+        linkAltTD.innerHTML = "<a href=\"javascript:getLink('" + linkAltTD.getAttribute("data-encoded-uri") + "', " + linkAltTD.getAttribute("data-app-id") + ")\">Direct Download</a>";
 }
 
 function getLink(encodedLink, appId)
