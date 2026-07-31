@@ -167,18 +167,26 @@ class AppRepository {
 
         $params = $statuses;
 
-        // Build search conditions
+        // Build search conditions. Matches title (exact / partial /
+        // space-insensitive), exact ID, author, the short summary, and
+        // the full description (app_metadata.description via join m).
         $sql .= " AND (
             LOWER(a.title) = LOWER(?)
             OR a.id = ?
             OR LOWER(a.title) LIKE LOWER(?)
             OR LOWER(REPLACE(a.title, ' ', '')) LIKE LOWER(?)
+            OR LOWER(a.author) LIKE LOWER(?)
+            OR LOWER(a.summary) LIKE LOWER(?)
+            OR LOWER(m.description) LIKE LOWER(?)
         )";
 
         $params[] = $searchStr;
         $params[] = is_numeric($searchStr) ? (int)$searchStr : 0;
         $params[] = "%{$searchStr}%";
         $params[] = "%{$searchStr}%";
+        $params[] = "%{$searchStr}%"; // author
+        $params[] = "%{$searchStr}%"; // summary
+        $params[] = "%{$searchStr}%"; // description
 
         // Hide apps scheduled for the future (server clock)
         $sql .= " AND " . $this->notFutureDatedClause();
@@ -188,17 +196,22 @@ class AppRepository {
             $sql .= " AND a.adult = FALSE";
         }
 
-        // Order by relevance: exact match first, then ID match, then partial
+        // Order by relevance: exact title, then ID, then a title match,
+        // then an author match, then everything else (summary/description).
         $sql .= " ORDER BY
             CASE
                 WHEN LOWER(a.title) = LOWER(?) THEN 1
                 WHEN a.id = ? THEN 2
-                ELSE 3
+                WHEN LOWER(a.title) LIKE LOWER(?) THEN 3
+                WHEN LOWER(a.author) LIKE LOWER(?) THEN 4
+                ELSE 5
             END,
             a.title";
 
         $params[] = $searchStr;
         $params[] = is_numeric($searchStr) ? (int)$searchStr : 0;
+        $params[] = "%{$searchStr}%"; // title match rank
+        $params[] = "%{$searchStr}%"; // author match rank
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute($params);
