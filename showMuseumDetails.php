@@ -10,6 +10,7 @@ function showHelp() {
 
 /* Lightbox for screenshots - ES5 compatible with fallback */
 var lightboxImages = [];
+var lightboxOrient = [];
 var lightboxIndex = 0;
 
 function openLightbox(src, index) {
@@ -19,10 +20,12 @@ function openLightbox(src, index) {
 		if (!overlay || !img) {
 			return true; /* fallback to normal link */
 		}
-		img.src = src;
 		lightboxIndex = index || 0;
+		img.onload = applyLightboxRotation;
+		img.src = src;
 		updateNavVisibility();
 		overlay.style.display = 'block';
+		if (img.complete) { applyLightboxRotation(); }
 		return false; /* prevent default link behavior */
 	} catch (e) {
 		return true; /* fallback on any error */
@@ -38,6 +41,39 @@ function closeLightbox() {
 	} catch (e) {
 		/* ignore errors on close */
 	}
+}
+
+/* Rotate a landscape-intended screenshot that is still stored portrait
+   (taller than wide, i.e. not already manually rotated) 90deg CCW. */
+function mmRotIfPortrait(img) {
+	try {
+		if (img && img.naturalWidth && img.naturalHeight > img.naturalWidth) {
+			if (img.className.indexOf('mm-rot-ccw') === -1) {
+				img.className = (img.className ? img.className + ' ' : '') + 'mm-rot-ccw';
+			}
+		}
+	} catch (e) {}
+}
+
+/* Same logic for the lightbox image: rotate CCW and fit the rotated box
+   into the viewport (swapped max width/height). Reset otherwise. */
+function applyLightboxRotation() {
+	try {
+		var img = document.getElementById('lightbox-img');
+		if (!img || !img.naturalWidth) return;
+		var wantLandscape = (lightboxOrient && lightboxOrient[lightboxIndex] === 'L');
+		if (wantLandscape && img.naturalHeight > img.naturalWidth) {
+			var vw = window.innerWidth || document.documentElement.clientWidth || 800;
+			var vh = window.innerHeight || document.documentElement.clientHeight || 600;
+			img.className = 'lb-rot';
+			img.style.maxWidth = Math.round(vh * 0.9) + 'px';
+			img.style.maxHeight = Math.round(vw * 0.9) + 'px';
+		} else {
+			img.className = '';
+			img.style.maxWidth = '';
+			img.style.maxHeight = '';
+		}
+	} catch (e) {}
 }
 
 function prevImage(e) {
@@ -152,6 +188,10 @@ function mmBack(link) {
 	max-height: 90%;
 	margin-top: 2%;
 	border: 2px solid #ffffff;
+}
+#lightbox-overlay img.lb-rot {
+	-webkit-transform: rotate(-90deg);
+	transform: rotate(-90deg);
 }
 #lightbox-close {
 	position: absolute;
@@ -415,6 +455,7 @@ function mm_dev_on($app, $key) {
 		<div class="mm-shots">
 		<?php
 		$screenshot_urls = array();
+		$screenshot_orient = array();
 		$screenshot_index = 0;
 		foreach ($app_detail["images"] as $value) {
 			if (strpos($value["screenshot"], "://") === false) {
@@ -428,13 +469,20 @@ function mm_dev_on($app, $key) {
 				$use_thumb = $value["thumbnail"];
 			}
 			$screenshot_urls[] = $use_screenshot;
-			echo("<a href='" . htmlspecialchars($use_screenshot, ENT_QUOTES) . "' target='_blank' onclick=\"return openLightbox('" . htmlspecialchars($use_screenshot, ENT_QUOTES) . "', " . $screenshot_index . ")\"><img src='" . htmlspecialchars($use_thumb, ENT_QUOTES) . "' alt='Screenshot'></a>");
+			// 'L' = meant to be landscape. Legacy Pre shots were often stored
+			// portrait regardless; flag those so the browser can rotate any that
+			// are still taller-than-wide (not already manually rotated).
+			$isLandscape = (strtoupper((string)($value["orientation"] ?? '')) === 'L');
+			$screenshot_orient[] = $isLandscape ? 'L' : 'P';
+			$imgExtra = $isLandscape ? " data-orient='L' onload='mmRotIfPortrait(this)'" : "";
+			echo("<a href='" . htmlspecialchars($use_screenshot, ENT_QUOTES) . "' target='_blank' onclick=\"return openLightbox('" . htmlspecialchars($use_screenshot, ENT_QUOTES) . "', " . $screenshot_index . ")\"><img src='" . htmlspecialchars($use_thumb, ENT_QUOTES) . "' alt='Screenshot'" . $imgExtra . "></a>");
 			$screenshot_index++;
 		}
 		?>
 		</div>
 		<script>
 		lightboxImages = <?php echo json_encode($screenshot_urls); ?>;
+		lightboxOrient = <?php echo json_encode($screenshot_orient); ?>;
 		</script>
 		<?php } ?>
 
