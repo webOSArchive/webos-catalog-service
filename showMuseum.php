@@ -2,7 +2,7 @@
 <html>
 <head>
 <link rel="shortcut icon" href="favicon.ico">
-<meta name="viewport" content="width=700, initial-scale=0.5">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <?php
 $config = include('WebService/config.php');
@@ -83,12 +83,12 @@ if (isset($_GET['category']) && isset($_GET['count']))
 elseif (isset($_GET['search']))
 {
 	$search = preg_replace("/[^a-zA-Z0-9 ]+/", "", $_GET['search']);
-	
-	// Load catalog directly instead of HTTP request  
+
+	// Load catalog directly instead of HTTP request
 	$fullcatalog = load_catalogs();
 	$search_str = strtolower($search);
 	$_adult = strpos($adult, 'true') !== false;
-	
+
 	$results = search_apps($fullcatalog, $search_str, $_adult);
 	$app_response = array('data' => $results);
 }
@@ -102,7 +102,7 @@ if (isset($app_response))
 include('meta-social-common.php');
 ?>
 <title>webOS App Museum II - Web Catalog</title>
-<link rel="stylesheet" href="webmuseum.css">
+<link rel="stylesheet" href="museum-modern.css">
 <link href="<?php echo $PROTOCOL . "://www.webosarchive.org/app-template/"?>web.css" rel="stylesheet" type="text/css" >
 <script>
 	function changeSearchFilter() {
@@ -115,10 +115,15 @@ include('meta-social-common.php');
 <body onload="if (document.getElementById('txtSearch')) { document.getElementById('txtSearch').focus(); }">
 <?php include("menu.php") ?>
 
-<div class="show-museum" style="margin-left:auto;margin-right:auto">
-<h2><a href="<?php echo ($homePath); ?>"><img src="assets/icon.png" style="height:64px;width:64px;margin-top:-10px;" align="middle"></a> &nbsp;<a href="<?php echo ($homePath); ?>">webOS App Museum II</a></h2>
-	<div class="museumMaster" style="margin-left:1.3em;">
-		<div class="categoryMenu">
+<div class="mm-wrap">
+	<div class="mm-head">
+		<a class="mm-head-icon" href="<?php echo ($homePath); ?>"><img src="assets/icon.png" alt="webOS App Museum II"></a>
+		<a class="mm-head-text" href="<?php echo ($homePath); ?>"><span class="mm-title">webOS App Museum II</span><span class="mm-sub">A historical archive of Palm / HP webOS apps</span></a>
+	</div>
+
+	<div class="mm-layout">
+		<div class="mm-cats">
+			<h4>Categories</h4>
 			<?php
 				repositionArrayElement($category_list, "Revisionist History", 1);
 				repositionArrayElement($category_list, "Curator's Choice", 1);
@@ -128,42 +133,41 @@ include('meta-social-common.php');
 					if ($catname != "All" && $catname != "Missing Apps" && $catcount > 0)
 					{
 						$catencode = (urlencode($array_key));
-						echo "<span ";
-						if (isset($_GET['category']) && strtolower($catname) == strtolower($_GET['category']))
-							echo ("class='categorySelected'");
-						echo ("><a href='showMuseum.php?category={$catencode}&count={$catcount}'>{$catname}</a></span> <span class='legal'>({$catcount} Apps)</span><br/>");
+						$isSel = (isset($_GET['category']) && strtolower($catname) == strtolower($_GET['category']));
+						echo "<a class='mm-cat" . ($isSel ? " mm-sel" : "") . "' href='showMuseum.php?category={$catencode}&count={$catcount}'>";
+						echo "<span class='mm-count'>{$catcount}</span>" . htmlspecialchars($catname);
+						echo "</a>";
 					}
 				}
 			?>
 		</div>
 
-		<div class="appsList">
+		<div class="mm-main">
 			<?php
 			if (isset($app_response) && count($app_response["data"]) > 0)
 			{
 				if (isset($_GET['category'])) {
 					$category = $_GET['category'];
 					$category = preg_replace("/[^a-zA-Z0-9 ]+/", "", $category);
-					echo ("<h3>Category: " . htmlspecialchars($category) . "</h3>");
+					echo ("<h3>" . htmlspecialchars($category) . "</h3>");
 					// Sort toggle
 					$sortRecentUrl = "showMuseum.php?category=" . urlencode($_GET['category']) . "&count=" . $_GET['count'] . "&sort=recent";
 					$sortAlphaUrl = "showMuseum.php?category=" . urlencode($_GET['category']) . "&count=" . $_GET['count'] . "&sort=alpha";
 					$sortRecUrl = "showMuseum.php?category=" . urlencode($_GET['category']) . "&count=" . $_GET['count'] . "&sort=recommended";
-					echo "<div class='legal' style='margin-bottom:10px;'>";
+					echo "<div class='mm-sort'>";
 					echo "Sort: ";
 					echo ($_sort == 'recent') ? "<b>Recently Updated</b>" : "<a href='{$sortRecentUrl}'>Recently Updated</a>";
-					echo " | ";
+					echo "<span class='mm-sep'>&middot;</span>";
 					echo ($_sort == 'alpha') ? "<b>Alphabetical</b>" : "<a href='{$sortAlphaUrl}'>Alphabetical</a>";
-					echo " | ";
+					echo "<span class='mm-sep'>&middot;</span>";
 					echo ($_sort == 'recommended') ? "<b>Recommended</b>" : "<a href='{$sortRecUrl}'>Recommended</a>";
 					echo "</div>";
 				}
 				if (isset($_GET['search'])) {
 					$searchTerm = $_GET['search'];
 					$searchTerm = preg_replace("/[^a-zA-Z0-9 ]+/", "", $searchTerm);
-					echo ("<h3>Search Results: '" . htmlspecialchars($searchTerm) . "'</h3>");
+					echo ("<h3 style='margin-bottom:14px;'>Search Results: &lsquo;" . htmlspecialchars($searchTerm) . "&rsquo;</h3>");
 				}
-				echo("<table cellpadding='5'>");
 				// Escape the raw query string for safe use inside HTML href attributes (prevents reflected XSS)
 				$qs = htmlspecialchars($_SERVER["QUERY_STRING"], ENT_QUOTES);
 				foreach($app_response["data"] as $app) {
@@ -172,59 +176,52 @@ include('meta-social-common.php');
 					} else {
 						$use_img = $app["appIcon"];
 					}
-
-					echo("<tr><td align='center' valign='top'><a href='showMuseumDetails.php?{$qs}&app={$app["id"]}'><img style='width:64px; height:64px' src='{$use_img}' border='0'></a>");
-					echo("<td width='100%' style='padding-left: 14px'><b><a href='showMuseumDetails.php?{$qs}&app={$app["id"]}'>{$app["title"]}</a></b><br/>");
-					echo("<small>" . substr($app["summary"],0, 180) . "...</small><br/>&nbsp;");
-					echo("</td></tr>");
+					$detailUrl = "showMuseumDetails.php?{$qs}&app={$app["id"]}";
+					echo "<a class='mm-app' href='" . htmlspecialchars($detailUrl, ENT_QUOTES) . "'>";
+					echo   "<span class='mm-app-icon'><img src='" . htmlspecialchars($use_img, ENT_QUOTES) . "' alt='' onerror=\"this.src='assets/icon.png';\"></span>";
+					echo   "<span class='mm-app-body'>";
+					echo     "<span class='mm-app-title'>" . htmlspecialchars($app["title"]) . "</span>";
+					echo     "<span class='mm-app-summary'>" . htmlspecialchars(substr($app["summary"], 0, 180)) . "&hellip;</span>";
+					echo   "</span>";
+					echo "</a>";
 				}
-				echo("</table>");
 				include 'footer.php';
 			}
 			else
 			{
 				?>
-				<p align='middle' style='margin-top:50px;'><img src='assets/webos-apps.png'></p>
-				<p align='middle' style='margin-bottom:30px;'><i>Choose a category to view apps, or...</i></p>
-				<form action="" id="frmSearch" name="frmSearch" method="get">
-					<div style="margin-left:auto;margin-right:auto;text-align:center;">
-					<?php
-					if (isset($_GET['search'])) {
-						$search = preg_replace("/[^a-zA-Z0-9 ]+/", "", $_GET['search']);
-					}
-					?>
-					<input type="text" id="txtSearch" name="search" class="search" placeholder="Just type..." value="<?php if (isset($search)) { echo $search; } ?>">
-
-					<input type="submit" class="search-button" value="Search">
-					<?php
-					if (isset($search)) {
-						echo "<p align='middle' style='margin-bottom:30px;'><i>No results</i></p>";
-					} else {
-						echo "<br/><br/>";
-					}
-					?>
-					Safe Search: 
-					<select id="chkSafe" name="safe" onchange="changeSearchFilter()">
-						<option value="on" <?php if ($_safe == "on") { echo "selected"; }?>>Moderate</option>
-						<option value="off" <?php if ($_safe == "off") { echo "selected"; }?>>Off</option>
-					</select>
-					</div>
-				</form>
+				<div class="mm-landing">
+					<img class="mm-hero" src="assets/webos-apps.png" alt="webOS Apps">
+					<p class="mm-lead">Choose a category to view apps, or&hellip;</p>
+					<form action="" id="frmSearch" name="frmSearch" method="get">
+						<?php
+						if (isset($_GET['search'])) {
+							$search = preg_replace("/[^a-zA-Z0-9 ]+/", "", $_GET['search']);
+						}
+						?>
+						<div class="mm-searchbar">
+							<input type="text" id="txtSearch" name="search" class="mm-search-input" placeholder="Just type&hellip;" value="<?php if (isset($search)) { echo htmlspecialchars($search); } ?>">
+						</div>
+						<input type="submit" class="mm-search-btn" value="Search">
+						<?php
+						if (isset($search)) {
+							echo "<p class='mm-noresult'>No results</p>";
+						}
+						?>
+						<div class="mm-safe">
+							Safe Search:
+							<select id="chkSafe" name="safe" onchange="changeSearchFilter()">
+								<option value="on" <?php if ($_safe == "on") { echo "selected"; }?>>Moderate</option>
+								<option value="off" <?php if ($_safe == "off") { echo "selected"; }?>>Off</option>
+							</select>
+						</div>
+					</form>
+				</div>
 				<?php
+				include 'footer.php';
 			}
 			?>
 		</div>
-	</div>
-	<?php
-	if (isset($app_response["data"]) && count($app_response["data"]) == 0)
-	{
-		include 'footer.php';
-	}
-	?>
-	<div style="display:none">
-	<?php
-	//echo ($app_content);
-	?>
 	</div>
 </div>
 </body>

@@ -2,7 +2,7 @@
 <html>
 <head>
 <link rel="shortcut icon" href="favicon.ico">
-<meta name="viewport" content="width=760, initial-scale=0.6">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <script>
 function showHelp() {
 	alert("Most webOS Devices should use the App Museum II native app to browse and install from the catalog. Older devices that can't run the Museum can Option+Tap (Orange or White Key) or Long Press (if enabled) on the Preware link on this page and copy it to your clipboard. Then you can use the 'Install Package' menu option in Preware to paste in and install the app using that link.");
@@ -175,6 +175,11 @@ if (document.addEventListener) {
 	background-color: rgba(0, 0, 0, 0.6);
 	color: #cccccc;
 }
+/* The JS-populated download link sits inside a button-styled box */
+.mm-dl a, .mm-dl a:hover {
+	color: #ffffff;
+	text-decoration: none;
+}
 </style>
 
 <?php
@@ -244,7 +249,7 @@ if (isset($app_detail["description"])) {
 	$app_detail["description"] = str_replace("\n", "<br>", $app_detail["description"]);
 	$app_detail["description"] = str_replace("\r\n", "<br>", $app_detail["description"]);
 } else {
-	$app_detail["description"] = "";	
+	$app_detail["description"] = "";
 }
 if (isset($app_detail["versionNote"])) {
 	$app_detail["versionNote"] = str_replace("\n", "<br>", $app_detail["versionNote"]);
@@ -252,7 +257,7 @@ if (isset($app_detail["versionNote"])) {
 } else {
 	$app_detail["versionNote"] = "";
 }
-	
+
 //Let's make some URLs!
 $author_url = "author/" . str_replace(" " , "%20", $found_app["author"]);
 $share_url = $PROTOCOL . $config["service_host"] . "/app/" . str_replace(" " , "", $found_app["title"]);
@@ -299,9 +304,14 @@ $meta_desc = trim($meta_desc[0]);
 
 //Add social media meta tags
 include('meta-social-app.php');
+
+//Helper: is a device supported? (keeps original truthiness semantics)
+function mm_dev_on($app, $key) {
+	return isset($app[$key]) && !empty($app[$key]);
+}
 ?>
 <title><?php echo $found_app["title"] ?> - webOS App Museum II</title>
-<link rel="stylesheet" href="webmuseum.css">
+<link rel="stylesheet" href="museum-modern.css">
 <script src="downloadHelper.php"></script>
 </head>
 <body onload="populateLink()">
@@ -313,119 +323,137 @@ include('meta-social-app.php');
 	<img id="lightbox-img" src="" alt="Screenshot">
 </div>
 <?php include("menu.php") ?>
-<div class="show-museum" style="margin-left:auto;margin-right:auto">
-	<h2><a href="<?php echo ($homePath); ?>"><img src="assets/icon.png" style="height:64px;width:64px;margin-top:-10px;" align="middle"></a> &nbsp;<a href="<?php echo ($homePath); ?>">webOS App Museum II</a></h2>
-	<br>
-	<table border="0" style="margin-left:1.3em;">
-	<tr><td colspan="2"><h1><?php echo $found_app["title"]; ?></h1></td>
-		<td rowspan="2">
-		<img src="<?php echo $use_icon; ?>" class="appIcon" >
-	</td></tr>
-	<tr><td class="rowTitle">Museum ID</td><td class="rowDetail"><?php echo $found_app["id"] ?></td></tr>
-	<tr><td class="rowTitle">Application ID</td><td colspan="2" class="rowDetail"><?php echo $app_detail["publicApplicationId"] ?></td></tr>
-	<tr><td class="rowTitle">Share Link</td><td colspan="2" class="rowDetail"><?php echo "<a href='" . $share_url . "'>" . $share_url . "</a>"?></td></tr>
-	<tr><td class="rowTitle">Author</td><td colspan="2" class="rowDetail"><?php echo "<a href='" . $author_url . "'>" . $found_app["author"] . "</a>"?></td></tr>
-	<tr><td class="rowTitle">Version</td><td class="rowDetail"><?php echo $app_detail["version"] ?></td><td></td></tr>
-	<tr><td class="rowTitle">Description</td><td colspan="2" class="rowDetail"><?php echo $app_detail["description"]; ?></td></tr>
-	<tr><td class="rowTitle">Version Note</td><td colspan="2" class="rowDetail"><?php echo $app_detail["versionNote"]; ?></td></tr>
-	<?php
-	$browserAsString = $_SERVER['HTTP_USER_AGENT'];
-	if (strstr(strtolower($browserAsString), "webos") || strstr(strtolower($browserAsString), "hpwos")) {
-		$plainURI = str_replace("https://", "http://", $plainURI);
-	?>
-		<tr><td class="rowTitle">Download</td><td colspan="2" class="rowDetail">
-			<a href="<?php echo $plainURI ?>">Preware Link</a> 
-			&nbsp;<a href="javascript:showHelp()">(?)</a>
-		</td></tr>
-	<?php
-	} else {
-	?>
-		<tr><td class="rowTitle">Download</td><td colspan="2" class="rowDetail" id="tdDownloadLink" title="Download Link Decoded by Javascript" data-encoded-uri="<?php echo $downloadURI ?>" data-app-id="<?php echo $found_app["id"] ?>"><i>Requires Javascript</i></td></tr>
-	<?php
-	    if (isset($altDownloadURI)) {
-			?>
-			<tr><td class="rowTitle">Alternate Version</td><td colspan="2" class="rowDetail" id="tdAltDownloadLink" title="Download Link Decoded by Javascript" data-encoded-uri="<?php echo $altDownloadURI ?>" data-app-id="<?php echo $found_app["id"] ?>"><i>Requires Javascript</i></td></tr>
-			<?php
-		}
-	}
-	?>
+<div class="mm-wrap">
+	<div class="mm-head">
+		<a class="mm-head-icon" href="<?php echo ($homePath); ?>"><img src="assets/icon.png" alt="webOS App Museum II"></a>
+		<a class="mm-head-text" href="<?php echo ($homePath); ?>"><span class="mm-title">webOS App Museum II</span><span class="mm-sub">A historical archive of Palm / HP webOS apps</span></a>
+	</div>
 
-	<tr><td class="rowTitle">Device Support</td>
-	<td class="rowDetail">
-		<ul>
-		<li class="deviceSupport<?php echo $found_app["Pre"] ?>">Pre: 
-		<li class="deviceSupport<?php echo $found_app["Pixi"] ?>">Pixi: 
-		<li class="deviceSupport<?php echo $found_app["Pre2"] ?>">Pre2: 
-		<li class="deviceSupport<?php echo $found_app["Veer"] ?>">Veer:
-		<li class="deviceSupport<?php echo $found_app["Pre3"] ?>">Pre3:
-		<li class="deviceSupport<?php echo $found_app["TouchPad"] ?>">TouchPad:
-		<li class="deviceSupport<?php echo $found_app["LuneOS"] ?>">LuneOS:
+	<div class="mm-detail">
+		<div class="mm-hero">
+			<div class="mm-hero-icon">
+				<img src="<?php echo htmlspecialchars($use_icon, ENT_QUOTES); ?>" alt="<?php echo htmlspecialchars($found_app["title"], ENT_QUOTES); ?> icon" onerror="this.src='assets/icon.png';">
+			</div>
+			<div class="mm-hero-info">
+				<h1><?php echo htmlspecialchars($found_app["title"]); ?></h1>
+				<div class="mm-byline">
+					by <a href="<?php echo htmlspecialchars($author_url, ENT_QUOTES); ?>"><?php echo htmlspecialchars($found_app["author"]); ?></a>
+					<?php if (!empty($app_detail["version"])) { echo " &middot; v" . htmlspecialchars($app_detail["version"]); } ?>
+				</div>
+				<?php
+				$browserAsString = $_SERVER['HTTP_USER_AGENT'];
+				if (strstr(strtolower($browserAsString), "webos") || strstr(strtolower($browserAsString), "hpwos")) {
+					$plainURI = str_replace("https://", "http://", $plainURI);
+				?>
+					<a class="mm-dl" href="<?php echo $plainURI ?>">Preware Link</a>
+					<a class="mm-dl-note" href="javascript:showHelp()">(?)</a>
+				<?php
+				} else {
+				?>
+					<span class="mm-dl" id="tdDownloadLink" title="Download Link Decoded by Javascript" data-encoded-uri="<?php echo $downloadURI ?>" data-app-id="<?php echo $found_app["id"] ?>"><i>Requires Javascript</i></span>
+					<?php if (isset($altDownloadURI)) { ?>
+						<div style="margin-top:10px;">
+							<span class="mm-section-title" style="margin:0 8px 0 0;display:inline;">Alternate Version</span>
+							<span class="mm-dl" id="tdAltDownloadLink" title="Download Link Decoded by Javascript" data-encoded-uri="<?php echo $altDownloadURI ?>" data-app-id="<?php echo $found_app["id"] ?>"><i>Requires Javascript</i></span>
+						</div>
+					<?php } ?>
+				<?php } ?>
+			</div>
+		</div>
+
+		<?php if (trim($app_detail["description"]) !== "") { ?>
+			<div class="mm-section-title">Description</div>
+			<div class="mm-desc"><?php echo $app_detail["description"]; ?></div>
+		<?php } ?>
+
+		<?php if (trim($app_detail["versionNote"]) !== "") { ?>
+			<div class="mm-section-title">Version Note</div>
+			<div class="mm-desc"><?php echo $app_detail["versionNote"]; ?></div>
+		<?php } ?>
+
+		<div class="mm-rows">
+			<div class="mm-row"><span class="mm-label">Museum ID</span><span class="mm-value"><?php echo htmlspecialchars($found_app["id"]) ?></span></div>
+			<div class="mm-row"><span class="mm-label">Application ID</span><span class="mm-value"><?php echo htmlspecialchars($app_detail["publicApplicationId"] ?? "") ?></span></div>
+			<div class="mm-row"><span class="mm-label">Share Link</span><span class="mm-value"><a href="<?php echo htmlspecialchars($share_url, ENT_QUOTES) ?>"><?php echo htmlspecialchars($share_url) ?></a></span></div>
+			<div class="mm-row"><span class="mm-label">Author</span><span class="mm-value"><a href="<?php echo htmlspecialchars($author_url, ENT_QUOTES) ?>"><?php echo htmlspecialchars($found_app["author"]) ?></a></span></div>
+			<div class="mm-row"><span class="mm-label">Version</span><span class="mm-value"><?php echo htmlspecialchars($app_detail["version"] ?? "") ?></span></div>
+			<div class="mm-row"><span class="mm-label">Home Page</span><span class="mm-value"><a href="<?php echo htmlspecialchars($app_detail["homeURL"] ?? "", ENT_QUOTES) ?>" target="_blank"><?php echo htmlspecialchars($app_detail["homeURL"] ?? "") ?></a></span></div>
+			<div class="mm-row"><span class="mm-label">Support URL</span><span class="mm-value"><a href="<?php echo htmlspecialchars($app_detail["supportURL"] ?? "", ENT_QUOTES) ?>" target="_blank"><?php echo htmlspecialchars($app_detail["supportURL"] ?? "") ?></a></span></div>
+			<div class="mm-row"><span class="mm-label">File Size</span><span class="mm-value"><?php echo round(($app_detail["appSize"] ?? 0)/1024,2) ?> KB</span></div>
+			<div class="mm-row"><span class="mm-label">License</span><span class="mm-value"><?php echo htmlspecialchars($app_detail["licenseURL"] ?? "") ?></span></div>
+			<div class="mm-row"><span class="mm-label">Copyright</span><span class="mm-value"><?php echo htmlspecialchars($app_detail["copyright"] ?? "") ?></span></div>
+		</div>
+
+		<div class="mm-section-title">Device Support</div>
+		<ul class="mm-devices">
+			<?php
+			$device_labels = array(
+				"Pre" => "Pre", "Pixi" => "Pixi", "Pre2" => "Pre2",
+				"Veer" => "Veer", "Pre3" => "Pre3", "TouchPad" => "TouchPad", "LuneOS" => "LuneOS"
+			);
+			foreach ($device_labels as $key => $label) {
+				$on = mm_dev_on($found_app, $key);
+				$icon = $on ? "assets/true.png" : "assets/false.png";
+				echo "<li class='" . ($on ? "mm-dev-yes" : "") . "'><img src='" . $icon . "' alt=''>" . htmlspecialchars($label) . "</li>";
+			}
+			?>
 		</ul>
-	</td>
-	<td></td>
-	</tr>
-	<tr><td class="rowTitle">Screenshots</td>
-	<td colspan="2" class="rowDetail">
-	<?php
-	$screenshot_urls = array();
-	$screenshot_index = 0;
-	foreach ($app_detail["images"] as $value) {
-		if (strpos($value["screenshot"], "://") === false) {
-			$use_screenshot = $img_path.strtolower($value["screenshot"]);
-		} else {
-			$use_screenshot = $value["screenshot"];
+
+		<?php if (!empty($app_detail["images"])) { ?>
+		<div class="mm-section-title">Screenshots</div>
+		<div class="mm-shots">
+		<?php
+		$screenshot_urls = array();
+		$screenshot_index = 0;
+		foreach ($app_detail["images"] as $value) {
+			if (strpos($value["screenshot"], "://") === false) {
+				$use_screenshot = $img_path.strtolower($value["screenshot"]);
+			} else {
+				$use_screenshot = $value["screenshot"];
+			}
+			if (strpos($value["thumbnail"], "://") === false) {
+				$use_thumb = $img_path.strtolower($value["thumbnail"]);
+			} else {
+				$use_thumb = $value["thumbnail"];
+			}
+			$screenshot_urls[] = $use_screenshot;
+			echo("<a href='" . htmlspecialchars($use_screenshot, ENT_QUOTES) . "' target='_blank' onclick=\"return openLightbox('" . htmlspecialchars($use_screenshot, ENT_QUOTES) . "', " . $screenshot_index . ")\"><img src='" . htmlspecialchars($use_thumb, ENT_QUOTES) . "' alt='Screenshot'></a>");
+			$screenshot_index++;
 		}
-		if (strpos($value["thumbnail"], "://") === false) {
-			$use_thumb = $img_path.strtolower($value["thumbnail"]);
-		} else {
-			$use_thumb = $value["thumbnail"];
+		?>
+		</div>
+		<script>
+		lightboxImages = <?php echo json_encode($screenshot_urls); ?>;
+		</script>
+		<?php } ?>
+
+		<?php
+		// Get and display related apps
+		$appRepo = new AppRepository();
+		$relatedApps = $appRepo->getRelatedApps($found_id, 6);
+		if (!empty($relatedApps)):
+		?>
+		<div class="mm-section-title">Related Apps</div>
+		<div class="mm-related">
+		<?php
+		foreach ($relatedApps as $related) {
+			if (strpos($related["appIcon"], "://") === false) {
+				$related_icon = $img_path.strtolower($related["appIcon"]);
+			} else {
+				$related_icon = $related["appIcon"];
+			}
+			$related_url = "showMuseumDetails.php?" . $_SERVER["QUERY_STRING"] . "&app=" . $related["id"];
+			echo "<a href='" . htmlspecialchars($related_url) . "'>";
+			echo "<img src='" . htmlspecialchars($related_icon) . "' onerror=\"this.src='assets/icon.png';\"><br>";
+			echo "<small>" . htmlspecialchars($related["title"]) . "</small>";
+			echo "</a>";
 		}
-		$screenshot_urls[] = $use_screenshot;
-		echo("<a href='" . $use_screenshot . "' target='_blank' onclick=\"return openLightbox('" . htmlspecialchars($use_screenshot, ENT_QUOTES) . "', " . $screenshot_index . ")\"><img class='screenshot' src='" . $use_thumb . "' style='width:64px'></a>");
-		$screenshot_index++;
-	}
-	?>
-	<script>
-	lightboxImages = <?php echo json_encode($screenshot_urls); ?>;
-	</script>
-	</td></tr>
-	<tr><td class="rowTitle">Home Page</td><td colspan="2" class="rowDetail"><a href="<?php echo $app_detail["homeURL"] ?>" target="_blank"><?php echo $app_detail["homeURL"] ?></a></td></tr>
-	<tr><td class="rowTitle">Support URL</td><td colspan="2" class="rowDetail"><a href="<?php echo $app_detail["supportURL"] ?>" target="_blank"><?php echo $app_detail["supportURL"] ?></a></td></tr>
-	<tr><td class="rowTitle">File Size</td><td colspan="2" class="rowDetail"><?php echo round($app_detail["appSize"]/1024,2) ?> KB</td></tr>
-	<tr><td class="rowTitle" class="rowDetail">License</td><td colspan="2"><?php echo $app_detail["licenseURL"] ?></td></tr>
-	<tr><td class="rowTitle" class="rowDetail">Copyright</td><td colspan="2"><?php echo $app_detail["copyright"] ?></td></tr>
-	<?php
-	// Get and display related apps
-	$appRepo = new AppRepository();
-	$relatedApps = $appRepo->getRelatedApps($found_id, 6);
-	if (!empty($relatedApps)):
-	?>
-	<tr><td class="rowTitle">Related Apps</td>
-	<td colspan="2" class="rowDetail">
-	<?php
-	foreach ($relatedApps as $related) {
-		if (strpos($related["appIcon"], "://") === false) {
-			$related_icon = $img_path.strtolower($related["appIcon"]);
-		} else {
-			$related_icon = $related["appIcon"];
-		}
-		$related_url = "showMuseumDetails.php?" . $_SERVER["QUERY_STRING"] . "&app=" . $related["id"];
-		echo "<a href='" . htmlspecialchars($related_url) . "' style='display:inline-block;text-align:center;margin:5px 10px 5px 0;vertical-align:top;width:80px;'>";
-		echo "<img src='" . htmlspecialchars($related_icon) . "' style='width:64px;height:64px;border:0;' onerror=\"this.src='assets/icon.png';\"><br>";
-		echo "<small>" . htmlspecialchars($related["title"]) . "</small>";
-		echo "</a>";
-	}
-	?>
-	</td></tr>
-	<?php endif; ?>
-	</table>
-	<?php
-	include 'footer.php';
-	?>
-	<div style="display:none;margin-top:18px">
-	<?php
-	//echo $content;
-	?>
+		?>
+		</div>
+		<?php endif; ?>
+
+		<?php include 'footer.php'; ?>
+	</div>
 </div>
 </body>
 </html>
