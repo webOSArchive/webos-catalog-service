@@ -226,7 +226,26 @@ if (isset($_GET["app"])) {
 }
 
 if (!$found_app) {
-	echo("ERROR: No matching app found");
+?>
+<title>App Not Found - webOS App Museum</title>
+<link rel="stylesheet" href="museum-modern.css">
+</head>
+<body>
+<?php include("menu.php") ?>
+<div class="mm-wrap">
+	<div class="mm-head">
+		<a class="mm-head-icon" href="showMuseum.php"><img src="assets/icon.png" alt="webOS App Museum"></a>
+		<a class="mm-head-text" href="showMuseum.php"><span class="mm-title">webOS App Museum</span><span class="mm-sub">A historical archive of Palm / HP webOS apps</span></a>
+	</div>
+	<div class="mm-detail">
+		<div class="mm-section-title">App Not Found</div>
+		<div class="mm-desc">Sorry, we couldn&rsquo;t find that app in the catalog. It may have been removed, or the link may be incorrect.</div>
+		<p style="margin-top:16px;"><a class="mm-dl" href="showMuseum.php">Browse the catalog</a></p>
+	</div>
+</div>
+</body>
+</html>
+<?php
 	die;
 }
 
