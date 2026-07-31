@@ -254,6 +254,10 @@ img {
 	margin: 16px 0 4px 0;
 	text-align: center;
 }
+/* Top pager sits directly above the listing — give it breathing room */
+.mm-pager.mm-pager-top {
+	margin-bottom: 22px;
+}
 .mm-pager a,
 .mm-pager .mm-pg-cur {
 	display: inline-block;
