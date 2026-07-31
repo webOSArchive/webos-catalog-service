@@ -33,7 +33,7 @@ $appRepo = new AppRepository();
 $search_str = urldecode(strtolower($query));
 $search_str = preg_replace("/[^a-zA-Z0-9 ]+/", "", $search_str);
 
-$results = $appRepo->searchByAuthor($search_str, false);
+$results = $appRepo->searchByAuthor($search_str, false, ['active'], 'recent');
 $app_response = create_app_response($results);
 
 //find info about author
