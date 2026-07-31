@@ -585,6 +585,13 @@ img {
 	background-color: #f0f1f5;
 }
 
+/* Auto-rotate: landscape screenshots stored portrait get spun 90deg CCW
+   (a 72x72 thumb is square, so the footprint is unchanged). */
+.mm-rot-ccw {
+	-webkit-transform: rotate(-90deg);
+	transform: rotate(-90deg);
+}
+
 /* Related apps */
 .mm-related a {
 	display: inline-block;
