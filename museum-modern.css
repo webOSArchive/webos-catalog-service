@@ -135,6 +135,41 @@ img {
 	letter-spacing: 0.06em;
 	color: #8a90a2;
 }
+
+/* Collapsible category picker (mobile only; the rail stays open on wide screens) */
+.mm-cats-toggle {
+	cursor: pointer;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	user-select: none;
+}
+.mm-cats-caret {
+	display: inline-block;
+	float: right;
+	width: 0;
+	height: 0;
+	margin-top: 4px;
+	margin-right: 2px;
+	/* expanded (default): triangle points down */
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-top: 6px solid #8a90a2;
+	border-bottom: 0;
+}
+.mm-cats.mm-collapsed .mm-cats-caret {
+	/* collapsed: triangle points right */
+	border-top: 5px solid transparent;
+	border-bottom: 5px solid transparent;
+	border-left: 6px solid #8a90a2;
+	border-right: 0;
+}
+.mm-cats.mm-collapsed .mm-cats-list {
+	display: none;
+}
+.mm-cats.mm-collapsed h4 {
+	margin-bottom: 0;
+}
+
 .mm-cat {
 	display: block;
 	padding: 8px 10px;
@@ -612,6 +647,18 @@ img {
 	.mm-layout .mm-cats {
 		width: 240px;
 	}
+
+	/* Category rail is always open on wide screens (no toggle) */
+	.mm-cats-caret {
+		display: none;
+	}
+	.mm-cats-toggle {
+		cursor: default;
+	}
+	.mm-cats.mm-collapsed .mm-cats-list {
+		display: block;
+	}
+
 	/* gutter between the rail and the card = empty page background */
 	.mm-layout .mm-main {
 		padding-left: 16px;

@@ -163,6 +163,20 @@ include('meta-social-common.php');
 			document.frmSearch.submit();
 		}
 	}
+
+	function toggleCats() {
+		if (document.documentElement.clientWidth >= 700) return; /* wide screens keep the rail open */
+		var box = document.getElementById('mmCats');
+		if (!box) return;
+		var label = document.getElementById('mmCatsLabel');
+		if (box.className.indexOf('mm-collapsed') === -1) {
+			box.className += ' mm-collapsed';
+			if (label) label.textContent = box.getAttribute('data-collapsed-label');
+		} else {
+			box.className = box.className.replace(' mm-collapsed', '');
+			if (label) label.textContent = box.getAttribute('data-open-label');
+		}
+	}
 </script>
 </head>
 <body onload="if (document.getElementById('txtSearch')) { document.getElementById('txtSearch').focus(); }">
@@ -174,9 +188,20 @@ include('meta-social-common.php');
 		<a class="mm-head-text" href="<?php echo ($homePath); ?>"><span class="mm-title">webOS App Museum</span><span class="mm-sub">A historical archive of Palm / HP webOS apps</span></a>
 	</div>
 
+	<?php
+		// Collapsed-state label for the mobile category picker = the selected category
+		$selectedCatName = '';
+		if (isset($_GET['category'])) {
+			foreach ($category_list as $cn) {
+				if (strtolower($cn) == strtolower($_GET['category'])) { $selectedCatName = $cn; break; }
+			}
+		}
+		$collapsedCatLabel = ($selectedCatName !== '') ? $selectedCatName : 'Categories';
+	?>
 	<div class="mm-layout">
-		<div class="mm-cats">
-			<h4>Categories</h4>
+		<div class="mm-cats" id="mmCats" data-open-label="Categories" data-collapsed-label="<?php echo htmlspecialchars($collapsedCatLabel, ENT_QUOTES); ?>">
+			<h4 class="mm-cats-toggle" onclick="toggleCats()"><span id="mmCatsLabel" class="mm-cats-label">Categories</span><span class="mm-cats-caret"></span></h4>
+			<div class="mm-cats-list">
 			<?php
 				repositionArrayElement($category_list, "Revisionist History", 1);
 				repositionArrayElement($category_list, "Curator's Choice", 1);
@@ -193,6 +218,7 @@ include('meta-social-common.php');
 					}
 				}
 			?>
+			</div>
 		</div>
 
 		<div class="mm-main">
