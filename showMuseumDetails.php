@@ -116,6 +116,22 @@ if (document.addEventListener) {
 } else if (document.attachEvent) {
 	document.attachEvent('onkeydown', handleLightboxKey);
 }
+
+/* Back link: return to the exact list (search/sort/page) when the visit came
+   from this site; otherwise follow the href to the app's category listing. */
+function mmBack(link) {
+	try {
+		var ref = document.referrer || '';
+		if (ref) {
+			var refHost = ref.split('/')[2] || '';
+			if (refHost === location.host && history.length > 1) {
+				history.back();
+				return false;
+			}
+		}
+	} catch (e) {}
+	return true;
+}
 </script>
 <style>
 #lightbox-overlay {
@@ -303,10 +319,13 @@ if (isset($altPlainURI)) {
 	$altDownloadURI = substr($altDownloadURI, 0, $splitPos) . $encode_secret . substr($altDownloadURI, $splitPos);
 }
 
-//Figure out where to go back to
-parse_str($_SERVER["QUERY_STRING"], $query);
-unset($query["app"]);
-$homePath = "showMuseum.php?" . http_build_query($query);
+//The masthead links to the catalog landing; back-to-list is derived below.
+$homePath = "showMuseum.php";
+//Back-to-list target from the app's OWN category, looked up live so it never
+//goes stale (current name, no baked-in count). mmBack() prefers history.back()
+//for the exact prior list state when the visit came from this site.
+$appCategory = isset($found_app['category']) ? $found_app['category'] : '';
+$backUrl = ($appCategory !== "") ? "showMuseum.php?category=" . urlencode($appCategory) : "showMuseum.php";
 
 //Figure out image paths
 if (strpos($found_app["appIconBig"], "://") === false) {
@@ -349,6 +368,7 @@ function mm_dev_on($app, $key) {
 	</div>
 
 	<div class="mm-detail">
+		<a class="mm-back" href="<?php echo htmlspecialchars($backUrl, ENT_QUOTES); ?>" onclick="return mmBack(this)">&lsaquo; Back to <?php echo ($appCategory !== "") ? htmlspecialchars($appCategory) : "catalog"; ?></a>
 		<div class="mm-hero">
 			<div class="mm-hero-icon">
 				<img src="<?php echo htmlspecialchars($use_icon, ENT_QUOTES); ?>" alt="<?php echo htmlspecialchars($found_app["title"], ENT_QUOTES); ?> icon" onerror="this.src='assets/icon.png';">
@@ -461,7 +481,7 @@ function mm_dev_on($app, $key) {
 			} else {
 				$related_icon = $related["appIcon"];
 			}
-			$related_url = "showMuseumDetails.php?" . $_SERVER["QUERY_STRING"] . "&app=" . $related["id"];
+			$related_url = "showMuseumDetails.php?app=" . $related["id"];
 			echo "<a href='" . htmlspecialchars($related_url) . "'>";
 			echo "<img src='" . htmlspecialchars($related_icon) . "' onerror=\"this.src='assets/icon.png';\"><br>";
 			echo "<small>" . htmlspecialchars($related["title"]) . "</small>";

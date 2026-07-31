@@ -25,14 +25,13 @@ function repositionArrayElement(array &$array, $value, int $order): void
 }
 
 // Render a page navigation bar for a paginated category listing.
-// $category and $count are the RAW request values (urlencoded here),
-// matching how the sort-toggle links are built, and $sort is carried
-// through so pagination never drops the chosen sort order.
-function render_pager($category, $count, $sort, $page, $totalPages, $extraClass = ""): void
+// $category is the RAW request value (urlencoded here) and $sort is
+// carried through so pagination never drops the chosen sort order.
+function render_pager($category, $sort, $page, $totalPages, $extraClass = ""): void
 {
 	if ($totalPages < 2) return;
 	$base = "showMuseum.php?category=" . urlencode($category)
-		. "&count=" . urlencode($count) . "&sort=" . urlencode($sort);
+		. "&sort=" . urlencode($sort);
 	$link = function ($p, $label, $cls = "") use ($base) {
 		return "<a class='" . $cls . "' href='"
 			. htmlspecialchars($base . "&page=" . (int)$p, ENT_QUOTES)
@@ -103,11 +102,10 @@ $category_list = array_keys($category_counts);
 sort($category_list);
 
 //Get the app list if there is a category query - using direct catalog loading to avoid rate limiting
-if (isset($_GET['category']) && isset($_GET['count']))
+if (isset($_GET['category']))
 {
 	$category = $_GET['category'];
 	$category = preg_replace("/[^a-zA-Z0-9&' ]+/", "", $_GET['category']);
-	$count = preg_replace("/[^0-9]+/", "", $_GET['count']);
 
 	// Load catalog directly instead of HTTP request
 	$fullcatalog = load_catalogs();
@@ -210,7 +208,7 @@ include('meta-social-common.php');
 					{
 						$catencode = (urlencode($array_key));
 						$isSel = (isset($_GET['category']) && strtolower($catname) == strtolower($_GET['category']));
-						echo "<a class='mm-cat" . ($isSel ? " mm-sel" : "") . "' href='showMuseum.php?category={$catencode}&count={$catcount}'>";
+						echo "<a class='mm-cat" . ($isSel ? " mm-sel" : "") . "' href='showMuseum.php?category={$catencode}'>";
 						echo "<span class='mm-count'>{$catcount}</span>" . htmlspecialchars($catname);
 						echo "</a>";
 					}
@@ -229,9 +227,9 @@ include('meta-social-common.php');
 					$category = preg_replace("/[^a-zA-Z0-9 ]+/", "", $category);
 					echo ("<h3>" . htmlspecialchars($category) . "</h3>");
 					// Sort toggle
-					$sortRecentUrl = "showMuseum.php?category=" . urlencode($_GET['category']) . "&count=" . $_GET['count'] . "&sort=recent";
-					$sortAlphaUrl = "showMuseum.php?category=" . urlencode($_GET['category']) . "&count=" . $_GET['count'] . "&sort=alpha";
-					$sortRecUrl = "showMuseum.php?category=" . urlencode($_GET['category']) . "&count=" . $_GET['count'] . "&sort=recommended";
+					$sortRecentUrl = "showMuseum.php?category=" . urlencode($_GET['category']) . "&sort=recent";
+					$sortAlphaUrl = "showMuseum.php?category=" . urlencode($_GET['category']) . "&sort=alpha";
+					$sortRecUrl = "showMuseum.php?category=" . urlencode($_GET['category']) . "&sort=recommended";
 					echo "<div class='mm-sort'>";
 					echo "Sort: ";
 					echo ($_sort == 'recent') ? "<b>Recently Updated</b>" : "<a href='{$sortRecentUrl}'>Recently Updated</a>";
@@ -246,7 +244,7 @@ include('meta-social-common.php');
 						$to = min($totalApps, $page * $PAGE_SIZE);
 						echo "<div class='mm-pgsummary'>Showing " . $from . "&ndash;" . $to
 							. " of " . $totalApps . " apps</div>";
-						render_pager($_GET['category'], $_GET['count'], $_sort, $page, $totalPages, 'mm-pager-top');
+						render_pager($_GET['category'], $_sort, $page, $totalPages, 'mm-pager-top');
 					}
 				}
 				if (isset($_GET['search'])) {
@@ -254,15 +252,13 @@ include('meta-social-common.php');
 					$searchTerm = preg_replace("/[^a-zA-Z0-9 ]+/", "", $searchTerm);
 					echo ("<h3 style='margin-bottom:14px;'>Search Results: &lsquo;" . htmlspecialchars($searchTerm) . "&rsquo;</h3>");
 				}
-				// Escape the raw query string for safe use inside HTML href attributes (prevents reflected XSS)
-				$qs = htmlspecialchars($_SERVER["QUERY_STRING"], ENT_QUOTES);
 				foreach($app_response["data"] as $app) {
 					if (strpos($app["appIcon"], "://") === false) {
 						$use_img = $img_path.strtolower($app["appIcon"]);
 					} else {
 						$use_img = $app["appIcon"];
 					}
-					$detailUrl = "showMuseumDetails.php?{$qs}&app={$app["id"]}";
+					$detailUrl = "showMuseumDetails.php?app={$app["id"]}";
 					echo "<a class='mm-app' href='" . htmlspecialchars($detailUrl, ENT_QUOTES) . "'>";
 					echo   "<span class='mm-app-icon'><img src='" . htmlspecialchars($use_img, ENT_QUOTES) . "' alt='' onerror=\"this.src='assets/icon.png';\"></span>";
 					echo   "<span class='mm-app-body'>";
@@ -273,7 +269,7 @@ include('meta-social-common.php');
 				}
 				// Pagination nav at the bottom of the list
 				if (!empty($isPaginated)) {
-					render_pager($_GET['category'], $_GET['count'], $_sort, $page, $totalPages);
+					render_pager($_GET['category'], $_sort, $page, $totalPages);
 				}
 				include 'footer.php';
 			}

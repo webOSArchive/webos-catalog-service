@@ -419,6 +419,18 @@ img {
 /* ============================================================
    Detail page
    ============================================================ */
+/* Back-to-list breadcrumb on the detail page */
+.mm-back {
+	display: inline-block;
+	margin-bottom: 12px;
+	font-size: 14px;
+	color: #6b7280;
+}
+.mm-back:hover {
+	color: #3e0bf9;
+	text-decoration: none;
+}
+
 .mm-detail {
 	background-color: #ffffff;
 	border: 1px solid #e4e6eb;
