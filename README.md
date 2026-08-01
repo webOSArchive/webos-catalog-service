@@ -58,6 +58,9 @@ All app data is stored in MySQL. Key tables:
 | `authors` | Vendor/author information |
 | `download_logs` | Download tracking |
 | `update_check_logs` | Update check tracking |
+| `accounts` | User accounts (admin + legacy-client) |
+| `roles` / `account_roles` | Roles and their assignment to accounts |
+| `account_tokens` | Device auth tokens for legacy clients |
 
 ### App Status
 
@@ -78,6 +81,45 @@ The `post_shutdown` flag identifies community-created apps after platform EOL.
 ### Admin UI (/admin)
 
 CRUD interface for managing catalog data, secured via nginx basic auth.
+
+### User Accounts
+
+Accounts exist only for **admin/staff** and **legacy-client support** — there is
+no web sign-up, and web visitors never need an account to browse. Accounts are
+**provisioned from the command line** (an admin Accounts page comes later).
+
+**One-time setup** — apply the schema migration (matches your `config.php` DB
+user/name; MariaDB — see the file header for MySQL 8):
+
+```bash
+mysql -u <db_user> -p <db_name> < sql/migrations/0001_accounts.sql
+```
+
+**Add a user:**
+
+```bash
+php scripts/create-account.php <username> [role]
+```
+
+You'll be prompted for an optional email and a password (entered hidden, never
+passed on the command line). `role` defaults to `superadmin`. Examples:
+
+```bash
+php scripts/create-account.php jon                 # superadmin (use for the first account)
+php scripts/create-account.php alice curator       # a curator
+```
+
+**Roles** (the capabilities behind each are defined in `includes/Capabilities.php`):
+
+| Role | For |
+|------|-----|
+| `superadmin` | Everything, including managing other accounts |
+| `admin` | Full catalog management (no account management) |
+| `curator` | Edit apps / categories / authors, moderate reviews |
+| `developer` | Submit and manage their own apps (no admin portal) |
+
+> Accounts are not yet wired into any login — `/admin` is still protected by
+> nginx basic auth. App-level login (layered inside basic auth) is the next phase.
 
 ### Web Interface
 
