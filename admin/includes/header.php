@@ -56,7 +56,7 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
         <div class="nav-actions">
             <a href="../" target="_blank">View Site</a>
             <?php if (function_exists('current_account') && ($__acct = current_account())): ?>
-            <span class="nav-user"><?php echo htmlspecialchars($__acct['username']); ?></span>
+            <a href="account.php" class="nav-user" title="My account &amp; password"><?php echo htmlspecialchars($__acct['username']); ?></a>
             <a href="logout.php">Log out</a>
             <?php endif; ?>
         </div>
