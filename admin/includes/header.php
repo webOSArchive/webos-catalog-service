@@ -33,9 +33,7 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
         </button>
         <div class="nav-menu" id="navMenu">
         <ul class="nav-links">
-            <?php if (!admin_is_owner_only()): ?>
             <li><a href="index.php" class="<?php echo $currentPage === 'index' ? 'active' : ''; ?>">Dashboard</a></li>
-            <?php endif; ?>
             <?php if (admin_has_capability('apps.edit') || admin_has_capability('apps.own')): ?>
             <li><a href="apps.php" class="<?php echo $currentPage === 'apps' ? 'active' : ''; ?>">Apps</a></li>
             <?php endif; ?>

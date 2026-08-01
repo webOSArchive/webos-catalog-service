@@ -38,9 +38,10 @@ browse. Accounts are admin-provisioned.
   by owner.
 - **Per-page permission gating:** `admin_require_capability()` / `admin_require_any()`
   / `admin_is_owner_only()` gate each admin page and filter the nav. `developer`
-  accounts hold `admin.access` but reach **only** the Apps area and see/edit **only
-  their own** apps (owner filter on the list; ownership check on edit; curation/status
-  fields forced on save; owner selector hidden).
+  accounts (`admin.access`, `apps.own`, `apps.submit`, `logs.view`, `ipk.manage`)
+  reach the Dashboard, Logs and IPK manager, and an Apps view scoped to **only their
+  own** apps (owner filter on the list; ownership check on edit; curation/status fields
+  forced on save; owner selector hidden). They do not see Categories, Authors or Accounts.
 
 ## Phase 3 — App submission + moderation (#3)
 
