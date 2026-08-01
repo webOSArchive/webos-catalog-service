@@ -1,4 +1,5 @@
 <?php
+if (!defined('ADMIN_BOOTSTRAP')) { http_response_code(403); exit('Forbidden'); }
 /**
  * Admin UI Header
  *

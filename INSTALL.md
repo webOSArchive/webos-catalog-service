@@ -214,8 +214,12 @@ web-fetchable. Add to your `server` block:
 
 ```nginx
 location ~ ^/(sql|scripts)/ { deny all; }   # migrations, CLI scripts
+location ~ /includes/       { deny all; }   # PHP partials/libraries
 location ~ /\.              { deny all; }    # dotfiles (.git, .htpasswd, ...)
 ```
+
+(The admin partials also refuse to run if fetched directly, so this is
+defense-in-depth.)
 
 ## Troubleshooting
 
