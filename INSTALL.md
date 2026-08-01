@@ -181,6 +181,32 @@ curl http://appcatalog.yourdomain.org/WebService/getMuseumMaster.php?count=1&key
 curl -I http://appcatalog.yourdomain.org/admin/
 ```
 
+## 12. User Accounts (Phase 0 foundation)
+
+Adds the accounts/roles schema. This does **not** change how the site or admin
+behave yet (admin is still protected by the nginx basic auth from step 6/7); it
+just puts the identity model in place. Accounts are **admin-provisioned only** —
+there is no web self-signup.
+
+```bash
+# Apply the migration (safe to re-run on MariaDB; see the note at the top of the
+# file if you are on MySQL 8 rather than MariaDB)
+mysql -u catalog_user -p webos_catalog < sql/migrations/0001_accounts.sql
+
+# Verify the tables exist
+mysql -u catalog_user -p webos_catalog -e "SHOW TABLES LIKE 'account%'; SELECT name FROM roles;"
+
+# Create the first (superadmin) account. Prompts for an optional email and a
+# hidden password — nothing sensitive is passed on the command line.
+php scripts/create-account.php <username>
+
+# Provision other accounts with a specific role (superadmin|admin|curator|developer)
+php scripts/create-account.php someuser curator
+```
+
+Nothing reads these accounts yet — admin login and permission checks arrive in
+Phase 1 and will layer inside the existing basic auth.
+
 ## Troubleshooting
 
 **500 errors:** Check nginx and PHP-FPM logs:
