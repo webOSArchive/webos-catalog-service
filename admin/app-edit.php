@@ -5,9 +5,11 @@
 require_once __DIR__ . '/includes/security.php';
 require_once __DIR__ . '/../includes/Database.php';
 require_once __DIR__ . '/../includes/AppRepository.php';
+require_once __DIR__ . '/../includes/AccountRepository.php';
 
 $db = Database::getInstance()->getConnection();
 $repo = new AppRepository();
+$accounts = (new AccountRepository())->listAccounts();
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : null;
 $app = $id ? $repo->getById($id) : null;
@@ -48,6 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'app_icon_big' => trim($_POST['app_icon_big'] ?? ''),
         'category' => $_POST['category'] ?? '',
         'vendor_id' => trim($_POST['vendor_id'] ?? '') ?: null,
+        'owner_account_id' => ($_POST['owner_account_id'] ?? '') !== '' ? (int)$_POST['owner_account_id'] : null,
         'status' => $_POST['status'] ?? 'active',
         'pixi' => isset($_POST['pixi']),
         'pre' => isset($_POST['pre']),
@@ -224,6 +227,18 @@ include 'includes/header.php';
                 <label>Vendor ID</label>
                 <input type="text" name="vendor_id" value="<?php echo htmlspecialchars($app['vendor_id'] ?? $_POST['vendor_id'] ?? ''); ?>">
                 <small>Links to author metadata (optional)</small>
+            </div>
+
+            <div class="form-group">
+                <label>Owner Account</label>
+                <select name="owner_account_id">
+                    <option value="">&mdash; none &mdash;</option>
+                    <?php $currentOwner = (string)($app['owner_account_id'] ?? $_POST['owner_account_id'] ?? ''); ?>
+                    <?php foreach ($accounts as $acct): ?>
+                    <option value="<?php echo (int)$acct['id']; ?>"<?php echo ($currentOwner === (string)$acct['id']) ? ' selected' : ''; ?>><?php echo htmlspecialchars($acct['username']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <small>The user account that owns/submitted this app (optional)</small>
             </div>
 
             <div class="form-group">
