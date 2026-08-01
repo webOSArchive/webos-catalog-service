@@ -41,7 +41,9 @@ browse. Accounts are admin-provisioned.
   accounts (`admin.access`, `apps.own`, `apps.submit`, `logs.view`, `ipk.manage`)
   reach the Dashboard, Logs and IPK manager, and an Apps view scoped to **only their
   own** apps (owner filter on the list; ownership check on edit; curation/status fields
-  forced on save; owner selector hidden). They do not see Categories, Authors or Accounts.
+  forced on save; owner selector hidden). IPK **uploads** are further scoped: the file
+  name must start with the `public_application_id` of one of their owned apps. They do
+  not see Categories, Authors or Accounts.
 
 ## Phase 3 — App submission + moderation (#3)
 

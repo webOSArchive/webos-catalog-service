@@ -8,9 +8,30 @@ $pageTitle = 'IPK Manager';
 require_once __DIR__ . '/includes/security.php';
 admin_require_capability('ipk.manage');
 require_once __DIR__ . '/../includes/AzureBlobService.php';
+require_once __DIR__ . '/../includes/AppRepository.php';
 
 $errors = [];
 $success = '';
+
+// Owner-only uploaders (developers) may only upload IPKs for apps they own:
+// the file name must start with one of their apps' public_application_id.
+$scopedUploads = !admin_has_capability('apps.edit');
+$allowedPackageIds = $scopedUploads
+    ? (new AppRepository())->getOwnedApplicationIds((int) current_account()['id'])
+    : [];
+
+/** True if $filename belongs to one of the allowed package ids (pkgid_*.ipk). */
+function ipk_owner_allows($filename, array $allowedIds) {
+    foreach ($allowedIds as $pkgid) {
+        if ($pkgid === '') {
+            continue;
+        }
+        if (strpos($filename, $pkgid . '_') === 0 || strcasecmp($filename, $pkgid . '.ipk') === 0) {
+            return true;
+        }
+    }
+    return false;
+}
 
 // Check if Azure is configured
 $azureConfigured = AzureBlobService::isConfigured();
@@ -47,6 +68,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['ipk_file']) && $azur
             if ($_FILES['ipk_file']['size'] > $maxSize) {
                 $errors[] = 'File too large. Maximum size is 200MB.';
             }
+        }
+
+        // Owner scope: developers may only upload IPKs for apps they own.
+        if (empty($errors) && $scopedUploads && !ipk_owner_allows($originalName, $allowedPackageIds)) {
+            $errors[] = empty($allowedPackageIds)
+                ? 'You can only upload IPKs for apps you own, and none of your apps have an Application ID set yet.'
+                : 'You can only upload IPKs for apps you own — the file name must start with one of your app IDs: ' . implode(', ', $allowedPackageIds);
         }
 
         // Upload to Azure
@@ -138,6 +166,16 @@ include 'includes/header.php';
                     <input type="file" name="ipk_file" accept=".ipk" required>
                     <small>Select a .ipk file to upload (max 200MB)</small>
                 </div>
+                <?php if ($scopedUploads): ?>
+                <p style="font-size:0.85em;color:#7f8c8d;margin:0 0 8px;">
+                    You can upload IPKs for your own apps only &mdash; the file name must start with one of your app IDs:
+                    <?php if (empty($allowedPackageIds)): ?>
+                        <em>(none of your apps have an Application ID set yet)</em>.
+                    <?php else: ?>
+                        <?php foreach ($allowedPackageIds as $pid): ?><code><?php echo htmlspecialchars($pid); ?>_</code> <?php endforeach; ?>
+                    <?php endif; ?>
+                </p>
+                <?php endif; ?>
                 <p style="font-size:0.85em;color:#7f8c8d;margin:0;">Note: Uploading a file with the same name will overwrite the existing file.</p>
             </fieldset>
             <div class="form-actions">
