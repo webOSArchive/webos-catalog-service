@@ -61,6 +61,73 @@ body {
     text-decoration: none;
 }
 
+/* --- Collapsible nav: hamburger only when the items don't fit --- */
+.nav-menu {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.nav-links { flex-shrink: 0; }
+.nav-actions { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+.nav-user { opacity: 0.85; }
+
+.nav-toggle {
+    display: none;            /* shown only when collapsed */
+    margin-left: auto;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    width: 42px;
+    height: 40px;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+}
+.nav-toggle-bar {
+    display: block;
+    width: 22px;
+    height: 2px;
+    margin: 0 auto;
+    background: rgba(255,255,255,0.9);
+    border-radius: 2px;
+}
+
+/* While measuring, let the menu take its natural width so overflow is detectable */
+.admin-nav.nav-measure .nav-menu { flex: 0 0 auto; min-width: auto; }
+
+/* Collapsed: show the hamburger and drop the menu into a panel below the bar */
+.admin-nav.nav-collapsed .nav-toggle { display: flex; }
+.admin-nav.nav-collapsed .nav-menu {
+    display: none;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    background: #2c3e50;
+    padding: 8px 12px 12px;
+    box-shadow: 0 10px 18px rgba(0,0,0,0.25);
+}
+.admin-nav.nav-collapsed.nav-open .nav-menu { display: flex; }
+.admin-nav.nav-collapsed .nav-links {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    width: 100%;
+}
+.admin-nav.nav-collapsed .nav-links a { display: block; padding: 10px 12px; }
+.admin-nav.nav-collapsed .nav-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    margin-top: 8px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.15);
+}
+
 /* Main Content */
 .admin-content {
     max-width: 1400px;
@@ -396,19 +463,8 @@ fieldset label input[type="checkbox"] {
 
 /* Responsive */
 @media (max-width: 768px) {
-    .admin-nav {
-        flex-wrap: wrap;
-        height: auto;
-        padding: 10px 15px;
-    }
-
-    .nav-links {
-        order: 3;
-        width: 100%;
-        margin-top: 10px;
-        flex-wrap: wrap;
-    }
-
+    /* Nav collapsing is handled by overflow detection (see admin.js / .nav-collapsed),
+       not a fixed breakpoint, so no .admin-nav / .nav-links overrides here. */
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
     }
