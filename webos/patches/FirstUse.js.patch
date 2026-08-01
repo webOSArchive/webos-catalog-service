@@ -1,0 +1,107 @@
+--- a/com.palm.app.firstuse/FirstUse.js	2026-08-01 16:34:36
++++ b/com.palm.app.firstuse/FirstUse.js	2026-08-01 18:24:35
+@@ -34,9 +34,9 @@
+ 		languageCode: "",
+ 		serverURL: "",
+ 		googleTerms: "",
+-		dataConnection: false,
+-		dataConnectionType: "",
+-		dataConnectionInitialized: false,
++		dataConnection: true,
++		dataConnectionType: "wifi",
++		dataConnectionInitialized: true,
+ 		first: true,
+ 		createProfile: false,
+ 		firstName: "",
+@@ -378,17 +378,11 @@
+ 
+ 	
+ 	getRestoreInProgressSuccess: function(inSender, inResponse) {
+-		console.log("getRestoreInProgressSuccess: tokens[FIRSTUSE_RESTORE_IN_PROGRESS] = " + inResponse.FIRSTUSE_RESTORE_IN_PROGRESS);
+-		if (inResponse.FIRSTUSE_RESTORE_IN_PROGRESS) {
+-			this.$.registerForSMS.call({"register":false});
+-			this.$.setPalmProfile.call({FIRSTUSE_RESTORE_IN_PROGRESS : false});
+-			console.log("Cleaning up a partial restore.");
+-	        this.$.eraseVar.call();
+-	        // not calling nextStep(), because we're rebooting the device and I don't want a screen to show for 
+-	        // a second before reboot
+-		} else {
+-			this.nextStep();
+-		}
++		// webOS Archive: NEVER erase the device. The stock path here calls
++		// eraseVar (wipe /media/cryptofs/apps) + reboot to "clean up a partial
++		// restore" — that is exactly what wiped a dev device. We do restore
++		// nothing, so just advance.
++		this.nextStep();
+ 	},
+ 	
+ 	getRestoreInProgressFailure: function() {
+@@ -828,19 +822,16 @@
+ 	},
+ 	
+ 	done: function(){
+-		//this.$.doneButton.setDisabled(true);
+-		console.info("Making call to postLogin settings....");
+-		if (this.connectedWithWiFi) {
+-			this.$.setTimeZoneFromIP.call();
+-		} else {
+-			this.postTimeZoneResponseReturned = true; // we just pretend we called it in non-wifi mode other wise we hang.
+-		}
+-
+-		console.log("Set Customizations: " + this.countryCode + " : " + this.languageCode);
+-		this.$.setCustomization.call({"language":this.languageCode,"country":this.countryCode});
++		// webOS Archive: safe completion. The account + device token are already
++		// written by accountservices (createNovaAccount/authenticateAccount). Do NOT
++		// call the dead HP postLogin services, do NOT reset, do NOT shut down —
++		// just close the app.
++		console.info("WOSA firstrun: account setup complete — closing (no reset, no erase, no shutdown).");
++		this.closeApp();
++	},
+ 
+-		this.$.postLoginSettings.call();
+-		this.$.removeRestoreFailedFile.call();
++	closeApp: function(){
++		try { window.close(); } catch (e) { console.info("WOSA close err: " + e); }
+ 	},
+ 	
+ 	postTimeZoneResponse: function(inSender, inResponse){
+@@ -893,16 +884,10 @@
+ 	},
+ 	
+ 	firstUseComplete: function() {
+-		console.info("*********First Use  complete*************");
+-		if(!this.isOTAAvailable || (this.otaSkipped == true)) {
+-			console.info("Shutting down because OTA is not available");
+-			this.$.registerForSMS.call({"register":false});
+-			PalmSystem.shutdown();
+-		} else {
+-            PalmSystem.markFirstUseDone();            
+-			console.info("There is an update install it.");            
+-            this.$.installUpdate.call();
+-		}
++		// webOS Archive: never shut down / reset / mark-first-use / install updates.
++		// (belt-and-suspenders — done() closes directly and shouldn't reach here.)
++		console.info("WOSA firstrun complete — safe close.");
++		this.closeApp();
+ 	},
+ 	
+ 	performSoftwareUpdate: function() {
+@@ -921,16 +906,8 @@
+ 	
+     
+     powerDownDevice: function () {
+-		console.info("5 minute timed out, this.view: " + this.view);
+-		if (this.locale == "") {//Not the best way but we'll come back to this later
+-			if(!this.chargerConnected){
+-				console.info("5 mins no USB/Dock in Language screen, powering down now....");
+-				if (this.powerDownMethod) clearTimeout(this.powerDownMethod);
+-				this.$.powerDown.call({"reason": "user inactivity in firstuse"});
+-			} else {
+-				console.info("Not powering down, In Language screen but connected to charger: " + this.chargerConnected);
+-			}
+-		}
++		// webOS Archive: disabled the stock 5-minute inactivity auto-powerdown.
++		console.info("WOSA firstrun: powerDownDevice disabled (no auto-poweroff).");
+ 	},
+ 	
+ 	powerDownResponse:function(inSender, inResponse){

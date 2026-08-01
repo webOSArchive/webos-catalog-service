@@ -1,0 +1,24 @@
+--- a/com.palm.app.firstuse/source/signin/Signin.js	2026-08-01 18:15:53
++++ b/com.palm.app.firstuse/source/signin/Signin.js	2026-08-01 16:37:43
+@@ -1976,13 +1976,14 @@
+ 	},
+ 	
+ 	doPostSignInChecks: function(){
+-		if (this.createdPostSignIn) {
+-			this.$.postSignIn.reset();
+-			console.log("doPostSignInChecks called twice, this should NEVER happen but we have seen it happen once when having network errors. JIRA DFISH-7207.");
+-		} else {
+-			this.createdPostSignIn = true;
+-			this.createComponent({name: "postSignIn", kind:"PostSignIn", onFinish: "postSignInDone"});
+-		}
++		// webOS Archive: skip the stock post-sign-in checks. PostSignIn runs an OTA
++		// software-update check (no update service exists -> hangs) and a backup-devices
++		// check (dead HP backend). The account + token are already written by
++		// accountservices, so go straight to finish. Handles both sign-in and create.
++		console.info("WOSA: skipping PostSignIn OTA/backup checks — finishing sign-in.");
++		this.$.scrim.hide();
++		this.$.spinner.setShowing(false);
++		this.doFinish();
+ 	},
+ 	
+ 	postSignInDone: function(){	

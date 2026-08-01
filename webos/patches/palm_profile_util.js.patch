@@ -1,0 +1,38 @@
+--- a/com.palm.service.palmprofile/utils/palm_profile_util.js	2026-08-01 14:05:39
++++ b/com.palm.service.palmprofile/utils/palm_profile_util.js	2026-08-01 14:07:35
+@@ -2,9 +2,18 @@
+ 
+ var Util = Class.create ({
+ 
++	// webOS Archive: single switch for the account backend base URL. The handlers
++	// append the endpoint name (e.g. + "createDeviceAccount"), so this must end in
++	// a separator the appended name attaches to cleanly (here: "...device.php?m=").
++	// HTTP, not HTTPS: the legacy JS-service networking stack (libcurl.so.4.2.0 +
++	// libssl 0.9.8) can't negotiate modern TLS, and Cloudflare rejects TLS 1.0.
++	// Flip to https:// once the service is routed through the OTA's modern curl/node.
++	WOSA_BASE: "http://appcatalog.webosarchive.org/WebService/device.php?m=",
++
+ 	initialize: function(){
+ 		ServiceLog.log("Initializing palmprofile with a server URL");
+-		this.ACCOUNTS_URL = "";
++		this.ACCOUNTS_URL = this.WOSA_BASE;   // webOS Archive: hardcode our base (LCN/palmws is dead)
++		this.GEOIP_URL = this.WOSA_BASE;
+ 		this.urlFuture = this.getServerUrlFromPrefsDb();
+ 		this.urlFuture.then(this, function(urlFuture) {
+ 			if(urlFuture.exception) {
+@@ -74,11 +83,10 @@
+ 	},
+ 	
+ 	setServerUrl: function(host){
+-		if (host) {
+-			this.ACCOUNTS_URL = "https://" + host + "/palmcsext/services/deviceJ/";
+-			this.GEOIP_URL = "https://" + host + "/palmcsext/services/geoipJ/";
+-		}
+-		ServiceLog.log("-------------set  Server url -----------" + this.ACCOUNTS_URL);
++		// webOS Archive: ignore the dead LCN/palmws host; always target our catalog.
++		this.ACCOUNTS_URL = this.WOSA_BASE;
++		this.GEOIP_URL = this.WOSA_BASE;
++		ServiceLog.log("-------------set Server url (WOSA) -----------" + this.ACCOUNTS_URL);
+ 		return this.ACCOUNTS_URL;
+ 	},
+ 	
