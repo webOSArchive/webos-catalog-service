@@ -51,6 +51,7 @@ function authenticate_info_ex($account, $token) {
     $yearMs  = 365 * 86400 * 1000;
     return ['AuthenticateInfoEx' => [
         'accountAlias'          => $account['email'] ?: $account['username'],
+        'displayName'           => ($account['display_name'] ?? '') ?: ($account['email'] ?: $account['username']),
         'token'                 => $token,
         'accountState'          => 'ACTIVE',
         'authenticationTime'    => $nowMs,
