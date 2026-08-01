@@ -19,6 +19,13 @@ class AccountRepository {
     /** Columns safe to return to callers (excludes password_hash). */
     const PUBLIC_COLS = 'id, username, email, display_name, status, author_vendor_id, legacy_account_id, created_at, updated_at, last_login_at';
 
+    /**
+     * A valid throwaway bcrypt hash. verifyLogin() always runs one
+     * password_verify() - against this when the account is missing or has no
+     * password - so response time doesn't reveal whether a username exists.
+     */
+    const DUMMY_HASH = '$2y$12$ztFAj8B7XTfOoq0.FkVVZejCjlIBBohgn7zUkGmRxFpDAS386VvqG';
+
     public function __construct() {
         $this->db = Database::getInstance()->getConnection();
     }
@@ -120,10 +127,11 @@ class AccountRepository {
         $stmt = $this->db->prepare("SELECT id, password_hash, status FROM accounts WHERE username = ?");
         $stmt->execute([$username]);
         $row = $stmt->fetch();
-        if (!$row || $row['status'] !== 'active' || empty($row['password_hash'])) {
-            return null;
-        }
-        if (!password_verify($password, $row['password_hash'])) {
+        // Always run exactly one password_verify (constant-time-ish) so a missing
+        // or password-less account is indistinguishable from a wrong password.
+        $hash = (!empty($row['password_hash'])) ? $row['password_hash'] : self::DUMMY_HASH;
+        $passwordOk = password_verify($password, $hash);
+        if (!$row || $row['status'] !== 'active' || empty($row['password_hash']) || !$passwordOk) {
             return null;
         }
         return $this->findById($row['id']);

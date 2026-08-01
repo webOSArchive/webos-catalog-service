@@ -181,31 +181,41 @@ curl http://appcatalog.yourdomain.org/WebService/getMuseumMaster.php?count=1&key
 curl -I http://appcatalog.yourdomain.org/admin/
 ```
 
-## 12. User Accounts (Phase 0 foundation)
+## 12. User Accounts
 
-Adds the accounts/roles schema. This does **not** change how the site or admin
-behave yet (admin is still protected by the nginx basic auth from step 6/7); it
-just puts the identity model in place. Accounts are **admin-provisioned only** —
-there is no web self-signup.
+App-level login for `/admin`, layered **inside** the nginx basic auth (which
+stays as an outer gate). Accounts are **admin-provisioned only** — there is no
+web self-signup.
+
+The `accounts` / `roles` / `account_roles` / `account_tokens` tables (and the
+`apps.owner_account_id` / `app_reviews.author_account_id` columns) are part of
+the database, so a fresh install gets them from the normal DB import (step 3).
+The original one-off migration is in the repo's git history if you ever need it.
 
 ```bash
-# Apply the migration (safe to re-run on MariaDB; see the note at the top of the
-# file if you are on MySQL 8 rather than MariaDB)
-mysql -u catalog_user -p webos_catalog < sql/migrations/0001_accounts.sql
-
-# Verify the tables exist
+# Confirm the accounts tables are present
 mysql -u catalog_user -p webos_catalog -e "SHOW TABLES LIKE 'account%'; SELECT name FROM roles;"
 
-# Create the first (superadmin) account. Prompts for an optional email and a
-# hidden password — nothing sensitive is passed on the command line.
-php scripts/create-account.php <username>
+# Create the first account (prompts for optional email + a hidden password).
+# Make the first one a superadmin so it can reach /admin and manage others.
+php scripts/create-account.php <username> superadmin
 
-# Provision other accounts with a specific role (superadmin|admin|curator|developer)
+# Provision more (roles: superadmin | admin | curator | developer)
 php scripts/create-account.php someuser curator
 ```
 
-Nothing reads these accounts yet — admin login and permission checks arrive in
-Phase 1 and will layer inside the existing basic auth.
+Then sign in at `/admin/` (after the basic-auth prompt) with an account that has
+the `admin.access` capability (superadmin/admin/curator). `developer` accounts
+have no admin access.
+
+**Harden file access (recommended).** The repo has non-public paths under the
+web root; deny them at the nginx layer so schema and helper scripts aren't
+web-fetchable. Add to your `server` block:
+
+```nginx
+location ~ ^/(sql|scripts)/ { deny all; }   # migrations, CLI scripts
+location ~ /\.              { deny all; }    # dotfiles (.git, .htpasswd, ...)
+```
 
 ## Troubleshooting
 

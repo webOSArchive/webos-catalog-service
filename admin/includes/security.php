@@ -19,7 +19,10 @@ require_once __DIR__ . '/../../includes/AccountRepository.php';
 // --- Isolated admin session -------------------------------------------------
 if (session_status() === PHP_SESSION_NONE) {
     session_name('WOSADMINSESS'); // distinct from the front-end site session
-    $secure = (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off');
+    // Behind Cloudflare/nginx the origin can see plain HTTP even when the user is
+    // on HTTPS; honor X-Forwarded-Proto so the admin cookie is still Secure.
+    $secure = (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off')
+        || (strtolower($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
     session_set_cookie_params([
         'lifetime'  => 0,
         'path'      => '/',
