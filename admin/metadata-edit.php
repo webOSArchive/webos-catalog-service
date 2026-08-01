@@ -18,6 +18,16 @@ if (!$id) {
     exit;
 }
 
+// Apps area gate; owners may only touch metadata for apps they own.
+admin_require_any(['apps.edit', 'apps.own']);
+if (admin_is_owner_only()) {
+    $ownApp = $appRepo->getById($id);
+    if (!$ownApp || (int)($ownApp['owner_account_id'] ?? 0) !== (int) current_account()['id']) {
+        http_response_code(403);
+        die('Forbidden: you can only edit metadata for apps your account owns.');
+    }
+}
+
 $app = $appRepo->getById($id);
 if (!$app) {
     header('Location: apps.php');

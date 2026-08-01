@@ -10,6 +10,12 @@ require_once __DIR__ . '/../includes/AppRepository.php';
 $db = Database::getInstance()->getConnection();
 $repo = new AppRepository();
 
+// Apps area: full managers see everything; owners (e.g. developers) see only
+// the apps their account owns.
+admin_require_any(['apps.edit', 'apps.own']);
+$canEditAll  = admin_has_capability('apps.edit');
+$ownerFilter = $canEditAll ? null : (int) current_account()['id'];
+
 // Get filter parameters
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $status = isset($_GET['status']) ? $_GET['status'] : '';
@@ -25,13 +31,15 @@ $apps = $repo->adminSearch([
     'category' => $category,
     'sort' => $sort,
     'page' => $page,
-    'perPage' => $perPage
+    'perPage' => $perPage,
+    'owner_account_id' => $ownerFilter
 ]);
 
 $totalCount = $repo->adminSearchCount([
     'search' => $search,
     'status' => $status,
-    'category' => $category
+    'category' => $category,
+    'owner_account_id' => $ownerFilter
 ]);
 
 $totalPages = ceil($totalCount / $perPage);
@@ -44,7 +52,7 @@ include 'includes/header.php';
 
 <div class="page-header">
     <h1>Apps <small style="color:#7f8c8d;font-size:0.6em">(<?php echo number_format($totalCount); ?> total)</small></h1>
-    <a href="app-edit.php" class="btn btn-primary">Add New App</a>
+    <?php if ($canEditAll): ?><a href="app-edit.php" class="btn btn-primary">Add New App</a><?php endif; ?>
 </div>
 
 <div class="card">

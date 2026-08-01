@@ -76,6 +76,22 @@ function admin_require_capability($capability) {
     }
 }
 
+/** Hard stop (403) unless the account has at least ONE of the given capabilities. */
+function admin_require_any(array $capabilities) {
+    foreach ($capabilities as $c) {
+        if (admin_has_capability($c)) {
+            return;
+        }
+    }
+    http_response_code(403);
+    die('Forbidden: your account does not have permission for this page.');
+}
+
+/** True for accounts that manage only their own apps and nothing else (developers). */
+function admin_is_owner_only() {
+    return admin_has_capability('apps.own') && !admin_has_capability('apps.edit');
+}
+
 // --- CSRF token helpers (for login + account management forms) --------------
 function csrf_token() {
     if (empty($_SESSION['csrf'])) {

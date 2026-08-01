@@ -33,13 +33,25 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
         </button>
         <div class="nav-menu" id="navMenu">
         <ul class="nav-links">
+            <?php if (!admin_is_owner_only()): ?>
             <li><a href="index.php" class="<?php echo $currentPage === 'index' ? 'active' : ''; ?>">Dashboard</a></li>
+            <?php endif; ?>
+            <?php if (admin_has_capability('apps.edit') || admin_has_capability('apps.own')): ?>
             <li><a href="apps.php" class="<?php echo $currentPage === 'apps' ? 'active' : ''; ?>">Apps</a></li>
+            <?php endif; ?>
+            <?php if (admin_has_capability('categories.manage')): ?>
             <li><a href="categories.php" class="<?php echo $currentPage === 'categories' ? 'active' : ''; ?>">Categories</a></li>
+            <?php endif; ?>
+            <?php if (admin_has_capability('authors.manage')): ?>
             <li><a href="authors.php" class="<?php echo $currentPage === 'authors' ? 'active' : ''; ?>">Authors</a></li>
+            <?php endif; ?>
+            <?php if (admin_has_capability('ipk.manage')): ?>
             <li><a href="ipk-manager.php" class="<?php echo $currentPage === 'ipk-manager' ? 'active' : ''; ?>">IPKs</a></li>
+            <?php endif; ?>
+            <?php if (admin_has_capability('logs.view')): ?>
             <li><a href="logs.php" class="<?php echo $currentPage === 'logs' ? 'active' : ''; ?>">Logs</a></li>
-            <?php if (function_exists('admin_has_capability') && admin_has_capability('accounts.manage')): ?>
+            <?php endif; ?>
+            <?php if (admin_has_capability('accounts.manage')): ?>
             <li><a href="accounts.php" class="<?php echo $currentPage === 'accounts' ? 'active' : ''; ?>">Accounts</a></li>
             <?php endif; ?>
         </ul>
