@@ -14,6 +14,9 @@
  * every other admin script requires an active account with 'admin.access'.
  */
 
+// Marker so partials (header/footer) can refuse to run if fetched directly.
+define('ADMIN_BOOTSTRAP', true);
+
 require_once __DIR__ . '/../../includes/AccountRepository.php';
 
 // --- Isolated admin session -------------------------------------------------
