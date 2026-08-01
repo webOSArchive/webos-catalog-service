@@ -3,6 +3,7 @@
  * App List / Search Page
  */
 $pageTitle = 'Apps';
+require_once __DIR__ . '/includes/security.php';
 require_once __DIR__ . '/../includes/Database.php';
 require_once __DIR__ . '/../includes/AppRepository.php';
 
