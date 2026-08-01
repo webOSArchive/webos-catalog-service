@@ -43,7 +43,7 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
             <?php if (admin_has_capability('authors.manage')): ?>
             <li><a href="authors.php" class="<?php echo $currentPage === 'authors' ? 'active' : ''; ?>">Authors</a></li>
             <?php endif; ?>
-            <?php if (admin_has_capability('ipk.manage')): ?>
+            <?php if (admin_has_capability('ipk.manage') || admin_has_capability('ipk.view')): ?>
             <li><a href="ipk-manager.php" class="<?php echo $currentPage === 'ipk-manager' ? 'active' : ''; ?>">IPKs</a></li>
             <?php endif; ?>
             <?php if (admin_has_capability('logs.view')): ?>

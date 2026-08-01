@@ -22,7 +22,8 @@ class Capabilities {
         'apps.submit',        // submit new apps
         'apps.own',           // manage apps this account owns (owner_account_id)
         'reviews.moderate',   // moderate/flag reviews
-        'ipk.manage',         // manage IPK packages
+        'ipk.manage',         // upload/manage IPK packages
+        'ipk.view',           // view + download IPKs (no upload)
         'categories.manage',  // manage categories
         'authors.manage',     // manage authors/vendors
         'logs.view',          // view logs / reports
@@ -37,7 +38,7 @@ class Capabilities {
         ],
         'curator'    => [
             'admin.access', 'apps.edit', 'categories.manage',
-            'authors.manage', 'reviews.moderate', 'logs.view',
+            'authors.manage', 'reviews.moderate', 'logs.view', 'ipk.view',
         ],
         'developer'  => ['admin.access', 'apps.submit', 'apps.own', 'logs.view', 'ipk.manage'],
     ];
