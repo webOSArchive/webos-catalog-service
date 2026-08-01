@@ -52,16 +52,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $storage->isConfigured()) {
             if (!$file || $file['error'] !== UPLOAD_ERR_OK || empty($file['tmp_name'])) {
                 $errors[] = 'Please choose a file to upload.';
             } else {
-                $rel = $storage->saveUpload($id, $file['tmp_name'], $isBig ? 'icon-256' : 'icon');
-                if ($rel === null) {
-                    $errors[] = 'That file is not a supported image (PNG, JPG or GIF).';
-                } else {
+                try {
+                    $rel = $storage->saveUpload($id, $file['tmp_name'], $isBig ? 'icon-256' : 'icon');
                     if ($isBig) {
                         $repo->updateIconPaths($id, $app['app_icon'], $rel);
                     } else {
                         $repo->updateIconPaths($id, $rel, $app['app_icon_big']);
                     }
                     $success = $isBig ? 'Large icon updated.' : 'Icon updated.';
+                } catch (Throwable $e) {
+                    $errors[] = $e->getMessage();
                 }
             }
         } elseif ($action === 'upload_screenshot') {
@@ -69,16 +69,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $storage->isConfigured()) {
             if (!$file || $file['error'] !== UPLOAD_ERR_OK || empty($file['tmp_name'])) {
                 $errors[] = 'Please choose a screenshot to upload.';
             } else {
-                $images   = $metaRepo->getImages($id);
-                $baseName = $storage->nextScreenshotName(array_map(function ($x) { return $x['screenshot']; }, $images));
-                $rel      = $storage->saveUpload($id, $file['tmp_name'], $baseName);
-                if ($rel === null) {
-                    $errors[] = 'That file is not a supported image (PNG, JPG or GIF).';
-                } else {
+                try {
+                    $images   = $metaRepo->getImages($id);
+                    $baseName = $storage->nextScreenshotName(array_map(function ($x) { return $x['screenshot']; }, $images));
+                    $rel      = $storage->saveUpload($id, $file['tmp_name'], $baseName);
                     $nextOrder = empty($images) ? 1 : (max(array_map('intval', array_keys($images))) + 1);
                     $images[$nextOrder] = ['screenshot' => $rel, 'thumbnail' => $rel, 'orientation' => 'P', 'device' => 'P'];
                     $metaRepo->updateImages($id, $images);
                     $success = 'Screenshot added. (Set its orientation on the Metadata page if it should be landscape.)';
+                } catch (Throwable $e) {
+                    $errors[] = $e->getMessage();
                 }
             }
         } elseif ($action === 'delete_screenshot') {
