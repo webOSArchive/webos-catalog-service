@@ -132,6 +132,7 @@ include 'includes/header.php';
                     <td>
                         <a href="app-edit.php?id=<?php echo $app['id']; ?>" class="btn btn-sm">Edit</a>
                         <a href="metadata-edit.php?id=<?php echo $app['id']; ?>" class="btn btn-sm">Metadata</a>
+                        <a href="app-images.php?id=<?php echo $app['id']; ?>" class="btn btn-sm">Images</a>
                     </td>
                 </tr>
                 <?php endforeach; ?>

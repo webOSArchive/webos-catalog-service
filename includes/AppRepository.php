@@ -473,6 +473,12 @@ class AppRepository {
         return array_map(function ($r) { return $r['public_application_id']; }, $stmt->fetchAll());
     }
 
+    /** Update just the icon paths for an app (used by the image uploader). */
+    public function updateIconPaths($id, $appIcon, $appIconBig) {
+        $stmt = $this->db->prepare("UPDATE apps SET app_icon = ?, app_icon_big = ? WHERE id = ?");
+        return $stmt->execute([$appIcon, $appIconBig, (int)$id]);
+    }
+
     /**
      * Get apps by list of IDs
      *
