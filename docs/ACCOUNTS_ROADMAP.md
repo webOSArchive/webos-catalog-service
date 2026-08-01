@@ -11,7 +11,7 @@ browse. Accounts are admin-provisioned.
 | 0 | Schema / foundation | ✅ done |
 | 1 | Admin login + permissions (inside basic auth) | ✅ done (pen-tested + hardened) |
 | 2 | Link apps to an owner account (#4) | ✅ done |
-| 3 | App submission + moderation (#3) | ⏭ planned |
+| 3 | App submission + moderation (#3) | 🔶 partial — trusted submission + claims live; moderation queue planned |
 | 4 | Legacy-client auth + reviews/ratings writes (#5) | ⏭ planned |
 
 ## Building blocks already in place (Phases 0–2)
@@ -54,19 +54,30 @@ browse. Accounts are admin-provisioned.
 
 Goal: accounts with `apps.submit` can submit apps; admins moderate them.
 
-- **Statuses:** submissions land as a new `apps.status = 'pending'` (add
-  `'rejected'` too), with `owner_account_id` = the submitter.
-- **Submission form:** a page for `apps.submit` accounts to create an app record
-  (title, author, category, icons, optional IPK). Decide surface: a limited-nav
-  area of `/admin`, or a dedicated authenticated page.
-- **Moderation queue:** admin page listing `pending` apps → approve (→ `active`)
-  or reject (→ `rejected`), gated by an approval capability.
-- **Developer view:** filter apps to `owner_account_id` for `developer` accounts
-  (a "My Apps" view) — a small lead-in worth doing first.
-- **IPK tie-in:** consider hooking submissions into `ipk-manager` / Azure blob.
+**Done (trusted-submission interim — all current users are trusted, no approval
+steps yet):**
 
-Open questions: where developers submit from; whether submissions include an IPK
-upload or just metadata + link.
+- **Direct submission:** `apps.submit` accounts use the regular `app-edit.php`
+  "Add New App" flow. New apps by owner-only accounts are forced to
+  `owner_account_id` = the submitter and start uncurated
+  (`recommendation_order` 0, no featured flags); curation fieldsets are hidden
+  for them. The developer picks status/content flags.
+- **App claims:** `admin/app-claim.php` ("Claim Existing App" on the Apps page,
+  `apps.own`) lets a developer claim an **unowned** app by ID with a required
+  explanation — e.g. to restore an app that was originally theirs. Claims are
+  auto-granted atomically (`AppRepository::claimApp`, race-safe on
+  `owner_account_id IS NULL`) and recorded in the `app_claims` table
+  (`sql/migrations/0002_app_claims.sql`; statuses `granted`/`pending`/`rejected`
+  ready for a future approval flow). Apps owned by someone else cannot be claimed.
+
+**Remaining (when trust no longer scales):**
+
+- **Moderation queue for submissions:** submissions land as
+  `apps.status = 'pending'` (add `'rejected'` too); admin page to approve
+  (→ `active`) or reject, gated by an approval capability.
+- **Claim approval flow:** claims land as `pending` in `app_claims`; admin
+  review UI to grant/reject (schema already supports it).
+- **IPK tie-in:** consider hooking submissions into `ipk-manager` / Azure blob.
 
 ## Phase 4 — Legacy-client accounts + writes (#5)
 

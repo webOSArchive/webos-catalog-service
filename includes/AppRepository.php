@@ -473,6 +473,43 @@ class AppRepository {
         return array_map(function ($r) { return $r['public_application_id']; }, $stmt->fetchAll());
     }
 
+    /**
+     * Claim an unowned app for an account (Phase 3-lite: auto-granted).
+     *
+     * Atomically assigns ownership and records the claim + explanation in
+     * app_claims for the audit trail / future approval flow. The WHERE guard
+     * on owner_account_id closes the race where two accounts claim at once.
+     *
+     * @param int    $appId
+     * @param int    $accountId
+     * @param string $explanation Why the claimant should own this app
+     * @return bool True if ownership was assigned; false if the app is already owned
+     */
+    public function claimApp($appId, $accountId, $explanation) {
+        $this->db->beginTransaction();
+        try {
+            $stmt = $this->db->prepare("
+                UPDATE apps SET owner_account_id = ?
+                WHERE id = ? AND owner_account_id IS NULL
+            ");
+            $stmt->execute([(int)$accountId, (int)$appId]);
+            if ($stmt->rowCount() === 0) {
+                $this->db->rollBack();
+                return false;
+            }
+            $stmt = $this->db->prepare("
+                INSERT INTO app_claims (app_id, account_id, explanation, status)
+                VALUES (?, ?, ?, 'granted')
+            ");
+            $stmt->execute([(int)$appId, (int)$accountId, $explanation]);
+            $this->db->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
+    }
+
     /** Update just the icon paths for an app (used by the image uploader). */
     public function updateIconPaths($id, $appIcon, $appIconBig) {
         $stmt = $this->db->prepare("UPDATE apps SET app_icon = ?, app_icon_big = ? WHERE id = ?");
