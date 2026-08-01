@@ -33,3 +33,46 @@ function toggleSelectAll(checkbox) {
         cb.checked = checkbox.checked;
     });
 }
+
+// Collapse the top nav to a hamburger only when the items don't fit.
+(function () {
+    var nav = document.getElementById('adminNav');
+    var toggle = document.getElementById('navToggle');
+    if (!nav || !toggle) {
+        return;
+    }
+
+    function fit() {
+        // Measure at natural width; collapse if the content overflows the bar.
+        nav.classList.remove('nav-collapsed', 'nav-open');
+        nav.classList.add('nav-measure');
+        var overflowing = nav.scrollWidth > nav.clientWidth + 1;
+        nav.classList.remove('nav-measure');
+        if (overflowing) {
+            nav.classList.add('nav-collapsed');
+        }
+        toggle.setAttribute('aria-expanded', 'false');
+    }
+
+    toggle.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var open = nav.classList.toggle('nav-open');
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+
+    // Close the dropdown when clicking outside it.
+    document.addEventListener('click', function (e) {
+        if (nav.classList.contains('nav-open') && !nav.contains(e.target)) {
+            nav.classList.remove('nav-open');
+            toggle.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    var resizeTimer;
+    window.addEventListener('resize', function () {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(fit, 100);
+    });
+
+    fit();
+})();

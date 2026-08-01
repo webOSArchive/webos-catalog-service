@@ -26,8 +26,12 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
     <link rel="stylesheet" href="assets/admin.css">
 </head>
 <body>
-    <nav class="admin-nav">
+    <nav class="admin-nav" id="adminNav">
         <div class="nav-brand">webOS Catalog Admin</div>
+        <button type="button" class="nav-toggle" id="navToggle" aria-label="Menu" aria-controls="navMenu" aria-expanded="false">
+            <span class="nav-toggle-bar"></span><span class="nav-toggle-bar"></span><span class="nav-toggle-bar"></span>
+        </button>
+        <div class="nav-menu" id="navMenu">
         <ul class="nav-links">
             <li><a href="index.php" class="<?php echo $currentPage === 'index' ? 'active' : ''; ?>">Dashboard</a></li>
             <li><a href="apps.php" class="<?php echo $currentPage === 'apps' ? 'active' : ''; ?>">Apps</a></li>
@@ -45,6 +49,7 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
             <span class="nav-user"><?php echo htmlspecialchars($__acct['username']); ?></span>
             <a href="logout.php">Log out</a>
             <?php endif; ?>
+        </div>
         </div>
     </nav>
     <main class="admin-content">
