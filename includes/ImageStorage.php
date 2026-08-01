@@ -67,18 +67,23 @@ class ImageStorage {
     public function saveUpload($appId, $tmpPath, $baseName) {
         $ext = $this->imageExtension($tmpPath);
         if ($ext === null) {
-            return null;
+            throw new RuntimeException('That file is not a supported image (PNG, JPG or GIF).');
         }
         $baseName = preg_replace('/[^a-zA-Z0-9_-]/', '', (string)$baseName); // no dots/slashes; ext added below
-        if ($baseName === '' || !$this->ensureAppDir($appId)) {
-            return null;
+        if ($baseName === '') {
+            throw new RuntimeException('Invalid image name.');
+        }
+        if (!$this->ensureAppDir($appId)) {
+            throw new RuntimeException('Could not create the image folder ' . $this->appDir($appId)
+                . ' — check that image_path exists and is writable by the web server.');
         }
         $filename = $baseName . '.' . $ext;
         $dest = $this->appDir($appId) . '/' . $filename;
 
         // move_uploaded_file for real uploads; copy fallback for tests/CLI.
         if (!@move_uploaded_file($tmpPath, $dest) && !@copy($tmpPath, $dest)) {
-            return null;
+            throw new RuntimeException('Could not write ' . $dest
+                . ' — the web server user needs write permission on that folder.');
         }
         @chmod($dest, 0644);
         return (int)$appId . '/' . $filename;
