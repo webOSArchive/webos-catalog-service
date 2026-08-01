@@ -9,9 +9,46 @@ class RateLimit {
     private $default_limit = 300; // requests per window
     private $default_window = 3600; // 1 hour in seconds
     
-    public function __construct() {
+    public function __construct($dir = null) {
+        // Optional absolute dir so callers outside WebService/ (e.g. admin login)
+        // can reuse the store regardless of the current working directory.
+        if ($dir !== null) {
+            $this->rate_limit_dir = $dir;
+        }
         if (!file_exists($this->rate_limit_dir)) {
             mkdir($this->rate_limit_dir, 0774, true);
+        }
+    }
+
+    /** Per-key store file ($key is usually an IP, optionally prefixed). */
+    private function fileFor($key) {
+        $safe = preg_replace('/[^a-zA-Z0-9\.]/', '_', $key);
+        return $this->rate_limit_dir . '/' . $safe . '.json';
+    }
+
+    /** Count events recorded for $key within $window seconds (does NOT record). */
+    public function recentCount($key, $window = null) {
+        if ($window === null) $window = $this->default_window;
+        $now = time();
+        $data = array_filter($this->getRateData($this->fileFor($key)), function ($t) use ($now, $window) {
+            return ($now - $t) < $window;
+        });
+        return count($data);
+    }
+
+    /** Record one event for $key (e.g. a failed login attempt). */
+    public function record($key) {
+        $file = $this->fileFor($key);
+        $data = $this->getRateData($file);
+        $data[] = time();
+        $this->saveRateData($file, $data);
+    }
+
+    /** Clear all recorded events for $key (e.g. on a successful login). */
+    public function clear($key) {
+        $file = $this->fileFor($key);
+        if (file_exists($file)) {
+            @unlink($file);
         }
     }
     

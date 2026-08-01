@@ -7,12 +7,21 @@
  * in the isolated admin session.
  */
 require_once __DIR__ . '/includes/security.php';
+require_once __DIR__ . '/../WebService/ratelimit.php';
 
 // Already signed in? Go to the dashboard.
 if (admin_is_logged_in()) {
     header('Location: index.php');
     exit;
 }
+
+// Brute-force throttle: cap FAILED sign-ins per client IP. Reuses the shared
+// file store (absolute path) with a 'login_' key so it never mixes with the
+// API rate limits.
+$loginLimiter = new RateLimit(__DIR__ . '/../WebService/__rateLimit');
+$loginKey     = 'login_' . $loginLimiter->getClientIP();
+$loginMaxFails = 8;    // failures allowed...
+$loginWindow   = 900;  // ...within 15 minutes
 
 /** Only allow local admin destinations for ?next (prevents open redirects). */
 function safe_next($n) {
@@ -30,7 +39,9 @@ $next  = safe_next($_POST['next'] ?? $_GET['next'] ?? 'index.php');
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!csrf_validate()) {
+    if ($loginLimiter->recentCount($loginKey, $loginWindow) >= $loginMaxFails) {
+        $error = 'Too many sign-in attempts. Please wait a few minutes and try again.';
+    } elseif (!csrf_validate()) {
         $error = 'Your session expired. Please try again.';
     } else {
         $username = trim($_POST['username'] ?? '');
@@ -39,15 +50,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $acct = $repo->verifyLogin($username, $password);
 
         if ($acct && $repo->hasCapability($acct['id'], 'admin.access')) {
-            session_regenerate_id(true); // prevent session fixation
+            $loginLimiter->clear($loginKey);      // reset the counter on success
+            session_regenerate_id(true);          // prevent session fixation
             $_SESSION['account_id'] = $acct['id'];
             $repo->updateLastLogin($acct['id']);
             header('Location: ' . $next);
             exit;
-        } elseif ($acct) {
-            $error = 'That account does not have admin access.';
         } else {
-            usleep(300000); // modest brute-force slowdown
+            // Same message + timing whether the password was wrong OR the account
+            // is valid but not an admin, so neither case is distinguishable.
+            $loginLimiter->record($loginKey);
+            usleep(300000);
             $error = 'Invalid username or password.';
         }
     }
