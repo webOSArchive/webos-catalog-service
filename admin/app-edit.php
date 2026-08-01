@@ -6,10 +6,12 @@ require_once __DIR__ . '/includes/security.php';
 require_once __DIR__ . '/../includes/Database.php';
 require_once __DIR__ . '/../includes/AppRepository.php';
 require_once __DIR__ . '/../includes/AccountRepository.php';
+require_once __DIR__ . '/../includes/ImageStorage.php';
 
 $db = Database::getInstance()->getConnection();
 $repo = new AppRepository();
 $accounts = (new AccountRepository())->listAccounts();
+$imgConfig = require __DIR__ . '/../WebService/config.php';
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : null;
 $app = $id ? $repo->getById($id) : null;
@@ -119,6 +121,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($isNew) {
                 $repo->create($data);
                 $id = $data['id'];
+                // Auto-create the app's image folder (named by the numeric app id).
+                $imgStore = ImageStorage::fromConfig($imgConfig);
+                if ($imgStore->isConfigured()) {
+                    $imgStore->ensureAppDir($id);
+                }
                 $success = true;
                 // Redirect to edit page
                 header("Location: app-edit.php?id=$id&saved=1");
@@ -173,7 +180,10 @@ include 'includes/header.php';
 
 <div class="page-header">
     <h1><?php echo $pageTitle; ?><?php echo $id ? " (ID: $id)" : ''; ?></h1>
-    <a href="apps.php" class="btn">Back to Apps</a>
+    <div>
+        <?php if (!$isNew): ?><a href="app-images.php?id=<?php echo (int)$id; ?>" class="btn">Manage Images</a><?php endif; ?>
+        <a href="apps.php" class="btn">Back to Apps</a>
+    </div>
 </div>
 
 <?php if ($success): ?>

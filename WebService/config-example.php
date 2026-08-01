@@ -31,6 +31,11 @@ return array(
         'package_host_secure' => $package_mirror_secure,
         'contact_email' => 'webosarchive@gmail.com',
 
+        // Filesystem path where app images (icons + screenshots) are stored, in
+        // per-app "<appId>" folders, mirroring what image_host serves. Used for
+        // admin/developer uploads. No trailing slash. NOT exposed via API.
+        'image_path' => '/home/wosa/wosa-web/AppImages',
+
         // Download URL encoding secret (NOT exposed via API)
         // Used to obfuscate download URLs - change this to a random string
         'download_secret' => 'change_this_to_random_string',

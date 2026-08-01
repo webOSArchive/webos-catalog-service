@@ -44,6 +44,11 @@ browse. Accounts are admin-provisioned.
   forced on save; owner selector hidden). IPK **uploads** are further scoped: the file
   name must start with the `public_application_id` of one of their owned apps. They do
   not see Categories, Authors or Accounts.
+- **App images:** icons + screenshots are uploaded via `admin/app-images.php` to the
+  filesystem (`config['image_path']`, per-app `<appId>/` folders auto-created on app
+  create) using `includes/ImageStorage.php` — never stored in the DB. Managers
+  (`apps.edit`, incl. curators) manage any app's images; owners (developers) only their
+  own. Uploads are validated as real images and given safe generated names.
 
 ## Phase 3 — App submission + moderation (#3)
 
