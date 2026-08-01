@@ -34,8 +34,13 @@ browse. Accounts are admin-provisioned.
   `accounts.php` (superadmin-only management: create / roles / enable-disable /
   reset password / delete-when-disabled), nav shows Accounts + current user.
 - **App ownership:** `app-edit.php` Owner Account selector; `apps.php` Owner column;
-  `AppRepository` create/update persist `owner_account_id`, `adminSearch` joins the
-  owner username.
+  `AppRepository` create/update persist `owner_account_id`, `adminSearch` filters/joins
+  by owner.
+- **Per-page permission gating:** `admin_require_capability()` / `admin_require_any()`
+  / `admin_is_owner_only()` gate each admin page and filter the nav. `developer`
+  accounts hold `admin.access` but reach **only** the Apps area and see/edit **only
+  their own** apps (owner filter on the list; ownership check on edit; curation/status
+  fields forced on save; owner selector hidden).
 
 ## Phase 3 — App submission + moderation (#3)
 
@@ -77,7 +82,6 @@ re-enable on-device signup (currently admin-provisioned only).
 
 ## Smaller follow-ons
 
-- "My Apps" filter by `owner_account_id` for developer accounts (lead-in to Phase 3).
 - Deeper authenticated pen test with throwaway `curator`/`developer` accounts.
 
 ## Decided / out of scope

@@ -5,6 +5,7 @@
  * Creates missing.txt and missing.csv from database for community recovery efforts
  */
 require_once __DIR__ . '/includes/security.php';
+admin_require_capability('apps.edit');
 require_once __DIR__ . '/../includes/Database.php';
 
 $db = Database::getInstance()->getConnection();

@@ -822,6 +822,11 @@ class AppRepository {
             $params[] = $filters['category'];
         }
 
+        if (!empty($filters['owner_account_id'])) {
+            $sql .= " AND a.owner_account_id = ?";
+            $params[] = (int)$filters['owner_account_id'];
+        }
+
         // Determine sort order
         $sort = $filters['sort'] ?? 'title';
         switch ($sort) {
@@ -883,6 +888,11 @@ class AppRepository {
         if (!empty($filters['category'])) {
             $sql .= " AND c.name = ?";
             $params[] = $filters['category'];
+        }
+
+        if (!empty($filters['owner_account_id'])) {
+            $sql .= " AND a.owner_account_id = ?";
+            $params[] = (int)$filters['owner_account_id'];
         }
 
         $stmt = $this->db->prepare($sql);

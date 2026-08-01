@@ -15,6 +15,16 @@ $id = isset($_GET['id']) ? (int)$_GET['id'] : null;
 $app = $id ? $repo->getById($id) : null;
 $isNew = !$app;
 
+// Apps area gate. Full managers edit anything; owners only their own apps.
+admin_require_any(['apps.edit', 'apps.own']);
+$canEditAll  = admin_has_capability('apps.edit');
+$ownOnly     = !$canEditAll;
+$myAccountId = (int) current_account()['id'];
+if ($ownOnly && ($isNew || (int)($app['owner_account_id'] ?? 0) !== $myAccountId)) {
+    http_response_code(403);
+    die('Forbidden: you can only edit apps your account owns.');
+}
+
 // Get suggested next ID for new apps
 $suggestedId = null;
 if ($isNew) {
@@ -66,6 +76,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'recommendation_order' => (int)($_POST['recommendation_order'] ?? 0),
         'post_shutdown' => isset($_POST['post_shutdown'])
     ];
+
+    if ($ownOnly) {
+        // Owners may only edit descriptive fields; curation/status/ownership
+        // are forced back to the app's current values (defense-in-depth, since
+        // the load check above already blocks non-owned apps).
+        $data['owner_account_id']       = $myAccountId;
+        $data['status']                 = $app['status'];
+        $data['recommendation_order']   = (int)$app['recommendation_order'];
+        $data['in_curators_choice']     = (bool)$app['in_curators_choice'];
+        $data['in_revisionist_history'] = (bool)$app['in_revisionist_history'];
+        $data['post_shutdown']          = (bool)$app['post_shutdown'];
+        $data['adult']                  = (bool)$app['adult'];
+    }
 
     // Validation
     if (empty($data['title'])) {
@@ -229,6 +252,7 @@ include 'includes/header.php';
                 <small>Links to author metadata (optional)</small>
             </div>
 
+            <?php if ($canEditAll): ?>
             <div class="form-group">
                 <label>Owner Account</label>
                 <select name="owner_account_id">
@@ -240,6 +264,7 @@ include 'includes/header.php';
                 </select>
                 <small>The user account that owns/submitted this app (optional)</small>
             </div>
+            <?php endif; ?>
 
             <div class="form-group">
                 <label>App Icon Path</label>

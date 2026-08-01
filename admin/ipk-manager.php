@@ -6,6 +6,7 @@
  */
 $pageTitle = 'IPK Manager';
 require_once __DIR__ . '/includes/security.php';
+admin_require_capability('ipk.manage');
 require_once __DIR__ . '/../includes/AzureBlobService.php';
 
 $errors = [];

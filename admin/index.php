@@ -9,6 +9,13 @@ require_once __DIR__ . '/../includes/AppRepository.php';
 require_once __DIR__ . '/../includes/LogRepository.php';
 require_once __DIR__ . '/../includes/SessionRepository.php';
 
+// Owner-only accounts (developers) have no use for the global dashboard —
+// send them straight to their apps.
+if (admin_is_owner_only()) {
+    header('Location: apps.php');
+    exit;
+}
+
 $db = Database::getInstance()->getConnection();
 $appRepo = new AppRepository();
 $logRepo = new LogRepository();
