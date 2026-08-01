@@ -163,6 +163,113 @@ state — opt-in is purely additive.
 
 ---
 
+## Future feature — restore previously-acquired apps
+
+HP's device backend exposed the account's **previously-installed apps** so a device could
+re-download them after sign-in. The on-device `com.palm.service.backup` still calls these
+right after login:
+
+- **`getUserInstalledApps_ext2`** — the list of apps the account had installed (drives
+  auto-reinstall). We currently stub it to return **no apps** so restore completes cleanly.
+- **`getRestoreDevices`** — the list of the account's prior devices and their backups
+  (drives the "copy from another device" UI). Also effectively stubbed empty.
+
+**Someday:** back these with real data. We already know which apps an account owns/downloaded
+(`download_logs`, and app ownership). Returning the account's acquired-app list from
+`getUserInstalledApps_ext2` would let a freshly-signed-in TouchPad automatically reinstall
+everything that account previously got from the Museum — a genuine "restore my apps" feature,
+using the exact protocol the device already speaks. The response shape is
+`{OutGetUserInstalledAppsV2:{userApps:[{id, version, title, …}]}}`.
+
+## Decoupling firstuse from system/OTA updates
+
+After sign-in, stock firstuse's `PostSignIn` card runs an **OTA software-update check**
+(`UpdateService/CheckForUpdate`) and will not finish until it returns. This device has **no
+software-update service at all**, so that check never resolves → the sign-in spinner hangs
+forever. Decision (per project direction): **firstuse must stay independent of system updates
+for the foreseeable future.** We patch the OTA gate out of `PostSignIn.js` (short-circuit
+`otaResponse`/`restoreResponse`, set `IsOTAAvailable`/`SoftwareUpdateAvailable` false) so
+sign-in completes on its own.
+
+System updates are a **separate project** (replacing the HP OTA server). When that exists, it
+should be its own flow/app — not re-coupled into firstuse. Related dead-HP calls firstuse makes
+that we've neutralized: `CheckForUpdate`/`GetStatusApp` (OTA), `getRestoreDevices` (backup
+device list), `getUserInstalledApps_ext2` (app restore — see Future feature above).
+
+## Revised architecture (learned from wiping a dev device)
+
+**What we learned:** completing stock firstuse in first-use mode runs a device reset that wipes
+`/media/cryptofs/apps` — which on webOS holds not just 3rd-party apps but **most 1P apps too**
+(Email, Calendar, Maps, Memos, Photos…). Only ROM apps in `/usr/palm/applications` (Phone,
+Browser, some Settings) survive. firstuse does this expecting to immediately re-download the full
+app set from HP's (dead) catalog/customization servers. So stock firstuse is hostile: every card
+depends on a dead HP service, and its completion path resets the device.
+
+**Decision 1 — build our own, don't patch stock firstuse.** Ship a purpose-built
+`com.webosarchive.firstrun` app that clones only the good asset — firstuse's **`Signin.js`** UI
+(Sign In / Create, already wired to our patched `accountservices`). It does ONLY controlled steps:
+show UI → (login patch already) write db8 `com.palm.account:1` + keymanager token → set the
+done-flags (`ran-first-use`, `first-use-profile-created`, `first-use-finished`) → close. **No
+erase, no OTA check, no HP restore, no `PalmSystem.shutdown()`.** Optional, re-armable, bailable,
+and structurally incapable of wiping a device. The on-device palmprofile-service patch + our
+Phase-4 endpoints stay as the backend.
+
+**Decision 2 — provisioning is additive-only, and separable.** The `getUserInstalledApps_ext2`
+seam (HP's "what should this device install" hook) can be upgraded from an empty stub to a
+**curated community baseline** (App Catalog client, patches, TLS bits) so a freshly-Doctored
+device auto-provisions the community stack. The invariant that makes this safe: **never erase
+first** — the danger was always the reset firstuse couples to the download, not the download
+itself. Account-setup and app-provisioning are independent features sharing one transport.
+
+**Testing rule:** validate "signs in WITHOUT wiping apps" and the provisioning baseline only on a
+freshly-Doctored device that actually has the full app set — you can't prove "doesn't delete apps"
+on a device with no apps. Prototype the additive account-write/flag logic anywhere.
+
+## Status — end of session (VERIFIED WORKING on hardware)
+
+The full flow works end-to-end on a freshly-Doctored + unlocked TouchPad, **without wiping apps**:
+
+- **Unlock reproduced without deviceTool** — memboot `topaz.uImage` (extracted from `devicetoolAIO.jar`)
+  → `touch /var/gadget/novacom_enabled` (dev-unlock) + `ran-first-use` (OOBE skip) → reboot. novacom
+  survives a normal boot. Community OTA just ships `/var/gadget/novacom_enabled`.
+- **Our own app `com.palm.app.webosaccount`** (a neutered clone of firstuse) signs in with a catalog
+  account → patched palmprofile service → `WebService/device.php` → writes the device profile
+  (db8 palmprofile record, username = account display_name e.g. "codepoet") + saves the token
+  (`getAccountToken` returns alias/token/ACTIVE/uniqueId) → **closes cleanly, no reset, no wipe.**
+  Verified: 54 apps registered / 34 launchpoints / 17 on disk unchanged; uptime continuous.
+
+**On-device pieces (NOT in git — re-deploy after any Doctor):** service patches
+`palm_profile_util.js` (redirect) + `LoginProfileCommandAssistant.js` (skip LCN); app dir
+`/usr/palm/applications/com.webosarchive.firstrun/` with id **`com.palm.app.webosaccount`** — its
+`FirstUse.js` (safe completion, erase/OTA/powerdown neutered, `dataConnection:true`), `Signin.js`
+(skip PostSignIn), `config.js` = `[signin]`, and **the id set in the base AND all
+`resources/<locale>/appinfo.json`** (they override the base). Register via `killall LunaSysMgr` or
+`applicationManager/rescan`. **Server side is live and in git** (`device.php`, `AccountRepository`).
+
+## Polish plan (documented — not yet built)
+
+1. **Restore the OEM "thank-you" / complete page** (REQUIRED — it's the visual confirmation that
+   sign-in worked; right now the app just vanishes). Mechanics: `completeFirstUse()` already shows
+   the `complete` VFlexBox (title "Thanks!", a `SpinnerLarge`, and subtitle *"We're almost done…
+   we'll restart your device…"*), but our `done()` calls `closeApp()` immediately and kills it.
+   Requirements:
+   - Keep the complete page **visible** (don't `closeApp()` from `done()`).
+   - **Edit the copy** — remove the "restart your device" line (we don't reboot); show a friendly
+     confirmation, ideally naming the signed-in account (e.g. "Signed in as codepoet").
+   - Stop/hide the `SpinnerLarge` (it implies work-in-progress) and add a **Done/Finish button** that
+     calls `closeApp()` so the user dismisses it deliberately. Page stays editable as needed.
+2. **Reconcile the device account** — after a successful sign-in, remove the bypass
+   "Dr. Skipped Firstuse" palmprofile account so only the real one shows in deviceinfo (delete via
+   `-a com.palm.service.accounts palm://com.palm.service.accounts/deleteAccount`).
+3. **Wire our own TOS card** — server endpoint `?m=getTermsAndConditions` is already built; add the
+   Terms step back into the flow pointing at it (patch `GetURLForTerms`/`Palm.js` per §4a).
+4. **Launcher / re-arm entry** — "re-arm on demand" is now simply *launching
+   `com.palm.app.webosaccount`*; add a Preferences/Accounts shortcut that opens it.
+5. **Package the OTA** — patched palmprofile service + the app + `/var/gadget/novacom_enabled` +
+   ship `device.php` on the server.
+6. **Save artifacts to git** — offered: a `webos/` dir with the device patch-set + app source so the
+   spike is version-controlled and re-deployable (currently only on-device + in scratch).
+
 ## 8. Confirm before shipping
 
 - **Exact request/response JSON** of `createNovaAccount` / `authenticateAccount` / `getAccountToken`
