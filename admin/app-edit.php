@@ -22,9 +22,14 @@ admin_require_any(['apps.edit', 'apps.own']);
 $canEditAll  = admin_has_capability('apps.edit');
 $ownOnly     = !$canEditAll;
 $myAccountId = (int) current_account()['id'];
-if ($ownOnly && ($isNew || (int)($app['owner_account_id'] ?? 0) !== $myAccountId)) {
-    http_response_code(403);
-    die('Forbidden: you can only edit apps your account owns.');
+if ($ownOnly) {
+    if ($isNew) {
+        // Developers may create new apps; the app is owned by their account.
+        admin_require_capability('apps.submit');
+    } elseif ((int)($app['owner_account_id'] ?? 0) !== $myAccountId) {
+        http_response_code(403);
+        die('Forbidden: you can only edit apps your account owns.');
+    }
 }
 
 // Get suggested next ID for new apps
@@ -80,16 +85,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ];
 
     if ($ownOnly) {
-        // Owners may only edit descriptive fields; curation/status/ownership
-        // are forced back to the app's current values (defense-in-depth, since
-        // the load check above already blocks non-owned apps).
-        $data['owner_account_id']       = $myAccountId;
-        $data['status']                 = $app['status'];
-        $data['recommendation_order']   = (int)$app['recommendation_order'];
-        $data['in_curators_choice']     = (bool)$app['in_curators_choice'];
-        $data['in_revisionist_history'] = (bool)$app['in_revisionist_history'];
-        $data['post_shutdown']          = (bool)$app['post_shutdown'];
-        $data['adult']                  = (bool)$app['adult'];
+        $data['owner_account_id'] = $myAccountId;
+        if ($isNew) {
+            // New submissions belong to the submitter and start uncurated; the
+            // developer chooses status and content flags themselves.
+            $data['recommendation_order']   = 0;
+            $data['in_curators_choice']     = false;
+            $data['in_revisionist_history'] = false;
+        } else {
+            // Owners may only edit descriptive fields; curation/status/ownership
+            // are forced back to the app's current values (defense-in-depth, since
+            // the load check above already blocks non-owned apps).
+            $data['status']                 = $app['status'];
+            $data['recommendation_order']   = (int)$app['recommendation_order'];
+            $data['in_curators_choice']     = (bool)$app['in_curators_choice'];
+            $data['in_revisionist_history'] = (bool)$app['in_revisionist_history'];
+            $data['post_shutdown']          = (bool)$app['post_shutdown'];
+            $data['adult']                  = (bool)$app['adult'];
+        }
     }
 
     // Validation
@@ -324,6 +337,7 @@ include 'includes/header.php';
                 <br><small>Community-created app after platform EOL</small>
             </fieldset>
 
+            <?php if ($canEditAll): // curation fields are ignored on save for owner-only accounts ?>
             <fieldset>
                 <legend>Featured In (Virtual Categories)</legend>
                 <label>
@@ -345,6 +359,7 @@ include 'includes/header.php';
                     <small>Higher number = higher recommendation. 0 = not featured.</small>
                 </div>
             </fieldset>
+            <?php endif; ?>
 
             <?php if (!$isNew): ?>
             <fieldset id="related-apps">

@@ -52,7 +52,10 @@ include 'includes/header.php';
 
 <div class="page-header">
     <h1>Apps <small style="color:#7f8c8d;font-size:0.6em">(<?php echo number_format($totalCount); ?> total)</small></h1>
-    <?php if ($canEditAll): ?><a href="app-edit.php" class="btn btn-primary">Add New App</a><?php endif; ?>
+    <div>
+        <?php if (admin_has_capability('apps.own')): ?><a href="app-claim.php" class="btn">Claim Existing App</a><?php endif; ?>
+        <?php if ($canEditAll || admin_has_capability('apps.submit')): ?><a href="app-edit.php" class="btn btn-primary">Add New App</a><?php endif; ?>
+    </div>
 </div>
 
 <div class="card">
