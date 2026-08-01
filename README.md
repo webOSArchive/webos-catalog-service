@@ -129,6 +129,9 @@ the admin nav.
 Bootstrap order on a fresh install: run the migration, create the first account
 with `scripts/create-account.php` (make it a `superadmin`), then sign in.
 
+Roadmap and status for the accounts system (done + planned phases) live in
+[`docs/ACCOUNTS_ROADMAP.md`](docs/ACCOUNTS_ROADMAP.md).
+
 ### Web Interface
 
 - `showMuseum.php` - Browsable catalog
