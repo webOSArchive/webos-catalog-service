@@ -223,6 +223,7 @@ include 'includes/header.php';
                     <td><?php echo formatFileSize($blob['size']); ?></td>
                     <td><?php echo date('M j, Y H:i', strtotime($blob['lastModified'])); ?></td>
                     <td>
+                        <a class="btn btn-sm" href="<?php echo htmlspecialchars($blob['url'], ENT_QUOTES); ?>" download="<?php echo htmlspecialchars($blob['name'], ENT_QUOTES); ?>">Download</a>
                         <button type="button" class="btn btn-sm" onclick="copyUrl('<?php echo htmlspecialchars($blob['url'], ENT_QUOTES); ?>')">Copy URL</button>
                     </td>
                 </tr>
