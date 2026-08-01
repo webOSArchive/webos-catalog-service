@@ -658,13 +658,13 @@ class AppRepository {
                 id, title, author, summary, app_icon, app_icon_big,
                 category_id, vendor_id, pixi, pre, pre2, pre3, veer,
                 touchpad, touchpad_exclusive, luneos, adult,
-                in_revisionist_history, in_curators_choice, post_shutdown, recommendation_order, status
+                in_revisionist_history, in_curators_choice, post_shutdown, recommendation_order, status, owner_account_id
             ) VALUES (
                 ?, ?, ?, ?, ?, ?,
                 (SELECT id FROM categories WHERE name = ?),
                 ?, ?, ?, ?, ?, ?,
                 ?, ?, ?, ?,
-                ?, ?, ?, ?, ?
+                ?, ?, ?, ?, ?, ?
             )
         ";
 
@@ -691,7 +691,8 @@ class AppRepository {
             (int)($data['in_curators_choice'] ?? false),
             (int)($data['post_shutdown'] ?? false),
             (int)($data['recommendation_order'] ?? 0),
-            $data['status'] ?? 'active'
+            $data['status'] ?? 'active',
+            $data['owner_account_id'] ?? null
         ]);
 
         return $data['id'];
@@ -727,7 +728,8 @@ class AppRepository {
                 in_curators_choice = ?,
                 post_shutdown = ?,
                 recommendation_order = ?,
-                status = ?
+                status = ?,
+                owner_account_id = ?
             WHERE id = ?
         ";
 
@@ -754,6 +756,7 @@ class AppRepository {
             (int)($data['post_shutdown'] ?? false),
             (int)($data['recommendation_order'] ?? 0),
             $data['status'] ?? 'active',
+            isset($data['owner_account_id']) ? $data['owner_account_id'] : null,
             $id
         ]);
     }
@@ -786,9 +789,12 @@ class AppRepository {
                 a.status,
                 a.adult,
                 a.recommendation_order,
-                a.updated_at
+                a.updated_at,
+                a.owner_account_id,
+                acct.username AS owner_username
             FROM apps a
             LEFT JOIN categories c ON a.category_id = c.id
+            LEFT JOIN accounts acct ON acct.id = a.owner_account_id
             WHERE 1=1
         ";
 

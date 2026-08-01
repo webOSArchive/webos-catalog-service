@@ -92,6 +92,7 @@ include 'includes/header.php';
                     <th>Icon</th>
                     <th>Title</th>
                     <th>Author</th>
+                    <th>Owner</th>
                     <th>Category</th>
                     <th>Rec.</th>
                     <th>Status</th>
@@ -116,6 +117,7 @@ include 'includes/header.php';
                     </td>
                     <td><?php echo htmlspecialchars($app['title']); ?></td>
                     <td><?php echo htmlspecialchars($app['author']); ?></td>
+                    <td><?php echo $app['owner_username'] ? htmlspecialchars($app['owner_username']) : '<span style="color:#aaa;">&mdash;</span>'; ?></td>
                     <td><?php echo htmlspecialchars($app['category'] ?? '-'); ?></td>
                     <td><?php echo (int)$app['recommendation_order']; ?></td>
                     <td><span class="status-badge status-<?php echo $app['status']; ?>"><?php echo $app['status']; ?></span></td>
