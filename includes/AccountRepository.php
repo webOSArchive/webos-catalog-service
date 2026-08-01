@@ -147,6 +147,87 @@ class AccountRepository {
         return $this->findById($row['id']);
     }
 
+    // -- Device / legacy-client auth (Phase 4) --------------------------------
+
+    /**
+     * Verify a device-client login. Device clients send an "accountAlias" that is
+     * usually the email, so we match username OR email (preferring an exact
+     * username match). Runs exactly one password_verify() like verifyLogin() so a
+     * missing/password-less account is indistinguishable from a wrong password.
+     * Returns the public account row on success, or null.
+     */
+    public function verifyDeviceLogin($alias, $password) {
+        $stmt = $this->db->prepare(
+            "SELECT id, password_hash, status FROM accounts
+             WHERE username = ? OR email = ?
+             ORDER BY (username = ?) DESC LIMIT 1"
+        );
+        $stmt->execute([$alias, $alias, $alias]);
+        $row = $stmt->fetch();
+        $hash = (!empty($row['password_hash'])) ? $row['password_hash'] : self::DUMMY_HASH;
+        $passwordOk = password_verify($password, $hash);
+        if (!$row || $row['status'] !== 'active' || empty($row['password_hash']) || !$passwordOk) {
+            return null;
+        }
+        return $this->findById($row['id']);
+    }
+
+    /**
+     * Issue a device auth token for an account. Returns the RAW token once (to
+     * hand to the client); only its sha256 hash is stored. $deviceId is the
+     * client's nduid/device id. $ttlDays null => no expiry.
+     */
+    public function issueDeviceToken($accountId, $deviceId = null, $userAgent = null, $ttlDays = 365) {
+        $raw     = bin2hex(random_bytes(32));
+        $hash    = hash('sha256', $raw);
+        $expires = ($ttlDays === null) ? null : date('Y-m-d H:i:s', time() + ((int)$ttlDays * 86400));
+        $stmt = $this->db->prepare(
+            "INSERT INTO account_tokens (account_id, token_hash, device_id, user_agent, expires_at)
+             VALUES (?, ?, ?, ?, ?)"
+        );
+        $stmt->execute([
+            (int)$accountId,
+            $hash,
+            $deviceId  !== null ? substr((string)$deviceId, 0, 128)  : null,
+            $userAgent !== null ? substr((string)$userAgent, 0, 255) : null,
+            $expires,
+        ]);
+        return $raw;
+    }
+
+    /**
+     * Resolve a raw device token to its account (active, unexpired) and bump
+     * last_seen_at. Returns the public account row, or null.
+     */
+    public function verifyDeviceToken($rawToken) {
+        if (!is_string($rawToken) || $rawToken === '') {
+            return null;
+        }
+        $hash = hash('sha256', $rawToken);
+        $stmt = $this->db->prepare(
+            "SELECT t.id AS token_id, t.account_id, t.expires_at, a.status
+             FROM account_tokens t JOIN accounts a ON a.id = t.account_id
+             WHERE t.token_hash = ? LIMIT 1"
+        );
+        $stmt->execute([$hash]);
+        $row = $stmt->fetch();
+        if (!$row || $row['status'] !== 'active') {
+            return null;
+        }
+        if (!empty($row['expires_at']) && strtotime($row['expires_at']) < time()) {
+            return null;
+        }
+        $upd = $this->db->prepare("UPDATE account_tokens SET last_seen_at = CURRENT_TIMESTAMP WHERE id = ?");
+        $upd->execute([(int)$row['token_id']]);
+        return $this->findById($row['account_id']);
+    }
+
+    /** Revoke a single device token by its raw value. */
+    public function revokeDeviceToken($rawToken) {
+        $stmt = $this->db->prepare("DELETE FROM account_tokens WHERE token_hash = ?");
+        return $stmt->execute([hash('sha256', (string)$rawToken)]);
+    }
+
     // -- Roles & capabilities -------------------------------------------------
 
     /** @return string[] role names assigned to the account */
