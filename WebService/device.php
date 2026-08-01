@@ -141,8 +141,53 @@ switch ($method) {
         echo json_encode(authenticate_info_ex($account, $token));
         break;
 
+    case 'getUserInstalledApps_ext2':
+        // App-restore lookup run by com.palm.service.backup right after sign-in.
+        // callServer reads resultObj.OutGetUserInstalledAppsV2; with no "userApps"
+        // key the backup activity completes cleanly ("nothing to restore") instead
+        // of erroring and retrying forever. We don't track per-account installed
+        // apps yet, so report none.
+        echo json_encode(['OutGetUserInstalledAppsV2' => new stdClass()]);
+        break;
+
+    case 'getTermsAndConditions':
+        // Our own community Terms of Service, shown by the firstuse Terms card.
+        // The service wraps this as {GetTermsAndConditions: <this>}; Palm.js reads
+        // .PALM (rendered as HTML) and .GOOGLE.
+        echo json_encode([
+            'PALM'   => device_terms_html(),
+            'GOOGLE' => '',
+        ]);
+        break;
+
     default:
         http_response_code(404);
         echo json_encode(['JSONException' => 'UNKNOWN_METHOD']);
         break;
+}
+
+/** Community Terms of Service HTML shown on the device's firstuse Terms card. */
+function device_terms_html() {
+    return
+        '<h2>webOS Archive Account &mdash; Terms of Service</h2>'
+      . '<p>This device connects to the community-run webOS App Museum II at '
+      . 'appcatalog.webosarchive.org. HP&rsquo;s original webOS services shut down in 2015; '
+      . 'this is an independent preservation project and is not affiliated with, or endorsed '
+      . 'by, HP or Palm.</p>'
+      . '<h3>1. Your account</h3>'
+      . '<p>A webOS Archive account is optional and is the same account used on the App Museum '
+      . 'website. It lets you sign in on this device and, in the future, post ratings and '
+      . 'reviews. You are responsible for keeping your password secure.</p>'
+      . '<h3>2. Acceptable use</h3>'
+      . '<p>Use the service lawfully and respectfully. Do not attempt to disrupt it, abuse other '
+      . 'members, or upload unlawful content.</p>'
+      . '<h3>3. Privacy</h3>'
+      . '<p>We store only what is needed to run the service: your account details and a per-device '
+      . 'sign-in token. We do not sell your data. Your device sends a device identifier so a lost '
+      . 'or retired device&rsquo;s access can be revoked.</p>'
+      . '<h3>4. No warranty</h3>'
+      . '<p>This is a free, volunteer-run archive provided &ldquo;as is,&rdquo; without warranty of '
+      . 'any kind. Service may change or end at any time.</p>'
+      . '<h3>5. Contact</h3>'
+      . '<p>Questions? Visit appcatalog.webosarchive.org. By tapping Accept you agree to these terms.</p>';
 }
