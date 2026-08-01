@@ -453,6 +453,27 @@ class AppRepository {
     }
 
     /**
+     * Public application IDs (package ids) of apps owned by an account. Used to
+     * scope IPK uploads: a developer may only upload IPKs whose filename begins
+     * with one of these package ids.
+     *
+     * @param int $accountId
+     * @return string[]
+     */
+    public function getOwnedApplicationIds($accountId) {
+        $stmt = $this->db->prepare("
+            SELECT m.public_application_id
+            FROM apps a
+            JOIN app_metadata m ON a.id = m.app_id
+            WHERE a.owner_account_id = ?
+              AND m.public_application_id IS NOT NULL
+              AND m.public_application_id <> ''
+        ");
+        $stmt->execute([(int)$accountId]);
+        return array_map(function ($r) { return $r['public_application_id']; }, $stmt->fetchAll());
+    }
+
+    /**
      * Get apps by list of IDs
      *
      * @param array $ids Array of app IDs
