@@ -112,6 +112,16 @@ class AccountRepository {
         return $stmt->execute([$status, (int)$accountId]);
     }
 
+    /**
+     * Permanently delete an account. account_roles / account_tokens cascade;
+     * apps.owner_account_id / app_reviews.author_account_id are set NULL (FKs).
+     * Callers should require the account be disabled first (see accounts.php).
+     */
+    public function deleteAccount($accountId) {
+        $stmt = $this->db->prepare("DELETE FROM accounts WHERE id = ?");
+        return $stmt->execute([(int)$accountId]);
+    }
+
     public function updateLastLogin($accountId) {
         $stmt = $this->db->prepare("UPDATE accounts SET last_login_at = CURRENT_TIMESTAMP WHERE id = ?");
         return $stmt->execute([(int)$accountId]);
