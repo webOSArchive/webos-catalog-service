@@ -92,6 +92,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $repo->removeRole($targetId, $role);
                 $success = 'Role removed.';
             }
+        } elseif ($action === 'delete') {
+            // Two-step safety: an account must be disabled before it can be deleted.
+            $target = $repo->findById($targetId);
+            if ($targetId === (int)$me['id']) {
+                $errors[] = 'You cannot delete your own account.';
+            } elseif (!$target) {
+                $errors[] = 'Account not found.';
+            } elseif ($target['status'] !== 'disabled') {
+                $errors[] = 'Disable the account before deleting it.';
+            } else {
+                $repo->deleteAccount($targetId);
+                $success = "Deleted account '" . $target['username'] . "'.";
+            }
         }
     }
 }
@@ -211,6 +224,15 @@ include 'includes/header.php';
                                 <input type="password" name="password" placeholder="new password" style="width:120px;padding:3px;" autocomplete="new-password">
                                 <button type="submit" class="btn btn-sm">Set PW</button>
                             </form>
+                            <?php if (!$isMe && $a['status'] === 'disabled'): ?>
+                            <!-- delete: only offered once an account is disabled (two-step safety) -->
+                            <form method="post" style="display:inline;" onsubmit="return confirm('Permanently delete this account? This cannot be undone.');">
+                                <?php echo csrf_field(); ?>
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="account_id" value="<?php echo (int)$a['id']; ?>">
+                                <button type="submit" class="btn btn-sm" style="color:#a12;border-color:#e0a0a0;">Delete</button>
+                            </form>
+                            <?php endif; ?>
                         </div>
                     </td>
                 </tr>
