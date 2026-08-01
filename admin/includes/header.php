@@ -34,9 +34,16 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
             <li><a href="authors.php" class="<?php echo $currentPage === 'authors' ? 'active' : ''; ?>">Authors</a></li>
             <li><a href="ipk-manager.php" class="<?php echo $currentPage === 'ipk-manager' ? 'active' : ''; ?>">IPKs</a></li>
             <li><a href="logs.php" class="<?php echo $currentPage === 'logs' ? 'active' : ''; ?>">Logs</a></li>
+            <?php if (function_exists('admin_has_capability') && admin_has_capability('accounts.manage')): ?>
+            <li><a href="accounts.php" class="<?php echo $currentPage === 'accounts' ? 'active' : ''; ?>">Accounts</a></li>
+            <?php endif; ?>
         </ul>
         <div class="nav-actions">
             <a href="../" target="_blank">View Site</a>
+            <?php if (function_exists('current_account') && ($__acct = current_account())): ?>
+            <span class="nav-user"><?php echo htmlspecialchars($__acct['username']); ?></span>
+            <a href="logout.php">Log out</a>
+            <?php endif; ?>
         </div>
     </nav>
     <main class="admin-content">

@@ -3,6 +3,7 @@
  * Logs Viewer Page
  */
 $pageTitle = 'Logs';
+require_once __DIR__ . '/includes/security.php';
 require_once __DIR__ . '/../includes/Database.php';
 require_once __DIR__ . '/../includes/LogRepository.php';
 

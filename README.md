@@ -86,7 +86,8 @@ CRUD interface for managing catalog data, secured via nginx basic auth.
 
 Accounts exist only for **admin/staff** and **legacy-client support** — there is
 no web sign-up, and web visitors never need an account to browse. Accounts are
-**provisioned from the command line** (an admin Accounts page comes later).
+**provisioned by an admin** — from the command line, or from the **Accounts**
+page inside `/admin` (superadmins only).
 
 **One-time setup** — apply the schema migration (matches your `config.php` DB
 user/name; MariaDB — see the file header for MySQL 8):
@@ -118,8 +119,15 @@ php scripts/create-account.php alice curator       # a curator
 | `curator` | Edit apps / categories / authors, moderate reviews |
 | `developer` | Submit and manage their own apps (no admin portal) |
 
-> Accounts are not yet wired into any login — `/admin` is still protected by
-> nginx basic auth. App-level login (layered inside basic auth) is the next phase.
+**Signing in:** `/admin` now requires an app-level login *in addition to* the
+nginx basic auth (basic auth stays as an outer gate for now). After the basic
+auth prompt, you land on a sign-in page; log in with an account that has the
+`admin.access` capability (superadmin/admin/curator). `developer` accounts have
+no admin access. Sessions are isolated from the front-end site; "Log out" is in
+the admin nav.
+
+Bootstrap order on a fresh install: run the migration, create the first account
+with `scripts/create-account.php` (make it a `superadmin`), then sign in.
 
 ### Web Interface
 
