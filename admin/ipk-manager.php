@@ -6,16 +6,20 @@
  */
 $pageTitle = 'IPK Manager';
 require_once __DIR__ . '/includes/security.php';
-admin_require_capability('ipk.manage');
+admin_require_any(['ipk.manage', 'ipk.view']); // view/download; upload is gated separately below
 require_once __DIR__ . '/../includes/AzureBlobService.php';
 require_once __DIR__ . '/../includes/AppRepository.php';
 
 $errors = [];
 $success = '';
 
+// Uploading requires ipk.manage; ipk.view accounts (e.g. curators) can only
+// view + download.
+$canUpload = admin_has_capability('ipk.manage');
+
 // Owner-only uploaders (developers) may only upload IPKs for apps they own:
 // the file name must start with one of their apps' public_application_id.
-$scopedUploads = !admin_has_capability('apps.edit');
+$scopedUploads = $canUpload && !admin_has_capability('apps.edit');
 $allowedPackageIds = $scopedUploads
     ? (new AppRepository())->getOwnedApplicationIds((int) current_account()['id'])
     : [];
@@ -37,7 +41,7 @@ function ipk_owner_allows($filename, array $allowedIds) {
 $azureConfigured = AzureBlobService::isConfigured();
 
 // Handle file upload
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['ipk_file']) && $azureConfigured) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['ipk_file']) && $azureConfigured && $canUpload) {
     try {
         // Validate file upload
         if ($_FILES['ipk_file']['error'] !== UPLOAD_ERR_OK) {
@@ -130,7 +134,7 @@ include 'includes/header.php';
 
 <div class="page-header">
     <h1>IPK Manager <small style="color:#7f8c8d;font-size:0.6em">(Azure Blob Storage)</small></h1>
-    <?php if ($azureConfigured): ?>
+    <?php if ($azureConfigured && $canUpload): ?>
     <button type="button" class="btn btn-primary" onclick="toggleUploadForm()">Upload New IPK</button>
     <?php endif; ?>
 </div>
@@ -156,6 +160,7 @@ include 'includes/header.php';
 </div>
 <?php else: ?>
 
+<?php if ($canUpload): ?>
 <div class="card" id="upload-form" style="display:none;">
     <div class="card-body">
         <form method="post" enctype="multipart/form-data" class="admin-form">
@@ -185,6 +190,7 @@ include 'includes/header.php';
         </form>
     </div>
 </div>
+<?php endif; ?>
 
 <div class="card">
     <div class="card-body">
