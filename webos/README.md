@@ -110,6 +110,12 @@ assistant route through it; every account/terms POST is real HTTPS. **Requires t
 community-OTA curl fix on the device** — which is a hard install prerequisite for
 this app anyway.
 
+**HTTPS-readiness gate:** the terms card is the flow's first secure fetch, so it
+doubles as an environment check. On success it enables Continue; on failure it
+keeps Continue disabled and shows an "Update required" popup telling the user to
+install the community update. A device without the modern-TLS curl can't get past
+the terms card into sign-in/create.
+
 ## Gotchas we hit (so you don't)
 
 - **App id must start with `com.palm.`** — webOS grants privileged service/db8 access by id
