@@ -150,6 +150,39 @@ switch ($method) {
         echo json_encode(['OutGetUserInstalledAppsV2' => new stdClass()]);
         break;
 
+    case 'getAllChallengeQuestions':
+        // Security-question list for the create-account card. The service's
+        // GetAllQuestionsCommandAssistant returns OutChallengeQuestions verbatim
+        // and the card reads .challengeQuestions[{id, question}] into its picker.
+        // Note: createDeviceAccount receives the chosen questionID + answer but we
+        // deliberately do NOT store them yet — password recovery is email-based.
+        echo json_encode(['OutChallengeQuestions' => ['challengeQuestions' => [
+            ['id' => 1, 'question' => 'What was the name of your first pet?'],
+            ['id' => 2, 'question' => 'What city were you born in?'],
+            ['id' => 3, 'question' => 'What was your childhood nickname?'],
+            ['id' => 4, 'question' => 'What was your first webOS device?'],
+            ['id' => 5, 'question' => 'What is your favorite mobile app of all time?'],
+        ]]]);
+        break;
+
+    case 'isEmailAvailable':
+        // Create-account email precheck (our patched IsEmailAvailableCommandAssistant
+        // posts {email}; the stock one asked the dead LCN location server). Mirrors
+        // createDeviceAccount's uniqueness rules so the precheck never passes an
+        // address that account creation would then reject.
+        $email = trim((string)($body['email'] ?? ''));
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            echo json_encode(['isEmailAvailable' => false]);
+            break;
+        }
+        $taken = (bool)$repo->findByEmail($email);
+        if (!$taken) {
+            $username = strlen($email) <= 64 ? $email : ('dev_' . substr(hash('sha256', $email), 0, 40));
+            $taken = (bool)$repo->findByUsername($username);
+        }
+        echo json_encode(['isEmailAvailable' => !$taken]);
+        break;
+
     case 'getTermsAndConditions':
         // Our own community Terms of Service, shown by the firstuse Terms card.
         // The service wraps this as {GetTermsAndConditions: <this>}; Palm.js reads

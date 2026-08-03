@@ -34,13 +34,15 @@ mv "$BUILD/apptmp/$APPID" "$BUILD/data/$STAGE_REL/app"
 find "$BUILD/data" -name '*.stock' -delete   # deploy.sh leaves pristine copies next to patched files
 
 echo ">> 2) pull patched service files from device"
-novacom run file:///bin/cat -- "$SVC/utils/palm_profile_util.js"               > "$BUILD/data/$STAGE_REL/service/palm_profile_util.js"
-novacom run file:///bin/cat -- "$SVC/handlers/LoginProfileCommandAssistant.js" > "$BUILD/data/$STAGE_REL/service/LoginProfileCommandAssistant.js"
+novacom run file:///bin/cat -- "$SVC/utils/palm_profile_util.js"                   > "$BUILD/data/$STAGE_REL/service/palm_profile_util.js"
+novacom run file:///bin/cat -- "$SVC/handlers/LoginProfileCommandAssistant.js"     > "$BUILD/data/$STAGE_REL/service/LoginProfileCommandAssistant.js"
+novacom run file:///bin/cat -- "$SVC/handlers/IsEmailAvailableCommandAssistant.js" > "$BUILD/data/$STAGE_REL/service/IsEmailAvailableCommandAssistant.js"
 
 echo ">> 3) sanity-check the payload actually carries our patches"
 grep -q "updateCompletePage" "$BUILD/data/$STAGE_REL/app/FirstUse.js"
 grep -q "WOSA" "$BUILD/data/$STAGE_REL/app/source/tnc/Palm.js"
 grep -q "WOSA_BASE" "$BUILD/data/$STAGE_REL/service/palm_profile_util.js"
+grep -q "WOSA" "$BUILD/data/$STAGE_REL/service/IsEmailAvailableCommandAssistant.js"
 grep -q "\"visible\": true" "$BUILD/data/$STAGE_REL/app/resources/en/appinfo.json"
 echo "   ok"
 

@@ -18,13 +18,14 @@ webos/
 ├── patches/                         # unified diffs against stock webOS 3.0.5 (topaz, build 86)
 │   ├── palm_profile_util.js.patch           # palmprofile SERVICE: getServerUrl -> our backend; upsert account (rename, never duplicate)
 │   ├── LoginProfileCommandAssistant.js.patch# login: skip dead LCN precheck; create local profile
+│   ├── IsEmailAvailableCommandAssistant.js.patch # create: email precheck -> our backend (was dead LCN)
 │   ├── FirstUse.js.patch                    # app: neuter erase/OTA/shutdown/powerdown; confirm page + Done
 │   ├── Signin.js.patch                      # app: skip hanging PostSignIn OTA/backup checks
 │   └── Palm.js.patch                        # app: terms card -> our TOS endpoint (skip dead LCN lookup)
 ├── app/
 │   ├── appinfo.json                 # our app id com.palm.app.webosaccount (com.palm.* = privileged)
-│   ├── config.js                    # FirstUse.config = [palm (terms), signin]
-│   └── images/icon.png              # Launcher icon (account glyph on webOS tile)
+│   └── config.js                    # FirstUse.config = [palm (terms), signin]
+│                                    # (Launcher icon = firstuse's own icon; the clone keeps it)
 ├── ipk/
 │   ├── postinst                     # run by Preware/ipkgservice as root: app -> rootfs, patch service
 │   └── prerm                        # uninstall: restore <file>.stock service files, remove app

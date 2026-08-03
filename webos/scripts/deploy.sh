@@ -33,9 +33,10 @@ apply() {
 echo ">> 0) remount rootfs rw"
 dev 'mount -o remount,rw / 2>/dev/null; echo ok'
 
-echo ">> 1) patch palmprofile service (redirect + skip-LCN login)"
-apply "$SVC/utils/palm_profile_util.js"               "$PATCHES/palm_profile_util.js.patch"
-apply "$SVC/handlers/LoginProfileCommandAssistant.js" "$PATCHES/LoginProfileCommandAssistant.js.patch"
+echo ">> 1) patch palmprofile service (redirect + skip-LCN login + email precheck)"
+apply "$SVC/utils/palm_profile_util.js"                   "$PATCHES/palm_profile_util.js.patch"
+apply "$SVC/handlers/LoginProfileCommandAssistant.js"     "$PATCHES/LoginProfileCommandAssistant.js.patch"
+apply "$SVC/handlers/IsEmailAvailableCommandAssistant.js" "$PATCHES/IsEmailAvailableCommandAssistant.js.patch"
 
 echo ">> 2) build app: clone firstuse -> $APPID"
 dev "rm -rf $APPDIR && cp -r $FU $APPDIR && echo cloned"
@@ -44,7 +45,7 @@ apply "$APPDIR/source/signin/Signin.js" "$PATCHES/Signin.js.patch"
 apply "$APPDIR/source/tnc/Palm.js"      "$PATCHES/Palm.js.patch"
 novacom put "file://$APPDIR/appinfo.json" < "$APP/appinfo.json"
 novacom put "file://$APPDIR/config.js"    < "$APP/config.js"
-novacom put "file://$APPDIR/images/icon.png" < "$APP/images/icon.png"
+# (icon: the clone keeps firstuse's own images/icon.png — we are "cloning", not re-skinning)
 # CRITICAL: localized resources/<locale>/appinfo.json each carry the id and OVERRIDE the base.
 # The id MUST start with com.palm. (webOS grants privileged calls by prefix) — set it everywhere.
 # They also carry visible:false (firstuse is hidden) — flip it so the app gets a Launcher icon.
