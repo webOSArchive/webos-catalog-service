@@ -46,6 +46,9 @@ apply "$APPDIR/source/tnc/Palm.js"      "$PATCHES/Palm.js.patch"
 novacom put "file://$APPDIR/appinfo.json" < "$APP/appinfo.json"
 novacom put "file://$APPDIR/config.js"    < "$APP/config.js"
 # (icon: the clone keeps firstuse's own images/icon.png — we are "cloning", not re-skinning)
+# self-updater (vendored from webos-common); add it to the enyo.depends list
+novacom put "file://$APPDIR/Updater-Helper.js" < "$APP/Updater-Helper.js"
+dev "sed -i 's|\"config.js\",|\"config.js\",\\n\t\"Updater-Helper.js\",|' $APPDIR/depends.js && grep -c Updater-Helper $APPDIR/depends.js"
 # CRITICAL: localized resources/<locale>/appinfo.json each carry the id and OVERRIDE the base.
 # The id MUST start with com.palm. (webOS grants privileged calls by prefix) — set it everywhere.
 # They also carry visible:false (firstuse is hidden) — flip it so the app gets a Launcher icon.

@@ -24,7 +24,9 @@ webos/
 │   └── Palm.js.patch                        # app: terms card -> our TOS endpoint (skip dead LCN lookup)
 ├── app/
 │   ├── appinfo.json                 # our app id com.palm.app.webosaccount (com.palm.* = privileged)
-│   └── config.js                    # FirstUse.config = [palm (terms), signin]
+│   ├── config.js                    # FirstUse.config = [palm (terms), signin]
+│   └── Updater-Helper.js            # vendored from webosarchive/webos-common (Enyo) — self-update
+│                                    # via the Museum entry "webOS Community Account Manager"
 │                                    # (Launcher icon = firstuse's own icon; the clone keeps it)
 ├── ipk/
 │   ├── postinst                     # run by Preware/ipkgservice as root: app -> rootfs, patch service
