@@ -153,11 +153,11 @@ switch ($method) {
         break;
 
     case 'getAllChallengeQuestions':
-        // Security-question list for the create-account card. The service's
-        // GetAllQuestionsCommandAssistant returns OutChallengeQuestions verbatim
-        // and the card reads .challengeQuestions[{id, question}] into its picker.
-        // Note: createDeviceAccount receives the chosen questionID + answer but we
-        // deliberately do NOT store them yet — password recovery is email-based.
+        // Security-question list. Currently UNUSED: the create-account card hides
+        // its security-question fields (we never stored the answer; recovery is
+        // handled by the Archive, not on-device). Kept for a future recovery flow —
+        // the service's GetAllQuestionsCommandAssistant returns OutChallengeQuestions
+        // verbatim and the card reads .challengeQuestions[{id, question}].
         echo json_encode(['OutChallengeQuestions' => ['challengeQuestions' => [
             ['id' => 1, 'question' => 'What was the name of your first pet?'],
             ['id' => 2, 'question' => 'What city were you born in?'],
