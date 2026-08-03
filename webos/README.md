@@ -16,9 +16,10 @@ it becomes the device profile, **without wiping the device**.
 ```
 webos/
 ├── patches/                         # unified diffs against stock webOS 3.0.5 (topaz, build 86)
-│   ├── palm_profile_util.js.patch           # palmprofile SERVICE: getServerUrl -> our backend; upsert account (rename, never duplicate)
+│   ├── palm_profile_util.js.patch           # palmprofile SERVICE: base -> our backend (HTTPS via curlPost); upsert account
 │   ├── LoginProfileCommandAssistant.js.patch# login: skip dead LCN precheck; create local profile
 │   ├── IsEmailAvailableCommandAssistant.js.patch # create: email precheck -> our backend (was dead LCN)
+│   ├── GetTermsAndConditionsCommandAssistant.js.patch # terms POST -> curlPost (HTTPS)
 │   ├── FirstUse.js.patch                    # app: neuter erase/OTA/shutdown/powerdown; confirm page + Done
 │   ├── Signin.js.patch                      # app: skip hanging PostSignIn OTA/backup checks
 │   └── Palm.js.patch                        # app: terms card -> our TOS endpoint (skip dead LCN lookup)
@@ -95,6 +96,19 @@ never activate. List it in the catalog so the Museum/Preware path is used.
 
 ipkg format gotcha: members inside `control.tar.gz`/`data.tar.gz` MUST be `./`-prefixed
 (`./control`, `./usr/...`) — webOS's ipkg 0.99 rejects the archive (rc 22) otherwise.
+
+## Transport: HTTPS via curl shim (not the service's node TLS)
+
+The account calls originate in the palmprofile JS service, whose HTTP client
+(`Foundations.Comms.AjaxCall`) runs on the stock **node 0.4.12 TLS**, which
+Cloudflare rejects (`socket hang up`). The community OTA ships a modern
+`/usr/bin/curl` (OpenSSL 1.1.1w, TLS 1.3) but the framework never uses it. So
+`palm_profile_util.js` adds **`curlPost()`** — shells out to `/usr/bin/curl` via
+node `child_process`, returns a Future shaped like `AjaxCall.post`
+(`result.responseJSON/responseText/status`). `postRequestInternal` and the terms
+assistant route through it; every account/terms POST is real HTTPS. **Requires the
+community-OTA curl fix on the device** — which is a hard install prerequisite for
+this app anyway.
 
 ## Gotchas we hit (so you don't)
 

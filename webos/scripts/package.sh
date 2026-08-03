@@ -37,6 +37,7 @@ echo ">> 2) pull patched service files from device"
 novacom run file:///bin/cat -- "$SVC/utils/palm_profile_util.js"                   > "$BUILD/data/$STAGE_REL/service/palm_profile_util.js"
 novacom run file:///bin/cat -- "$SVC/handlers/LoginProfileCommandAssistant.js"     > "$BUILD/data/$STAGE_REL/service/LoginProfileCommandAssistant.js"
 novacom run file:///bin/cat -- "$SVC/handlers/IsEmailAvailableCommandAssistant.js" > "$BUILD/data/$STAGE_REL/service/IsEmailAvailableCommandAssistant.js"
+novacom run file:///bin/cat -- "$SVC/handlers/GetTermsAndConditionsCommandAssistant.js" > "$BUILD/data/$STAGE_REL/service/GetTermsAndConditionsCommandAssistant.js"
 
 echo ">> 3) sanity-check the payload actually carries our patches"
 grep -q "updateCompletePage" "$BUILD/data/$STAGE_REL/app/FirstUse.js"

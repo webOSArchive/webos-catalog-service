@@ -37,6 +37,7 @@ echo ">> 1) patch palmprofile service (redirect + skip-LCN login + email prechec
 apply "$SVC/utils/palm_profile_util.js"                   "$PATCHES/palm_profile_util.js.patch"
 apply "$SVC/handlers/LoginProfileCommandAssistant.js"     "$PATCHES/LoginProfileCommandAssistant.js.patch"
 apply "$SVC/handlers/IsEmailAvailableCommandAssistant.js" "$PATCHES/IsEmailAvailableCommandAssistant.js.patch"
+apply "$SVC/handlers/GetTermsAndConditionsCommandAssistant.js" "$PATCHES/GetTermsAndConditionsCommandAssistant.js.patch"
 
 echo ">> 2) build app: clone firstuse -> $APPID"
 dev "rm -rf $APPDIR && cp -r $FU $APPDIR && echo cloned"

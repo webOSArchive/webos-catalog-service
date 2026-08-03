@@ -21,7 +21,7 @@ fi
 mount -o remount,rw / || exit 1
 
 # 1) palmprofile service -> webOS Archive backend (keep pristine copies once)
-for f in utils/palm_profile_util.js handlers/LoginProfileCommandAssistant.js handlers/IsEmailAvailableCommandAssistant.js; do
+for f in utils/palm_profile_util.js handlers/LoginProfileCommandAssistant.js handlers/IsEmailAvailableCommandAssistant.js handlers/GetTermsAndConditionsCommandAssistant.js; do
     if [ -f "$SVC/$f" ] && [ ! -f "$SVC/$f.stock" ]; then
         cp "$SVC/$f" "$SVC/$f.stock"
     fi

@@ -41,9 +41,9 @@
  	getTerms: function(inSender, inResponse){
 -     	var url = "https://" + inResponse.locationHost + "/palmcsext/services/deviceJ/";
 +		// webOS Archive: terms come from our catalog backend — same base the
-+		// patched palmprofile service uses. MUST be http:// — the legacy JS-service
-+		// TLS stack (openssl 0.9.8, TLS1.0) can't reach the https origin.
-+		var url = "http://appcatalog.webosarchive.org/WebService/device.php?m=";
++		// patched palmprofile service uses. HTTPS: the service routes this POST
++		// through the OTA's modern /usr/bin/curl (see PalmProfileUtil.curlPost).
++		var url = "https://appcatalog.webosarchive.org/WebService/device.php?m=";
      	enyo.application.FirstUse.setServerURL(url);
  		var lang = enyo.g11n.currentLocale().getLanguage();
  		console.info("Getting terms from: " + url);
