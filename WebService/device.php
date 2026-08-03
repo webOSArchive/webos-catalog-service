@@ -94,7 +94,9 @@ switch ($method) {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             device_fail('INVALID_EMAIL');
         }
-        if (strlen($password) < 6) {
+        // Same minimum as scripts/create-account.php and the device UI ("at
+        // least 8 characters"). No maximum — password_hash handles any length.
+        if (strlen($password) < 8) {
             device_fail('WEAK_PASSWORD');
         }
         if ($repo->findByEmail($email)) {
