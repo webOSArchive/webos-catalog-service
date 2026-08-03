@@ -44,9 +44,11 @@ apply "$APPDIR/source/signin/Signin.js" "$PATCHES/Signin.js.patch"
 apply "$APPDIR/source/tnc/Palm.js"      "$PATCHES/Palm.js.patch"
 novacom put "file://$APPDIR/appinfo.json" < "$APP/appinfo.json"
 novacom put "file://$APPDIR/config.js"    < "$APP/config.js"
+novacom put "file://$APPDIR/images/icon.png" < "$APP/images/icon.png"
 # CRITICAL: localized resources/<locale>/appinfo.json each carry the id and OVERRIDE the base.
 # The id MUST start with com.palm. (webOS grants privileged calls by prefix) — set it everywhere.
-dev "for f in \$(find $APPDIR/resources -name appinfo.json); do sed -i 's/com\\.palm\\.app\\.firstuse/$APPID/g; s/HP webOS/webOS Account/g' \"\$f\"; done; echo reid-done"
+# They also carry visible:false (firstuse is hidden) — flip it so the app gets a Launcher icon.
+dev "for f in \$(find $APPDIR/resources -name appinfo.json); do sed -i 's/com\\.palm\\.app\\.firstuse/$APPID/g; s/HP webOS/webOS Account/g; s/\"visible\": false/\"visible\": true/g; s/\"vendor\": \"HP\"/\"vendor\": \"webOS Archive\"/g; s/\"version\": \"3.0.0\"/\"version\": \"1.0.0\"/g' \"\$f\"; done; echo reid-done"
 
 echo ">> 3) register (rescan)"
 dev 'luna-send -n 1 palm://com.palm.applicationManager/rescan "{}"'

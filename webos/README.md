@@ -23,10 +23,15 @@ webos/
 │   └── Palm.js.patch                        # app: terms card -> our TOS endpoint (skip dead LCN lookup)
 ├── app/
 │   ├── appinfo.json                 # our app id com.palm.app.webosaccount (com.palm.* = privileged)
-│   └── config.js                    # FirstUse.config = [palm (terms), signin]
+│   ├── config.js                    # FirstUse.config = [palm (terms), signin]
+│   └── images/icon.png              # Launcher icon (account glyph on webOS tile)
+├── ipk/
+│   ├── postinst                     # run by Preware/ipkgservice as root: app -> rootfs, patch service
+│   └── prerm                        # uninstall: restore <file>.stock service files, remove app
 ├── scripts/
 │   ├── unlock.sh                    # reproduce deviceTool's dev-unlock + OOBE-skip (no jar run)
-│   └── deploy.sh                    # apply patches + build the app + register it
+│   ├── deploy.sh                    # apply patches + build the app + register it (dev workflow)
+│   └── package.sh                   # pull built app from device -> Preware-installable IPK (dist/)
 └── README.md
 ```
 
@@ -64,6 +69,29 @@ scripts/deploy.sh          # patches the service, builds com.palm.app.webosaccou
 
 Launch the app (or, eventually, a Preferences shortcut), sign in with a catalog account
 (username or email + password). On success it writes the device profile + token and closes.
+
+## 3. Package for distribution (Museum / Preware)
+
+The app is built on-device (we ship diffs, not HP source), so packaging pulls the
+built artifacts back off a deployed device:
+
+```sh
+scripts/deploy.sh          # build + verify on the dev device first
+scripts/package.sh         # -> dist/org.webosarchive.webosaccount_<ver>_all.ipk
+```
+
+The IPK stages its payload under `/media/cryptofs/apps/usr/palm/webosarchive/` and a
+`postinst` (run as **root** by Preware / `org.webosinternals.ipkgservice`) replays the
+deploy: app into rootfs `/usr/palm/applications/`, palmprofile service patched with
+pristine `<file>.stock` backups. `prerm` restores stock and removes the app.
+
+**Install path matters:** the on-device Museum app installs by handing the IPK URL to
+Preware (`org.webosinternals.preware {type:"install"}`), whose ipkgservice runs install
+scripts. The **stock** appinstaller does NOT run postinst — the package would stage but
+never activate. List it in the catalog so the Museum/Preware path is used.
+
+ipkg format gotcha: members inside `control.tar.gz`/`data.tar.gz` MUST be `./`-prefixed
+(`./control`, `./usr/...`) — webOS's ipkg 0.99 rejects the archive (rc 22) otherwise.
 
 ## Gotchas we hit (so you don't)
 

@@ -274,8 +274,18 @@ The full flow works end-to-end on a freshly-Doctored + unlocked TouchPad, **with
    `serverURL + "getTermsAndConditions"`, so the `?m=` base composes as-is); also neutered the
    error-popup path that deleted the saved Wi-Fi profile + restarted the flow (now just retries
    the fetch). `webos/app/config.js` is now `[palm, signin]` — terms card first, then sign-in.
-4. **Launcher / re-arm entry** — "re-arm on demand" is now simply *launching
-   `com.palm.app.webosaccount`*; add a Preferences/Accounts shortcut that opens it.
+4. ✅ **Launcher entry** — DONE: the localized `resources/<locale>/appinfo.json` files carried
+   firstuse's `"visible": false` (they override the base) — deploy.sh's re-id pass now flips
+   visibility, sets vendor "webOS Archive", and ships a proper Launcher icon
+   (`webos/app/images/icon.png`, account glyph on a webOS-style tile). Launchpoint verified.
+4c. ✅ **Installable IPK** (pre-OTA distribution via the Museum) — DONE, verified full lifecycle
+   on hardware: `webos/scripts/package.sh` pulls the built app + patched service files off a
+   deployed device (repo ships diffs, not HP source) and assembles
+   `dist/org.webosarchive.webosaccount_<ver>_all.ipk`. `ipk/postinst` (root, via
+   Preware/ipkgservice — the Museum app's install path; stock appinstaller does NOT run
+   scripts) replays the deploy: app → rootfs, service patched with `.stock` backups;
+   `ipk/prerm` restores stock + removes the app. Gotcha: ipkg 0.99 requires `./`-prefixed
+   tar members or it rejects the archive (rc 22). The app is destined for its OWN repo later.
 4b. ✅ **De-brand HP strings** (user request — don't put words in HP's mouth): all visible
    HP / hpwebos.com / palm.com / "previously Palm Profile" strings in the terms card
    (`Palm.js.patch`: card title, accept-confirm popup, server-error popup) and sign-in card

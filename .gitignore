@@ -76,3 +76,6 @@ Generated\ Files/
 # but keep track of directories ending in .cache
 !?*.[Cc]ache/
 .htaccess
+
+# webOS device artifacts: packaging build output (webos/scripts/package.sh)
+webos/dist/
