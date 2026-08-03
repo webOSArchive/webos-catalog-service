@@ -1,5 +1,5 @@
---- a/com.palm.app.firstuse/FirstUse.js	2026-08-01 16:34:36
-+++ b/com.palm.app.firstuse/FirstUse.js	2026-08-01 18:24:35
+--- a/com.palm.app.firstuse/FirstUse.js
++++ b/com.palm.app.firstuse/FirstUse.js
 @@ -34,9 +34,9 @@
  		languageCode: "",
  		serverURL: "",
@@ -13,7 +13,19 @@
  		first: true,
  		createProfile: false,
  		firstName: "",
-@@ -378,17 +378,11 @@
+@@ -72,8 +72,9 @@
+ 				{kind: "VFlexBox", align: "center", components: [
+ 					{kind: "Control", layoutKind: "VFlexLayout", align:'center', className:"contentDefaults", pack: 'justify', components: [
+ 						{name: "completeSetup", content: rb.$L("Thanks!"), className: "title"},
+-						{content: rb.$L("We're almost done. When we finish, we'll restart your device and you'll be ready to go."), className: "subtitle"},
+-						{kind: "SpinnerLarge", name: "spinner", showing: true},
++						{name: "completeSubtitle", content: rb.$L("Your webOS Account is ready to use."), className: "subtitle"},
++						{kind: "SpinnerLarge", name: "spinner", showing: false},
++						{name: "completeDone", kind: "Button", caption: rb.$L("Done"), className: "enyo-button", style: "width: 220px; margin-top: 24px;", onclick: "completeDoneTap"},
+ 					]}
+ 				]}
+ 			]}
+@@ -378,17 +379,11 @@
  
  	
  	getRestoreInProgressSuccess: function(inSender, inResponse) {
@@ -36,7 +48,7 @@
  	},
  	
  	getRestoreInProgressFailure: function() {
-@@ -828,19 +822,16 @@
+@@ -828,19 +823,31 @@
  	},
  	
  	done: function(){
@@ -44,17 +56,29 @@
 -		console.info("Making call to postLogin settings....");
 -		if (this.connectedWithWiFi) {
 -			this.$.setTimeZoneFromIP.call();
--		} else {
--			this.postTimeZoneResponseReturned = true; // we just pretend we called it in non-wifi mode other wise we hang.
--		}
--
--		console.log("Set Customizations: " + this.countryCode + " : " + this.languageCode);
--		this.$.setCustomization.call({"language":this.languageCode,"country":this.countryCode});
 +		// webOS Archive: safe completion. The account + device token are already
 +		// written by accountservices (createNovaAccount/authenticateAccount). Do NOT
 +		// call the dead HP postLogin services, do NOT reset, do NOT shut down —
-+		// just close the app.
-+		console.info("WOSA firstrun: account setup complete — closing (no reset, no erase, no shutdown).");
++		// leave the confirmation page up; the user dismisses it with Done.
++		console.info("WOSA firstrun: account setup complete — showing confirmation (no reset, no erase, no shutdown).");
++		this.updateCompletePage();
++	},
++
++	updateCompletePage: function(){
++		// getAccountToken is async — this runs from done() and again from
++		// getTokenResponse, whichever lands last wins with the alias filled in.
++		var alias = this.getAcctAlias();
++		if (alias) {
++			this.$.completeSubtitle.setContent("Signed in as " + alias + ". Your webOS Account is ready to use.");
+ 		} else {
+-			this.postTimeZoneResponseReturned = true; // we just pretend we called it in non-wifi mode other wise we hang.
++			this.$.completeSubtitle.setContent("Your webOS Account is ready to use.");
+ 		}
++	},
+ 
+-		console.log("Set Customizations: " + this.countryCode + " : " + this.languageCode);
+-		this.$.setCustomization.call({"language":this.languageCode,"country":this.countryCode});
++	completeDoneTap: function(){
 +		this.closeApp();
 +	},
  
@@ -65,7 +89,7 @@
  	},
  	
  	postTimeZoneResponse: function(inSender, inResponse){
-@@ -893,16 +884,10 @@
+@@ -893,16 +900,10 @@
  	},
  	
  	firstUseComplete: function() {
@@ -86,7 +110,7 @@
  	},
  	
  	performSoftwareUpdate: function() {
-@@ -921,16 +906,8 @@
+@@ -921,16 +922,8 @@
  	
      
      powerDownDevice: function () {
@@ -105,3 +129,14 @@
  	},
  	
  	powerDownResponse:function(inSender, inResponse){
+@@ -1029,8 +1022,9 @@
+ 		if(inResponse.returnValue){
+ 			this.setAcctAlias(inResponse.accountAlias);
+ 			this.setAcctToken(inResponse.token);
++			this.updateCompletePage();
+ 			if (this.assignDeviceNameRetry) {
+-				this.assignDeviceName();	
++				this.assignDeviceName();
+ 			}
+ 		} else {
+ 			console.info("Could not get token info");

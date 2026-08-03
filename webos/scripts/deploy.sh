@@ -18,8 +18,17 @@ APPDIR=/usr/palm/applications/$APPID
 
 # dev '<shell>' : run a command on the device (pushed script — novacom `sh -c` is unreliable)
 dev() { printf '%s\n' "$1" > /tmp/_dev.sh; novacom put file:///tmp/_dev.sh < /tmp/_dev.sh >/dev/null; novacom run file:///bin/sh -- /tmp/_dev.sh; }
-# apply <device-path> <patch> : pull stock, patch on host, push back
-apply() { novacom run file:///bin/cat -- "$1" > /tmp/_stock 2>/dev/null; cp /tmp/_stock /tmp/_patched; patch -s /tmp/_patched "$2"; novacom put "file://$1" < /tmp/_patched; echo "  patched $1"; }
+# apply <device-path> <patch> : patch on host from a preserved stock copy, push back.
+# Idempotent: the first touch saves <file>.stock on-device; every deploy re-patches from
+# that pristine base (never from the live file — patch would auto-reverse an applied diff).
+# -f makes a mismatched patch fail loudly (set -e aborts) instead of guessing.
+apply() {
+  dev "[ -f $1.stock ] || cp $1 $1.stock" >/dev/null
+  novacom run file:///bin/cat -- "$1.stock" > /tmp/_patched 2>/dev/null
+  patch -s -f /tmp/_patched "$2"
+  novacom put "file://$1" < /tmp/_patched
+  echo "  patched $1"
+}
 
 echo ">> 0) remount rootfs rw"
 dev 'mount -o remount,rw / 2>/dev/null; echo ok'
@@ -32,6 +41,7 @@ echo ">> 2) build app: clone firstuse -> $APPID"
 dev "rm -rf $APPDIR && cp -r $FU $APPDIR && echo cloned"
 apply "$APPDIR/FirstUse.js"             "$PATCHES/FirstUse.js.patch"
 apply "$APPDIR/source/signin/Signin.js" "$PATCHES/Signin.js.patch"
+apply "$APPDIR/source/tnc/Palm.js"      "$PATCHES/Palm.js.patch"
 novacom put "file://$APPDIR/appinfo.json" < "$APP/appinfo.json"
 novacom put "file://$APPDIR/config.js"    < "$APP/config.js"
 # CRITICAL: localized resources/<locale>/appinfo.json each carry the id and OVERRIDE the base.

@@ -1,5 +1,5 @@
---- a/com.palm.service.palmprofile/utils/palm_profile_util.js	2026-08-01 14:05:39
-+++ b/com.palm.service.palmprofile/utils/palm_profile_util.js	2026-08-01 14:07:35
+--- a/com.palm.service.palmprofile/utils/palm_profile_util.js
++++ b/com.palm.service.palmprofile/utils/palm_profile_util.js
 @@ -2,9 +2,18 @@
  
  var Util = Class.create ({
@@ -36,3 +36,117 @@
  		return this.ACCOUNTS_URL;
  	},
  	
+@@ -242,40 +250,80 @@
+ 	},
+ 		
+ 	createLocalAccount: function (username, onComplete) {
+-		var account = {
+-			"templateId": "com.palm.palmprofile",
+-   			"capabilityProviders": [
+-				{"id": "com.palm.palmprofile.contacts"},
+-				{"id": "com.palm.palmprofile.calendar"},
+-				{"id": "com.palm.palmprofile.tasks"},
+-				{"id": "com.palm.palmprofile.memos"},
+-				{"id": "com.palm.palmprofile.sms"},
+-				{"id": "com.palm.palmprofile.voice"},
+-				{"id": "com.palm.palmprofile.localfilestore"}
+-			],
+-    		"username": username,
+-    		"credentials": {}
+-		};
+-		ServiceLog.log("Creating a palmprofile account with username:" + username);
+-		
+-		var acctFuture = PalmCall.call("palm://com.palm.service.accounts/", "createAccount", account);
+-		acctFuture.then(function(){
+-		if (acctFuture.exception){
+-			ServiceLog.error("----------- local acct creation failed ------------" + JSON.stringify(acctFuture.exception));
+-		}else{
+-			if (acctFuture.result) {
+-				ServiceLog.log("----------- local acct created successfully ------------" + JSON.stringify(acctFuture.result));
+-				
+-				var fileUtil = new FileUtil();
+-				fileUtil.createAccountCreatedFlag();
++		// webOS Archive: UPSERT — never create a second parallel palmprofile
++		// account. If one already exists (e.g. the "Dr. Skipped Firstuse"
++		// activation-bypass row), rename it in place via modifyAccount; deleting
++		// it would run the accounts-service teardown cascade, and duplicates
++		// confuse deviceinfo. Only create when no palmprofile account exists.
++		var listFuture = PalmCall.call("palm://com.palm.service.accounts/", "listAccounts", {});
++		listFuture.then(function(){
++			var existing = null, i, res = listFuture.result;
++			if (!listFuture.exception && res && res.results) {
++				for (i = 0; i < res.results.length; i++) {
++					if (res.results[i].templateId === "com.palm.palmprofile") {
++						existing = res.results[i];
++						break;
++					}
++				}
+ 			}
+-		}
+-		
+-		onComplete();
+-		});	
+-		
+-		
+-		
++			if (existing) {
++				if (existing.username === username || username === "Dr. Skipped Firstuse") {
++					// The default/bypass create must never rename a real signed-in
++					// account — any existing row already satisfies activation.
++					ServiceLog.log("WOSA: palmprofile account already present (" + existing.username + ") — no rename needed.");
++					onComplete();
++					return;
++				}
++				ServiceLog.log("WOSA: renaming existing palmprofile account '" + existing.username + "' -> '" + username + "'");
++				var modFuture = PalmCall.call("palm://com.palm.service.accounts/", "modifyAccount", {
++					"accountId": existing._id,
++					"object": {"username": username}
++				});
++				modFuture.then(function(){
++					if (modFuture.exception){
++						ServiceLog.error("----------- local acct rename failed ------------" + JSON.stringify(modFuture.exception));
++					} else {
++						ServiceLog.log("----------- local acct renamed successfully ------------");
++						var fileUtil = new FileUtil();
++						fileUtil.createAccountCreatedFlag();
++					}
++					onComplete();
++				});
++				return;
++			}
++
++			var account = {
++				"templateId": "com.palm.palmprofile",
++				"capabilityProviders": [
++					{"id": "com.palm.palmprofile.contacts"},
++					{"id": "com.palm.palmprofile.calendar"},
++					{"id": "com.palm.palmprofile.tasks"},
++					{"id": "com.palm.palmprofile.memos"},
++					{"id": "com.palm.palmprofile.sms"},
++					{"id": "com.palm.palmprofile.voice"},
++					{"id": "com.palm.palmprofile.localfilestore"}
++				],
++				"username": username,
++				"credentials": {}
++			};
++			ServiceLog.log("Creating a palmprofile account with username:" + username);
++
++			var acctFuture = PalmCall.call("palm://com.palm.service.accounts/", "createAccount", account);
++			acctFuture.then(function(){
++			if (acctFuture.exception){
++				ServiceLog.error("----------- local acct creation failed ------------" + JSON.stringify(acctFuture.exception));
++			}else{
++				if (acctFuture.result) {
++					ServiceLog.log("----------- local acct created successfully ------------" + JSON.stringify(acctFuture.result));
++
++					var fileUtil = new FileUtil();
++					fileUtil.createAccountCreatedFlag();
++				}
++			}
++
++			onComplete();
++			});
++		});
+ 	},
+ 	
+ 	getDeviceName: function(){

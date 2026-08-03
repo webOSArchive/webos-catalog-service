@@ -16,13 +16,14 @@ it becomes the device profile, **without wiping the device**.
 ```
 webos/
 ├── patches/                         # unified diffs against stock webOS 3.0.5 (topaz, build 86)
-│   ├── palm_profile_util.js.patch           # palmprofile SERVICE: getServerUrl -> our backend
+│   ├── palm_profile_util.js.patch           # palmprofile SERVICE: getServerUrl -> our backend; upsert account (rename, never duplicate)
 │   ├── LoginProfileCommandAssistant.js.patch# login: skip dead LCN precheck; create local profile
-│   ├── FirstUse.js.patch                    # app: neuter erase/OTA/shutdown/powerdown; safe close
-│   └── Signin.js.patch                      # app: skip hanging PostSignIn OTA/backup checks
+│   ├── FirstUse.js.patch                    # app: neuter erase/OTA/shutdown/powerdown; confirm page + Done
+│   ├── Signin.js.patch                      # app: skip hanging PostSignIn OTA/backup checks
+│   └── Palm.js.patch                        # app: terms card -> our TOS endpoint (skip dead LCN lookup)
 ├── app/
 │   ├── appinfo.json                 # our app id com.palm.app.webosaccount (com.palm.* = privileged)
-│   └── config.js                    # FirstUse.config = [signin] only
+│   └── config.js                    # FirstUse.config = [palm (terms), signin]
 ├── scripts/
 │   ├── unlock.sh                    # reproduce deviceTool's dev-unlock + OOBE-skip (no jar run)
 │   └── deploy.sh                    # apply patches + build the app + register it

@@ -246,25 +246,43 @@ The full flow works end-to-end on a freshly-Doctored + unlocked TouchPad, **with
 `resources/<locale>/appinfo.json`** (they override the base). Register via `killall LunaSysMgr` or
 `applicationManager/rescan`. **Server side is live and in git** (`device.php`, `AccountRepository`).
 
-## Polish plan (documented — not yet built)
+## Polish plan
 
-1. **Restore the OEM "thank-you" / complete page** (REQUIRED — it's the visual confirmation that
-   sign-in worked; right now the app just vanishes). Mechanics: `completeFirstUse()` already shows
-   the `complete` VFlexBox (title "Thanks!", a `SpinnerLarge`, and subtitle *"We're almost done…
-   we'll restart your device…"*), but our `done()` calls `closeApp()` immediately and kills it.
-   Requirements:
-   - Keep the complete page **visible** (don't `closeApp()` from `done()`).
-   - **Edit the copy** — remove the "restart your device" line (we don't reboot); show a friendly
-     confirmation, ideally naming the signed-in account (e.g. "Signed in as codepoet").
-   - Stop/hide the `SpinnerLarge` (it implies work-in-progress) and add a **Done/Finish button** that
-     calls `closeApp()` so the user dismisses it deliberately. Page stays editable as needed.
-2. **Reconcile the device account** — after a successful sign-in, remove the bypass
-   "Dr. Skipped Firstuse" palmprofile account so only the real one shows in deviceinfo (delete via
-   `-a com.palm.service.accounts palm://com.palm.service.accounts/deleteAccount`).
-3. **Wire our own TOS card** — server endpoint `?m=getTermsAndConditions` is already built; add the
-   Terms step back into the flow pointing at it (patch `GetURLForTerms`/`Palm.js` per §4a).
+1. ✅ **Restore the OEM "thank-you" / complete page** — DONE (in `webos/patches/FirstUse.js.patch`):
+   `done()` no longer closes; it shows the `complete` view with the spinner hidden, subtitle
+   *"Signed in as \<accountAlias\>. Your webOS Account is ready to use."* (via `updateCompletePage()`,
+   called from both `done()` and `getTokenResponse` since `getAccountToken` is async), and a
+   **Done** button that calls `closeApp()`. Also fixed `deploy.sh apply()` to be idempotent:
+   first touch saves `<file>.stock` on-device and every deploy re-patches from that pristine base
+   (patching the live file made `patch` auto-reverse an already-applied diff — this silently
+   un-patched the service once).
+2. ✅ **Reconcile the device account** — DONE (verified on hardware), by RENAME not delete
+   (user call: deletion risks the accounts-service teardown cascade; duplicates were the actual
+   bug). `createLocalAccount` in `webos/patches/palm_profile_util.js.patch` now UPSERTS: if a
+   `com.palm.palmprofile` account exists it renames it in place via
+   `com.palm.service.accounts/modifyAccount {accountId, object:{username}}` (preserves
+   capabilityProviders; callable by `com.palm.accountservices` — raw db8 merge is NOT, kind
+   permission denied); creates only when none exists; the bypass name "Dr. Skipped Firstuse"
+   never overwrites a real account. (Bypass *create* was already duplicate-safe — it has its own
+   listAccounts guard and returns accountCreated:false.) Verified: fresh-device simulation (row
+   named back to bypass) + real sign-in → log "WOSA: renaming … 'Dr. Skipped Firstuse' ->
+   'codepoet'", single account, token ACTIVE. Pre-cleanup backups:
+   `/media/internal/.webos-account-backup/palmprofile-accounts-pre-rename-20260803.json`.
+3. ✅ **Wire our own TOS card** — DONE (verified on hardware). `webos/patches/Palm.js.patch`:
+   `getURL()` skips the dead-LCN `getURLForTerms` retry loop and calls `getTerms()` directly with
+   our HTTP `device.php?m=` base (the service's `getTermsAndConditions` POSTs to
+   `serverURL + "getTermsAndConditions"`, so the `?m=` base composes as-is); also neutered the
+   error-popup path that deleted the saved Wi-Fi profile + restarted the flow (now just retries
+   the fetch). `webos/app/config.js` is now `[palm, signin]` — terms card first, then sign-in.
 4. **Launcher / re-arm entry** — "re-arm on demand" is now simply *launching
    `com.palm.app.webosaccount`*; add a Preferences/Accounts shortcut that opens it.
+4b. ✅ **De-brand HP strings** (user request — don't put words in HP's mouth): all visible
+   HP / hpwebos.com / palm.com / "previously Palm Profile" strings in the terms card
+   (`Palm.js.patch`: card title, accept-confirm popup, server-error popup) and sign-in card
+   (`Signin.js.patch`: headers, about/forgot/embargo/error popups, view subtitles) replaced with
+   generic webOS Account / App Museum / webosarchive.org wording. Note: `rb.$L()` keys off the
+   source string, so non-English locales will show these new strings untranslated (English) —
+   acceptable. Only remaining "hpwebos" in Signin.js is a commented-out line.
 5. **Package the OTA** — patched palmprofile service + the app + `/var/gadget/novacom_enabled` +
    ship `device.php` on the server.
 6. **Save artifacts to git** — offered: a `webos/` dir with the device patch-set + app source so the
