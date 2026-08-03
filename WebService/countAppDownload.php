@@ -18,9 +18,29 @@ if (isset($_GET["appid"]) && $_GET["appid"] != "") {
     $ipAddress = getVisitorIP();
     $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : null;
 
+    // Optional device attribution: on-device clients send their nduid as
+    // &device=<nduid>. The signed-in account (if any) is resolved server-side
+    // from account_tokens — clients never send the auth token here.
+    $deviceId  = null;
+    $accountId = null;
+    if (isset($_GET["device"]) && $_GET["device"] != "") {
+        $device = trim(urldecode($_GET["device"]));
+        if ($device !== '' && strlen($device) <= 128 && ctype_alnum(str_replace(['-', '_'], '', $device))) {
+            $deviceId = $device;
+        }
+    }
+
     try {
         $logRepo = new LogRepository();
-        $logRepo->logDownload($appid, $source, $ipAddress, $userAgent);
+        if ($deviceId !== null) {
+            require_once __DIR__ . '/../includes/AccountRepository.php';
+            try {
+                $accountId = (new AccountRepository())->accountIdForDevice($deviceId);
+            } catch (Exception $e) {
+                // Attribution is best-effort — never block the download count.
+            }
+        }
+        $logRepo->logDownload($appid, $source, $ipAddress, $userAgent, $deviceId, $accountId);
     } catch (Exception $e) {
         error_log("Non-fatal error: " . $_SERVER['SCRIPT_NAME'] . " was unable to log download: " . $e->getMessage(), 0);
     }

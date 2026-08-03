@@ -181,9 +181,20 @@ class AccountRepository {
         $raw     = bin2hex(random_bytes(32));
         $hash    = hash('sha256', $raw);
         $expires = ($ttlDays === null) ? null : date('Y-m-d H:i:s', time() + ((int)$ttlDays * 86400));
+        // One row per physical device (uq_tokens_device): a re-register or
+        // re-sign-in overwrites that device's row — the device only holds its
+        // latest token, so the replaced row was unusable anyway. created_at is
+        // preserved as "first seen". Tokens without a device id just insert
+        // (unique index ignores NULLs).
         $stmt = $this->db->prepare(
             "INSERT INTO account_tokens (account_id, token_hash, device_id, user_agent, expires_at)
-             VALUES (?, ?, ?, ?, ?)"
+             VALUES (?, ?, ?, ?, ?)
+             ON DUPLICATE KEY UPDATE
+                account_id   = VALUES(account_id),
+                token_hash   = VALUES(token_hash),
+                user_agent   = VALUES(user_agent),
+                expires_at   = VALUES(expires_at),
+                last_seen_at = NOW()"
         );
         $stmt->execute([
             (int)$accountId,
@@ -193,6 +204,32 @@ class AccountRepository {
             $expires,
         ]);
         return $raw;
+    }
+
+    /** Devices registered to an account (Q: "how many devices does an account have?"). */
+    public function devicesForAccount($accountId) {
+        $stmt = $this->db->prepare(
+            "SELECT device_id, user_agent, created_at, last_seen_at, expires_at
+               FROM account_tokens
+              WHERE account_id = ? AND device_id IS NOT NULL
+              ORDER BY created_at"
+        );
+        $stmt->execute([(int)$accountId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /** Resolve a device id (nduid) to the account currently signed in on it, or null. */
+    public function accountIdForDevice($deviceId) {
+        if ($deviceId === null || $deviceId === '') {
+            return null;
+        }
+        $stmt = $this->db->prepare(
+            "SELECT account_id FROM account_tokens
+              WHERE device_id = ? AND (expires_at IS NULL OR expires_at > NOW())"
+        );
+        $stmt->execute([substr((string)$deviceId, 0, 128)]);
+        $id = $stmt->fetchColumn();
+        return $id !== false ? (int)$id : null;
     }
 
     /**

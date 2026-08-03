@@ -35,10 +35,14 @@ class LogRepository {
                 source VARCHAR(255) NULL DEFAULT 'app',
                 ip_address VARCHAR(45) NULL,
                 user_agent TEXT NULL,
+                device_id VARCHAR(128) NULL,
+                account_id BIGINT UNSIGNED NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 INDEX idx_app_id (app_id),
                 INDEX idx_app_identifier (app_identifier),
                 INDEX idx_source (source),
+                INDEX idx_device_id (device_id),
+                INDEX idx_account_id (account_id),
                 INDEX idx_created_at (created_at)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
         ");
@@ -71,19 +75,50 @@ class LogRepository {
      * @param string $source Download source (default: 'app')
      * @param string|null $ipAddress Client IP
      * @param string|null $userAgent User agent string
+     * @param string|null $deviceId Device identifier (nduid) if the client sent one
+     * @param int|null $accountId Account signed in on that device at download time
      * @return bool Success
      */
-    public function logDownload($appIdentifier, $source = 'app', $ipAddress = null, $userAgent = null) {
+    public function logDownload($appIdentifier, $source = 'app', $ipAddress = null, $userAgent = null, $deviceId = null, $accountId = null) {
         // Try to get numeric app_id if identifier is numeric
         $appId = is_numeric($appIdentifier) ? (int)$appIdentifier : null;
 
         $sql = "
-            INSERT INTO download_logs (app_id, app_identifier, source, ip_address, user_agent)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO download_logs (app_id, app_identifier, source, ip_address, user_agent, device_id, account_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         ";
 
         $stmt = $this->db->prepare($sql);
-        return $stmt->execute([$appId, $appIdentifier, $source, $ipAddress, $userAgent]);
+        return $stmt->execute([
+            $appId,
+            $appIdentifier,
+            $source,
+            $ipAddress,
+            $userAgent,
+            $deviceId !== null ? substr((string)$deviceId, 0, 128) : null,
+            $accountId !== null ? (int)$accountId : null,
+        ]);
+    }
+
+    /**
+     * Apps a device has acquired (Q: "which apps has this device downloaded?" —
+     * the restore-style lookup). One row per app, newest acquisition first.
+     *
+     * @param string $deviceId Device identifier (nduid)
+     * @return array [{app_id, app_identifier, last_downloaded, downloads}]
+     */
+    public function appsForDevice($deviceId) {
+        $stmt = $this->db->prepare("
+            SELECT app_id, app_identifier,
+                   MAX(created_at) AS last_downloaded,
+                   COUNT(*) AS downloads
+              FROM download_logs
+             WHERE device_id = ?
+             GROUP BY app_id, app_identifier
+             ORDER BY last_downloaded DESC
+        ");
+        $stmt->execute([substr((string)$deviceId, 0, 128)]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
