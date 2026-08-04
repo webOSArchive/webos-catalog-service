@@ -58,6 +58,8 @@ App data is stored in MySQL. Key tables:
 | `AppRepository.php` | App queries (search, filter, CRUD, related apps) |
 | `MetadataRepository.php` | Detailed app metadata and images |
 | `LogRepository.php` | Download/update logging and reports |
+| `AccountRepository.php` | Accounts, roles, and device/web tokens (issue, verify, refresh, revoke) |
+| `StorageRepository.php` | Per-account app KV storage backing `storage.php` (revisions, quota enforcement, account-deletion cascade via `deleteAccount()`) |
 
 ### API Endpoints (WebService/)
 
@@ -68,6 +70,8 @@ App data is stored in MySQL. Key tables:
 | `getMuseumDetails.php` | 200/hour | App details with related apps |
 | `countAppDownload.php` | — | Logs a download to `download_logs` (no body returned) |
 | `getLatestVersionInfo.php` | — | Update check; museum app reads `0.json`, other apps read `getMuseumDetails.php` |
+| `device.php` | 60/hour | webOS Account backend: HP-shaped device methods (`createDeviceAccount`, `authenticateFromDevice`, …) plus plain-JSON web/PWA auth (`authenticateWeb`, `refreshToken`, `deauthenticate`). Sets its own CORS headers — see README "CORS" for the required nginx exemption |
+| `storage.php` | 600/hour + per-account | Cloud app storage: per-account, per-app KV sync (`?m=get/getAll/list/set/setMany/delete/usage`). Auth via `Authorization: PalmAuth token=…` resolved by `AccountRepository::verifyDeviceToken()`; quotas from `storage_*` config keys; values are opaque client-scrambled blobs. Client SDK: `webos-common/AppStorage`. Sets its own CORS headers |
 
 **`download_logs.source`** identifies the client: web frontend (unset/`app`), on-device Museum app (`webos` / `luneos`), and the patched HP first-party clients (`webos-appcatalog-enyo` for TouchPad, `webos-appcatalog-mojo` for phones). Use these to separate device installs from web in most-downloaded reports.
 
@@ -112,3 +116,5 @@ Devices running the community OTA have TLS 1.3 / full modern HTTPS support; new 
 
 - **image_host** - Icons and screenshots
 - **package_host** - IPK packages (served over HTTP for stock pre-OTA devices)
+- **storage_host** - Base URL for the app-storage + web-auth endpoints (public via `getConfig.php`)
+- **storage_**\* - App-storage quota/throttle keys enforced by `storage.php` (see `config-example.php`; omitted keys fall back to built-in defaults)

@@ -36,6 +36,21 @@ client_max_body_size 200M;
 
 Restart both services after changes. Adjust the size values as needed for your largest IPKs.
 
+### CORS (nginx)
+
+The nginx config adds a global `Access-Control-Allow-Origin: *` header for the web frontend and static content. `WebService/device.php` and `WebService/storage.php` manage their own CORS in PHP (they answer OPTIONS preflights and put headers on 4xx responses), so they must be **exempted** from the global header — a duplicated `Access-Control-Allow-Origin` makes browsers reject every request. Give each an exact-match location containing the same fastcgi directives as the generic `.php` location (copy them verbatim) and **no** `add_header`:
+
+```nginx
+location = /WebService/device.php  { include snippets/fastcgi-php.conf; fastcgi_pass unix:/run/php/php-fpm.sock; }
+location = /WebService/storage.php { include snippets/fastcgi-php.conf; fastcgi_pass unix:/run/php/php-fpm.sock; }
+```
+
+Two pitfalls, both learned the hard way: an exact-match location *without* working fastcgi directives serves the PHP **source** as static text; and if the global `add_header` sits at `server {}` level, these locations still inherit it unless they declare an `add_header` of their own (e.g. `add_header Vary Origin;`). Any future endpoint that emits its own CORS headers needs the same exemption. Verify with:
+
+```bash
+curl -s -D - -o /dev/null -X OPTIONS https://<host>/WebService/storage.php | grep -i access-control
+```
+
 ## Data
 
 1. Museum Database is periodically backed-up in Releases on this GitHub repo
