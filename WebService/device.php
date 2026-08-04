@@ -44,7 +44,10 @@ require_once __DIR__ . '/../includes/AccountRepository.php';
 header('Access-Control-Allow-Origin: *');
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
     header('Access-Control-Allow-Methods: POST, OPTIONS');
-    header('Access-Control-Allow-Headers: Content-Type');
+    // Same set as storage.php: the SDK sends X-Palm-Device-Id on every call
+    // (it mints the device id before first sign-in) and Authorization once a
+    // token exists (refreshToken/deauthenticate).
+    header('Access-Control-Allow-Headers: Authorization, Content-Type, X-Palm-Device-Id');
     header('Access-Control-Max-Age: 86400');
     http_response_code(204);
     exit;
