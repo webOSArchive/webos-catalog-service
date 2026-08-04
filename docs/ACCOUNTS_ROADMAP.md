@@ -90,9 +90,10 @@ Goal: restored webOS clients authenticate and post ratings/reviews.
   write to `app_reviews` with `author_account_id` = account, then recompute
   `app_metadata.star_rating` / `apps.review_count`. `is_inappropriate` already
   exists for moderation (`reviews.moderate`).
-- **Legacy HTTP reality:** device tokens travel cleartext (legacy TLS). Treat
-  device accounts as low-trust — per-device revocable tokens, never the admin
-  password; rate-limit the login endpoint (reuse `WebService/ratelimit.php`).
+- **Transport:** devices running the community OTA have TLS 1.3 / full modern
+  HTTPS, so device tokens travel encrypted. Still treat device accounts as
+  low-trust — per-device revocable tokens, never the admin password;
+  rate-limit the login endpoint (reuse `WebService/ratelimit.php`).
 - **Optional reconciliation:** map rescued Palm `app_reviews.account_id` →
   `accounts.legacy_account_id` so a returning user reclaims their old reviews.
 

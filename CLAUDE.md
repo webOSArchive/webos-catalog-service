@@ -71,7 +71,7 @@ App data is stored in MySQL. Key tables:
 
 **`download_logs.source`** identifies the client: web frontend (unset/`app`), on-device Museum app (`webos` / `luneos`), and the patched HP first-party clients (`webos-appcatalog-enyo` for TouchPad, `webos-appcatalog-mojo` for phones). Use these to separate device installs from web in most-downloaded reports.
 
-The patched HP clients also self-update from static manifests at the domain root — `appcatalog-touchpad.json` and `appcatalog-phones.json` (latest `version`, `versionNote`, IPK `filename`) — served over **HTTP** since legacy devices can't do modern TLS.
+The patched HP clients also self-update from static manifests at the domain root — `appcatalog-touchpad.json` and `appcatalog-phones.json` (latest `version`, `versionNote`, IPK `filename`) — served over **HTTP** as a compatibility fallback for stock devices that haven't taken the community OTA. Devices running the OTA have TLS 1.3 / full modern HTTPS support.
 
 **Sort Options** (for `getMuseumMaster.php` and web frontend):
 - `recent` (default) - By `app_metadata.last_modified_time` descending
@@ -106,9 +106,9 @@ checkRateLimit(60, 3600);  // 60 requests per hour
 
 ### Protocol Handling
 
-Legacy webOS devices cannot handle modern HTTPS. Downloads are proxied through `downloadProxy.php` to serve HTTP content to HTTPS users.
+Devices running the community OTA have TLS 1.3 / full modern HTTPS support; new APIs should be HTTPS-only. HTTP serving of packages/manifests is retained only as a compatibility fallback for stock devices without the OTA. Downloads are proxied through `downloadProxy.php` to serve HTTP-hosted content to HTTPS web users.
 
 ## External Dependencies (configured in config.php)
 
 - **image_host** - Icons and screenshots
-- **package_host** - IPK packages (HTTP only, no SSL)
+- **package_host** - IPK packages (served over HTTP for stock pre-OTA devices)

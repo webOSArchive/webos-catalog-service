@@ -157,7 +157,7 @@ The backend depends on archived content hosted by the community. Configure hosts
 - **AppImages**: Icons and screenshots - [archive](https://archive.org/download/webosappcatalog-supplementary)
 - **AppPackages**: IPK files - [archive](https://archive.org/details/webosappcatalog)
 
-Note: Package hosts must support HTTP (legacy webOS devices cannot handle modern HTTPS). The `downloadProxy.php` script proxies HTTP content to HTTPS web users.
+Note: Package hosts should still support plain HTTP as a compatibility fallback for stock devices that haven't taken the community OTA; devices running the OTA have TLS 1.3 / full modern HTTPS support. The `downloadProxy.php` script proxies HTTP content to HTTPS web users.
 
 ## What is This?
 

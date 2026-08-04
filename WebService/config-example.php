@@ -1,7 +1,8 @@
 <?php
 //copy this file to config.php
 //  put global config here, subdirectories are supported, but no trailing slashes
-//  you must host these repositories over HTTPS AND HTTP without redirecting to HTTPS
+//  host these repositories over HTTPS; devices with the community OTA have TLS 1.3 / modern HTTPS support.
+//  Plain HTTP (no redirect to HTTPS) is only needed as a fallback for stock devices without the OTA
 //  (you can use the Upgrade-Insecure-Requests header in your server config to serve HTTPS to modern web clients)
 //  Note: getConfig.php exposes ONLY an explicit allowlist of public values
 //        (service_host, image_host, package_host, package_host_secure, contact_email).
@@ -39,6 +40,14 @@ return array(
         // Download URL encoding secret (NOT exposed via API)
         // Used to obfuscate download URLs - change this to a random string
         'download_secret' => 'change_this_to_random_string',
+
+        // Cloud app storage quotas (NOT exposed via API) — enforced on write
+        // by WebService/storage.php; omit any key to use its built-in default.
+        'storage_max_value_bytes' => 32768,          // 32 KB per value
+        'storage_max_keys_per_app' => 200,           // keys per app per account
+        'storage_max_bytes_per_app' => 524288,       // 512 KB per app per account
+        'storage_max_bytes_per_account' => 2097152,  // 2 MB per account total
+        'storage_writes_per_hour' => 300,            // per-account write throttle
 
         // Database credentials (NOT exposed via API - filtered in getConfig.php)
         'db_host' => 'localhost',
