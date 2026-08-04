@@ -14,18 +14,41 @@
  *   ?m=createDeviceAccount      register a new webOS Account (= a catalog account)
  *   ?m=authenticateFromDevice   sign in to an existing account
  *
+ * Web/PWA clients (Phase 2 of the app-storage plan) use the plain-JSON
+ * methods instead of the HP shapes — same accounts, same per-device tokens,
+ * with a browser-generated synthetic device id (recommend "pwa-<uuid>" kept
+ * in localStorage) so each browser shows up in devicesForAccount() and is
+ * individually revocable:
+ *
+ *   ?m=authenticateWeb   {login, password, device_id} -> {token, expires_at, account}
+ *   ?m=refreshToken      {token} -> {token, expires_at}   (old token is invalidated)
+ *   ?m=deauthenticate    {token} -> {deauthenticated}     (sign-out; idempotent)
+ *
  * A "webOS Account" IS a catalog `accounts` row; the device gets a per-device
  * token in `account_tokens` (device_id = nduid). Web self-signup stays disabled;
  * device signup is the sanctioned legacy-client path (admin can still disable an
  * account, which revokes device access via the accounts.status check).
  *
- * Transport: served over HTTP because the legacy device JS/TLS stack (libssl
- * 0.9.8) can't negotiate modern TLS. Device tokens are therefore treated as
+ * Transport: HTTPS — devices running the community OTA have modern TLS (the
+ * on-device service posts via /usr/bin/curl). Tokens are still treated as
  * low-trust — per-device, revocable, never the account password.
  */
 
 require_once __DIR__ . '/ratelimit.php';
 require_once __DIR__ . '/../includes/AccountRepository.php';
+
+// CORS for browser/PWA clients: bearer-token auth with no cookies, so a
+// wildcard origin is safe. Content-Type: application/json makes browsers
+// preflight, hence the OPTIONS handler. Legacy device clients (curl) ignore
+// these headers entirely.
+header('Access-Control-Allow-Origin: *');
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
+    header('Access-Control-Allow-Methods: POST, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type');
+    header('Access-Control-Max-Age: 86400');
+    http_response_code(204);
+    exit;
+}
 
 header('Content-Type: application/json');
 
@@ -193,6 +216,63 @@ switch ($method) {
             'PALM'   => device_terms_html(),
             'GOOGLE' => '',
         ]);
+        break;
+
+    case 'authenticateWeb':
+        // Browser/PWA sign-in. Same verification and token issuance as
+        // authenticateFromDevice, minus the HP protocol shapes. The client's
+        // synthetic device_id makes the browser just another revocable
+        // "device" under the one-token-per-device model.
+        $login    = trim((string)($body['login'] ?? ''));
+        $password = (string)($body['password'] ?? '');
+        $deviceId = trim((string)($body['device_id'] ?? ''));
+        if ($login === '' || $password === '' || $deviceId === '' || strlen($deviceId) > 128) {
+            http_response_code(400);
+            echo json_encode(['error' => 'invalid_request',
+                              'message' => 'login, password and device_id (max 128 chars) are required']);
+            break;
+        }
+        $account = $repo->verifyDeviceLogin($login, $password);
+        if (!$account) {
+            http_response_code(401);
+            echo json_encode(['error' => 'auth_failed',
+                              'message' => 'Wrong login or password, or account disabled']);
+            break;
+        }
+        $token = $repo->issueDeviceToken($account['id'], $deviceId, $_SERVER['HTTP_USER_AGENT'] ?? null);
+        echo json_encode([
+            'token'      => $token,
+            'expires_at' => date('c', time() + 365 * 86400),
+            'account'    => [
+                'alias'        => $account['email'] ?: $account['username'],
+                'display_name' => ($account['display_name'] ?? '') ?: ($account['email'] ?: $account['username']),
+            ],
+        ]);
+        break;
+
+    case 'refreshToken':
+        // Trade a valid token for a fresh one (same account + device); the old
+        // token stops working. Lets long-lived clients renew before the
+        // 365-day expiry without re-asking for the password.
+        $token = (string)($body['token'] ?? '');
+        $new   = $token !== '' ? $repo->refreshDeviceToken($token, $_SERVER['HTTP_USER_AGENT'] ?? null) : null;
+        if (!$new) {
+            http_response_code(401);
+            echo json_encode(['error' => 'invalid_token',
+                              'message' => 'Token is invalid, expired, or the account is disabled']);
+            break;
+        }
+        echo json_encode(['token' => $new, 'expires_at' => date('c', time() + 365 * 86400)]);
+        break;
+
+    case 'deauthenticate':
+        // Sign-out: revoke this token. Idempotent — an already-dead token
+        // still reports success so client sign-out never gets stuck.
+        $token = (string)($body['token'] ?? '');
+        if ($token !== '') {
+            $repo->revokeDeviceToken($token);
+        }
+        echo json_encode(['deauthenticated' => true]);
         break;
 
     default:

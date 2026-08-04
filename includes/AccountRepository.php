@@ -265,6 +265,37 @@ class AccountRepository {
         return $stmt->execute([hash('sha256', (string)$rawToken)]);
     }
 
+    /**
+     * Trade a valid raw token for a fresh one on the same account + device,
+     * invalidating the old token. Returns the new raw token, or null when the
+     * presented token is invalid/expired or the account isn't active.
+     */
+    public function refreshDeviceToken($rawToken, $userAgent = null, $ttlDays = 365) {
+        if (!is_string($rawToken) || $rawToken === '') {
+            return null;
+        }
+        $stmt = $this->db->prepare(
+            "SELECT t.id, t.account_id, t.device_id, t.expires_at, a.status
+             FROM account_tokens t JOIN accounts a ON a.id = t.account_id
+             WHERE t.token_hash = ? LIMIT 1"
+        );
+        $stmt->execute([hash('sha256', $rawToken)]);
+        $row = $stmt->fetch();
+        if (!$row || $row['status'] !== 'active') {
+            return null;
+        }
+        if (!empty($row['expires_at']) && strtotime($row['expires_at']) < time()) {
+            return null;
+        }
+        if ($row['device_id'] === null) {
+            // No device id means no uq_tokens_device row to overwrite — delete
+            // the old row explicitly so refreshes don't pile up dead tokens.
+            $del = $this->db->prepare("DELETE FROM account_tokens WHERE id = ?");
+            $del->execute([(int)$row['id']]);
+        }
+        return $this->issueDeviceToken((int)$row['account_id'], $row['device_id'], $userAgent, $ttlDays);
+    }
+
     // -- Roles & capabilities -------------------------------------------------
 
     /** @return string[] role names assigned to the account */

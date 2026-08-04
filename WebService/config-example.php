@@ -30,6 +30,10 @@ return array(
         'image_host' => select_lb_resource($image_mirrors),
         'package_host' => select_lb_resource($package_mirror_plain),
         'package_host_secure' => $package_mirror_secure,
+        // Base for the app-storage + web-auth endpoints (storage.php,
+        // device.php), no trailing slash. Config-driven so clients never
+        // hard-code it. Public (exposed via getConfig.php).
+        'storage_host' => 'appcatalog.webosarchive.org/WebService',
         'contact_email' => 'webosarchive@gmail.com',
 
         // Filesystem path where app images (icons + screenshots) are stored, in

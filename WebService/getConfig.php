@@ -11,6 +11,7 @@ $publicKeys = [
     'image_host',
     'package_host',
     'package_host_secure',
+    'storage_host',
     'contact_email',
 ];
 
