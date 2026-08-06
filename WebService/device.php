@@ -520,7 +520,18 @@ switch ($method) {
                               'message' => 'Wrong login or password, or account disabled']);
             break;
         }
-        $token = $repo->issueDeviceToken($account['id'], $deviceId, $_SERVER['HTTP_USER_AGENT'] ?? null);
+        // A browser is a revocable client like any other, but it should not read as
+        // a handset in the account's device list. Clients send "PWA-<AppName>";
+        // anything that omits it still gets a name that says what it is, rather
+        // than falling through to the generic "webOS device".
+        $webName = trim((string)($body['device_name'] ?? ''));
+        if ($webName === '') {
+            $webName = 'PWA';
+        } elseif (stripos($webName, 'pwa') !== 0) {
+            $webName = 'PWA-' . $webName;
+        }
+        $token = $repo->issueDeviceToken($account['id'], $deviceId, $_SERVER['HTTP_USER_AGENT'] ?? null, 365,
+                                         ['name' => $webName]);
         echo json_encode([
             'token'      => $token,
             'expires_at' => date('c', time() + 365 * 86400),
