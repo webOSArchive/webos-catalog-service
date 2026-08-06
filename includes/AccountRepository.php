@@ -217,11 +217,16 @@ class AccountRepository {
     /**
      * Verify a password against one known account, WITHOUT minting a token.
      *
-     * This is the re-authentication check ("confirm your password to edit your
-     * profile"), not a sign-in. Deliberately separate from verifyDeviceLogin():
-     * issuing a token here would overwrite the caller's own uq_tokens_device row
-     * and silently invalidate the token it is currently authenticating with.
-     * Runs exactly one password_verify() like the other verify* methods.
+     * This is the re-authentication check ("confirm your password to do X"), not
+     * a sign-in. Deliberately separate from verifyDeviceLogin(): issuing a token
+     * here would overwrite the caller's own uq_tokens_device row and silently
+     * invalidate the token it is currently authenticating with. Runs exactly one
+     * password_verify() like the other verify* methods.
+     *
+     * Currently uncalled: the device profile editor dropped its re-auth prompt in
+     * favour of the per-device token. Kept because any future step-up check (a
+     * destructive action, an admin confirm) needs exactly this and must not be
+     * tempted to reach for verifyDeviceLogin(), which has the token side effect.
      */
     public function verifyAccountPassword($accountId, $password) {
         $stmt = $this->db->prepare("SELECT password_hash, status FROM accounts WHERE id = ?");

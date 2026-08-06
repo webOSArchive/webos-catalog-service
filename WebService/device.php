@@ -340,6 +340,18 @@ switch ($method) {
         // The NAME row. Only the display name is written: the request also
         // carries email/language/country, but email has its own method (and its
         // own uniqueness rules) and we store no locale.
+        //
+        // accounts has ONE name column, display_name. The app edits a single
+        // "full name" field; firstName/lastName exist only because that is the
+        // shape the stock assistant sends, and re-joining them here with a space
+        // is the exact inverse of the split device_split_name does on read, so a
+        // name round-trips unchanged however many words it has.
+        //
+        // Token-authenticated only. It used to also verify a password, because
+        // the app had just collected one at its re-auth gate; that gate is gone
+        // (the per-device token is the authenticator, as it is for every other
+        // write method here) and requiring a password no client holds would make
+        // this the one un-callable endpoint.
         $in      = $body['InUpdateAccountInfo'] ?? [];
         $acct    = $in['account'] ?? [];
         $account = device_account_or_fail($repo, $in['authToken'] ?? '');
@@ -347,11 +359,6 @@ switch ($method) {
         $last    = trim((string)($acct['lastName'] ?? ''));
         if ($first === '') {
             device_fail('INVALID_REQUEST');
-        }
-        // The app collected the password at the re-auth gate and replays it here.
-        // Verify it against this account rather than trusting the token alone.
-        if (!$repo->verifyAccountPassword($account['id'], (string)($in['password'] ?? ''))) {
-            device_fail('PAMS1100');   // "The password you entered is incorrect."
         }
         $repo->updateProfile($account['id'], ['display_name' => trim($first . ' ' . $last)]);
         echo json_encode(['OutUpdateAccountInfo' => ['returnValue' => true]]);
