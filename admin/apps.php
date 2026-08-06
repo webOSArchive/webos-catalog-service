@@ -21,8 +21,29 @@ $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $status = isset($_GET['status']) ? $_GET['status'] : '';
 $category = isset($_GET['category']) ? $_GET['category'] : '';
 $sort = isset($_GET['sort']) ? $_GET['sort'] : 'title';
+$dir = isset($_GET['dir']) ? (strtolower($_GET['dir']) === 'desc' ? 'desc' : 'asc') : null;
 $page = max(1, isset($_GET['page']) ? (int)$_GET['page'] : 1);
 $perPage = 50;
+
+// Same default-direction rule as AppRepository::adminSearch, used here only
+// to know which arrow to display and which direction a header click toggles to.
+$sortDefaultDirs = ['id' => 'desc', 'recommendation' => 'desc'];
+$effectiveDir = $dir !== null ? $dir : ($sortDefaultDirs[$sort] ?? 'asc');
+
+function admin_sort_link($column, $label, $currentSort, $currentDir, $baseParams) {
+    $nextDir = ($currentSort === $column && $currentDir === 'asc') ? 'desc' : 'asc';
+    $params = $baseParams;
+    $params['sort'] = $column;
+    $params['dir'] = $nextDir;
+    $arrow = $currentSort === $column ? ($currentDir === 'asc' ? ' &#9650;' : ' &#9660;') : '';
+    return '<a href="?' . htmlspecialchars(http_build_query($params)) . '" class="sort-link">' . htmlspecialchars($label) . $arrow . '</a>';
+}
+
+$sortBaseParams = array_filter([
+    'search' => $search,
+    'status' => $status,
+    'category' => $category,
+], function ($v) { return $v !== ''; });
 
 // Get apps with filters
 $apps = $repo->adminSearch([
@@ -30,6 +51,7 @@ $apps = $repo->adminSearch([
     'status' => $status,
     'category' => $category,
     'sort' => $sort,
+    'dir' => $dir,
     'page' => $page,
     'perPage' => $perPage,
     'owner_account_id' => $ownerFilter
@@ -99,14 +121,14 @@ include 'includes/header.php';
         <table class="admin-table">
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <th><?php echo admin_sort_link('id', 'ID', $sort, $effectiveDir, $sortBaseParams); ?></th>
                     <th>Icon</th>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>Owner</th>
-                    <th>Category</th>
-                    <th>Rec.</th>
-                    <th>Status</th>
+                    <th><?php echo admin_sort_link('title', 'Title', $sort, $effectiveDir, $sortBaseParams); ?></th>
+                    <th><?php echo admin_sort_link('author', 'Author', $sort, $effectiveDir, $sortBaseParams); ?></th>
+                    <th><?php echo admin_sort_link('owner', 'Owner', $sort, $effectiveDir, $sortBaseParams); ?></th>
+                    <th><?php echo admin_sort_link('category', 'Category', $sort, $effectiveDir, $sortBaseParams); ?></th>
+                    <th><?php echo admin_sort_link('recommendation', 'Rec.', $sort, $effectiveDir, $sortBaseParams); ?></th>
+                    <th><?php echo admin_sort_link('status', 'Status', $sort, $effectiveDir, $sortBaseParams); ?></th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -154,6 +176,7 @@ include 'includes/header.php';
     if ($status) $queryParams['status'] = $status;
     if ($category) $queryParams['category'] = $category;
     if ($sort && $sort !== 'title') $queryParams['sort'] = $sort;
+    if ($dir !== null) $queryParams['dir'] = $dir;
     $queryString = http_build_query($queryParams);
     ?>
 

@@ -892,16 +892,39 @@ class AppRepository {
         }
 
         // Determine sort order
-        $sort = $filters['sort'] ?? 'title';
+        $allowedSorts = ['id', 'title', 'author', 'owner', 'category', 'recommendation', 'status'];
+        $sort = in_array($filters['sort'] ?? '', $allowedSorts, true) ? $filters['sort'] : 'title';
+
+        // Some columns have a more useful default direction than ascending
+        // (e.g. newest IDs / highest recommendation first) when the caller
+        // hasn't explicitly asked for a direction.
+        $defaultDirs = ['id' => 'desc', 'recommendation' => 'desc'];
+        $requestedDir = $filters['dir'] ?? null;
+        $dir = $requestedDir !== null
+            ? (strtolower($requestedDir) === 'desc' ? 'DESC' : 'ASC')
+            : strtoupper($defaultDirs[$sort] ?? 'asc');
+
         switch ($sort) {
             case 'recommendation':
-                $sql .= " ORDER BY a.recommendation_order DESC, a.title";
+                $sql .= " ORDER BY a.recommendation_order $dir, a.title ASC";
                 break;
             case 'id':
-                $sql .= " ORDER BY a.id DESC";
+                $sql .= " ORDER BY a.id $dir";
+                break;
+            case 'author':
+                $sql .= " ORDER BY a.author $dir";
+                break;
+            case 'owner':
+                $sql .= " ORDER BY acct.username $dir";
+                break;
+            case 'category':
+                $sql .= " ORDER BY c.name $dir";
+                break;
+            case 'status':
+                $sql .= " ORDER BY a.status $dir";
                 break;
             default:
-                $sql .= " ORDER BY a.title";
+                $sql .= " ORDER BY a.title $dir";
         }
 
         $page = max(1, (int)($filters['page'] ?? 1));

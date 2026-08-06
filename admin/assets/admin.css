@@ -223,6 +223,18 @@ body {
     color: #2c3e50;
 }
 
+.admin-table th a.sort-link {
+    color: inherit;
+    text-decoration: none;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.admin-table th a.sort-link:hover {
+    color: #2980b9;
+    text-decoration: underline;
+}
+
 .admin-table tr:hover {
     background: #f8f9fa;
 }
