@@ -14,6 +14,25 @@
  *   ?m=createDeviceAccount      register a new webOS Account (= a catalog account)
  *   ?m=authenticateFromDevice   sign in to an existing account
  *
+ * The stock Accounts settings app (com.palm.app.accounts) drives a second,
+ * token-authenticated surface — the profile editor behind the account row. Its
+ * assistants are stock and already post through our transport, so these are
+ * server-only implementations of HP's original wire shapes:
+ *
+ *   ?m=getAccountInfoAggregate  the whole profile in one call (name, email,
+ *                               username, device list) — the app's entry call
+ *   ?m=isUserValid              re-auth gate ("enter your account password")
+ *   ?m=updateAccountInfo        change the display name
+ *   ?m=changeEmailAddress       change the account email
+ *   ?m=changePassword           set a new password
+ *   ?m=assignDeviceName         the device names itself after sign-in
+ *   ?m=updateUsername           OURS, not HP's: pick a public username
+ *
+ * Username: every device account starts with username = its email (see
+ * createDeviceAccount). The Accounts app now exposes it as an editable field so
+ * members have a shareable handle that is not their email address, and the
+ * device publishes it to other apps via getAccountToken.
+ *
  * Web/PWA clients (Phase 2 of the app-storage plan) use the plain-JSON
  * methods instead of the HP shapes — same accounts, same per-device tokens,
  * with a browser-generated synthetic device id (recommend "pwa-<uuid>" kept
@@ -56,7 +75,10 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
 header('Content-Type: application/json');
 
 // Throttle all device-auth traffic per IP (shares WebService/__rateLimit).
-checkRateLimit(60, 3600);
+// Sign-in alone is a handful of calls, but the Accounts app's profile editor is
+// chatty (an aggregate fetch plus a re-auth every time it is opened, then one
+// call per edit), and a household behind one NAT shares this budget.
+checkRateLimit(240, 3600);
 
 $method = $_GET['m'] ?? '';
 $body   = json_decode(file_get_contents('php://input'), true);
@@ -77,6 +99,9 @@ function authenticate_info_ex($account, $token) {
     $yearMs  = 365 * 86400 * 1000;
     return ['AuthenticateInfoEx' => [
         'accountAlias'          => $account['email'] ?: $account['username'],
+        // Our own field: the patched getToken() copies it into the db8 profile so
+        // getAccountToken can hand the username to any app on the device.
+        'accountUsername'       => $account['username'],
         'displayName'           => ($account['display_name'] ?? '') ?: ($account['email'] ?: $account['username']),
         'token'                 => $token,
         'accountState'          => 'ACTIVE',
@@ -101,6 +126,89 @@ function device_id_from($device) {
     }
     $id = $device['nduID'] ?? $device['deviceID'] ?? null;
     return ($id !== null && $id !== '') ? $id : null;
+}
+
+/**
+ * Descriptive device fields out of the same HP device block, for the account's
+ * DEVICES list. The device sends no friendly name at sign-in — it assigns one
+ * afterwards via assignDeviceName — so only model/OS are available here.
+ */
+function device_meta_from($device) {
+    if (!is_array($device)) {
+        return [];
+    }
+    return [
+        'model' => $device['deviceModel'] ?? null,
+        'os'    => $device['firmwareVersion'] ?? null,
+    ];
+}
+
+/**
+ * Resolve the caller's account from an HP "authToken"/token field, or end the
+ * request. Every profile-editing method is authenticated this way: the device
+ * holds a per-device token from sign-in and never re-sends the password except
+ * through isUserValid.
+ */
+function device_account_or_fail($repo, $token) {
+    $account = is_string($token) && $token !== '' ? $repo->verifyDeviceToken($token) : null;
+    if (!$account) {
+        // ACCOUNT_NOT_DEFINED_ERROR is one of the few codes the Accounts app has
+        // real copy for ("We were unable to locate your account information").
+        device_fail('ACCOUNT_NOT_DEFINED_ERROR');
+    }
+    return $account;
+}
+
+/**
+ * Split a stored display_name back into the first/last pair the Accounts app
+ * edits. Lossy for multi-word given names ("Mary Jo Smith" -> "Mary"/"Jo
+ * Smith"), but it round-trips: the app rejoins them with a space on save.
+ */
+function device_split_name($display) {
+    $display = trim((string)$display);
+    if ($display === '') {
+        return ['', ''];
+    }
+    $sp = strpos($display, ' ');
+    return $sp === false
+        ? [$display, '']
+        : [substr($display, 0, $sp), trim(substr($display, $sp + 1))];
+}
+
+/**
+ * Username rules. Deliberately narrower than accounts.username's VARCHAR(64):
+ * this is a public handle, so keep it short, typeable and free of the '@' that
+ * would make it ambiguous with an email at sign-in (verifyDeviceLogin matches
+ * username OR email). Uniqueness is case-insensitive via the column collation.
+ *
+ * @return string|null error code, or null when acceptable.
+ */
+function device_username_error($username) {
+    static $reserved = ['admin', 'administrator', 'root', 'system', 'support', 'help',
+                        'moderator', 'webos', 'webosarchive', 'museum', 'palm', 'hp', 'null'];
+    if (!preg_match('/^[A-Za-z0-9][A-Za-z0-9._-]{2,31}$/', $username)) {
+        return 'USERNAME_INVALID';
+    }
+    if (in_array(strtolower($username), $reserved, true)) {
+        return 'USERNAME_RESERVED';
+    }
+    return null;
+}
+
+/** The account's devices, in the shape the Accounts app's DEVICES list renders. */
+function device_list_for($repo, $accountId) {
+    $out = [];
+    foreach ($repo->devicesForAccount($accountId) as $d) {
+        $model = (string)($d['device_model'] ?? '');
+        $out[] = [
+            'nduId'            => $d['device_id'],
+            'deviceName'       => ($d['device_name'] ?? '') ?: ($model ?: 'webOS device'),
+            'deviceModel'      => $model,
+            'deviceType'       => $model ?: 'webOS',
+            'webOSDisplayName' => (string)($d['device_os'] ?? ''),
+        ];
+    }
+    return $out;
 }
 
 switch ($method) {
@@ -146,7 +254,8 @@ switch ($method) {
         } catch (Throwable $e) {
             device_fail('ACCOUNT_CREATION_ERROR');
         }
-        $token = $repo->issueDeviceToken($id, $deviceId, $_SERVER['HTTP_USER_AGENT'] ?? null);
+        $token = $repo->issueDeviceToken($id, $deviceId, $_SERVER['HTTP_USER_AGENT'] ?? null, 365,
+                                         device_meta_from($in['device'] ?? null));
         echo json_encode(authenticate_info_ex($repo->findById($id), $token));
         break;
 
@@ -165,8 +274,170 @@ switch ($method) {
             echo json_encode(['authFailed' => true]);
             exit;
         }
-        $token = $repo->issueDeviceToken($account['id'], $deviceId, $_SERVER['HTTP_USER_AGENT'] ?? null);
+        $token = $repo->issueDeviceToken($account['id'], $deviceId, $_SERVER['HTTP_USER_AGENT'] ?? null, 365,
+                                         device_meta_from($in['device'] ?? null));
         echo json_encode(authenticate_info_ex($account, $token));
+        break;
+
+    case 'getAccountInfoAggregate':
+        // Entry call for the Accounts app's profile editor. HP answered this with
+        // one fat payload so the app didn't need four round trips, and the stock
+        // GetAccountInfoAggregateAssistant hands OutAccountInfoAggregate straight
+        // through as the app's `accountAggregate`. (HP's typo "Aggretate" in the
+        // REQUEST key is real — it is what the assistant sends.)
+        $in      = $body['InAccountInfoAggretate'] ?? [];
+        $account = device_account_or_fail($repo, $in['token'] ?? '');
+        list($first, $last) = device_split_name($account['display_name']);
+        // The app echoes country/language back on save; we don't store either, so
+        // derive them from the locale the app sent and let them round-trip.
+        $locale = (string)($in['locale'] ?? 'en_US');
+        $parts  = preg_split('/[_-]/', $locale);
+        echo json_encode(['OutAccountInfoAggregate' => [
+            'accountInfo' => [
+                'firstName'    => $first,
+                'lastName'     => $last,
+                'email'        => $account['email'] ?: '',
+                'username'     => $account['username'],
+                // Not 'A'/'C': those two make the app offer "Resend Verification
+                // Email", and we have no email verification flow.
+                'accountState' => 'ACTIVE',
+                'language'     => strtolower($parts[0] ?? 'en'),
+                'country'      => strtoupper($parts[1] ?? 'US'),
+            ],
+            'accountDevices' => device_list_for($repo, $account['id']),
+            // We store no security questions — the profile editor shows the
+            // username in that row instead. These stay as harmless empties so a
+            // device running the patched service but the stock app still renders
+            // (ProfileSettings dereferences .question without a guard).
+            'acctChallengeQuestions'         => ['id' => 0, 'question' => ''],
+            'challengeQuestions'             => [],
+            'securityQuestionSelectedAnswer' => '',
+        ]]);
+        break;
+
+    case 'isUserValid':
+        // Re-auth gate: the profile editor asks for the account password before
+        // showing anything. Verifies only — issuing a token here would overwrite
+        // this device's uq_tokens_device row and invalidate the very token the
+        // app is about to edit with.
+        $in       = $body['InAuth'] ?? [];
+        $alias    = trim((string)($in['accountAlias'] ?? ''));
+        $password = (string)($in['password'] ?? '');
+        if ($alias === '' || $password === '') {
+            device_fail('INVALID_REQUEST');
+        }
+        $account = $repo->verifyDeviceLogin($alias, $password);
+        $out     = ['status' => (bool)$account];
+        if ($account) {
+            // The assistant writes this back to the local db8 profile, which is
+            // how a changed email propagates to a device that missed the change.
+            $out['accountAlias'] = $account['email'] ?: $account['username'];
+        }
+        echo json_encode(['OutUserValid' => $out]);
+        break;
+
+    case 'updateAccountInfo':
+        // The NAME row. Only the display name is written: the request also
+        // carries email/language/country, but email has its own method (and its
+        // own uniqueness rules) and we store no locale.
+        $in      = $body['InUpdateAccountInfo'] ?? [];
+        $acct    = $in['account'] ?? [];
+        $account = device_account_or_fail($repo, $in['authToken'] ?? '');
+        $first   = trim((string)($acct['firstName'] ?? ''));
+        $last    = trim((string)($acct['lastName'] ?? ''));
+        if ($first === '') {
+            device_fail('INVALID_REQUEST');
+        }
+        // The app collected the password at the re-auth gate and replays it here.
+        // Verify it against this account rather than trusting the token alone.
+        if (!$repo->verifyAccountPassword($account['id'], (string)($in['password'] ?? ''))) {
+            device_fail('PAMS1100');   // "The password you entered is incorrect."
+        }
+        $repo->updateProfile($account['id'], ['display_name' => trim($first . ' ' . $last)]);
+        echo json_encode(['OutUpdateAccountInfo' => ['returnValue' => true]]);
+        break;
+
+    case 'changeEmailAddress':
+        // The EMAIL row. Note this does NOT touch accounts.username even when the
+        // two happen to match (they do for every account created on-device):
+        // silently changing the login handle out from under the member would be
+        // worse than leaving a stale-looking one, and the username is separately
+        // editable now.
+        $in       = $body['InChangeEmailAddress'] ?? [];
+        $account  = device_account_or_fail($repo, $in['authToken'] ?? '');
+        $newEmail = trim((string)($in['newEmailAddress'] ?? ''));
+        if ($newEmail === '' || !filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
+            device_fail('PAMS1005');   // "Please enter a valid email address."
+        }
+        if (strcasecmp($newEmail, (string)$account['email']) === 0) {
+            device_fail('PAMS1123');   // "Cannot change to the same email address."
+        }
+        if ($repo->emailTaken($newEmail, $account['id'])) {
+            device_fail('PAMS1008');   // "Email address is already in use."
+        }
+        $repo->updateProfile($account['id'], ['email' => $newEmail]);
+        echo json_encode(['OutChangeEmailAddress' => ['returnValue' => true]]);
+        break;
+
+    case 'changePassword':
+        // The PASSWORD row. The device's existing tokens are deliberately left
+        // alive: revoking them here would sign the member out of the very device
+        // they are standing in front of, mid-edit.
+        $in       = $body['InChangePassword'] ?? [];
+        $account  = device_account_or_fail($repo, $in['authToken'] ?? '');
+        $newPass  = (string)($in['newPassword'] ?? '');
+        if ($newPass === '') {
+            device_fail('INVALID_REQUEST');
+        }
+        // Same floor as account creation, so a password set here could also have
+        // been used to sign up.
+        if (strlen($newPass) < 8) {
+            device_fail('WEAK_PASSWORD');
+        }
+        $repo->setPassword($account['id'], $newPass);
+        echo json_encode(['OutChangePassword' => ['returnValue' => true]]);
+        break;
+
+    case 'assignDeviceName':
+        // The device naming itself, shortly after sign-in. Previously unimplemented
+        // (the call failed silently), which is why the DEVICES list had nothing
+        // human-readable to show. The assistant reads back .InAssignDeviceName
+        // .assignedName — HP used the "In" prefix on the response too.
+        $in      = $body['InAssignDeviceName'] ?? [];
+        $account = device_account_or_fail($repo, $in['authToken'] ?? '');
+        $name    = trim((string)($in['name'] ?? ''));
+        $nduId   = trim((string)($in['nduId'] ?? ''));
+        if ($name === '' || $nduId === '') {
+            device_fail('INVALID_REQUEST');
+        }
+        $repo->setDeviceName($account['id'], $nduId, $name);
+        echo json_encode(['InAssignDeviceName' => ['assignedName' => substr($name, 0, 64)]]);
+        break;
+
+    case 'updateUsername':
+        // Ours, not HP's — reached from the USERNAME row the Accounts app shows
+        // where HP put the security question. On success the service also writes
+        // the new username into the local db8 profile so other apps pick it up
+        // from getAccountToken without another sign-in.
+        $in       = $body['InUpdateUsername'] ?? [];
+        $account  = device_account_or_fail($repo, $in['authToken'] ?? '');
+        $username = trim((string)($in['username'] ?? ''));
+        if ($username === (string)$account['username']) {
+            // No-op rather than an error: the dialog opens pre-filled, so saving
+            // an untouched field is the most likely "edit" of all. Compared
+            // exactly, not case-insensitively, so "jon" -> "Jon" is still a real
+            // change (usernameTaken excludes this account, so it won't collide).
+            echo json_encode(['OutUpdateUsername' => ['username' => $account['username']]]);
+            break;
+        }
+        if ($err = device_username_error($username)) {
+            device_fail($err);
+        }
+        if ($repo->usernameTaken($username, $account['id'])) {
+            device_fail('USERNAME_TAKEN');
+        }
+        $repo->updateProfile($account['id'], ['username' => $username]);
+        echo json_encode(['OutUpdateUsername' => ['username' => $username]]);
         break;
 
     case 'getUserInstalledApps_ext2':

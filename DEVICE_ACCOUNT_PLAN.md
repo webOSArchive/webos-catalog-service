@@ -94,6 +94,20 @@ Normal PHP in this repo; no device risk. New rate-limited endpoints under `WebSe
 - Map the palmprofile vocabulary onto these: `isEmailAvailable`→check endpoint,
   `getAccountToken`→`device/token`, `getAggregatedAccountInfo`→profile read.
 
+> **Built (2026-08-06), with two deviations.** Everything is `device.php?m=<method>`, not REST
+> paths, and the shared app-key was never added (the per-IP rate limit is the only gate on
+> account creation). The profile read is now live as `?m=getAccountInfoAggregate`, which
+> unblocked the **stock Accounts settings app** — tapping the account row there used to fail
+> with "Must be connected to a network to communicate with HP's Cloud Services" purely because
+> that one method 404'd. Its whole profile editor is now backed: `isUserValid` (re-auth gate),
+> `updateAccountInfo` (name), `changeEmailAddress`, `changePassword`, and `assignDeviceName`
+> — the last of which had been failing silently since day one, which is why the DEVICES list
+> had no readable names. Plus `?m=updateUsername`, which is ours rather than HP's: accounts are
+> created with `username` = the member's email, and the Accounts app now shows an editable
+> **Username** row where HP had the security question (we store no security answers). The
+> device publishes the chosen handle to every other app through `getAccountToken`'s new
+> `accountUsername` field.
+
 **Transport:** the OTA ships modern TLS, so target **HTTPS** to the origin. Keep the base URL
 config-driven (one string) so it can fall back to HTTP or the `oauth.wosa.link` broker for any
 not-yet-upgraded device. Tokens are bearer secrets; NDUID is treated as non-secret.

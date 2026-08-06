@@ -107,6 +107,48 @@ class AccountRepository {
         return $stmt->execute([$hash, (int)$accountId]);
     }
 
+    /**
+     * Update the self-service profile fields (username, email, display_name).
+     * Only the keys present in $fields are touched. Uniqueness is the caller's
+     * job (see usernameTaken()/emailTaken()); a race still hits the UNIQUE
+     * indexes on accounts.username/email and throws.
+     *
+     * @return bool false when $fields contained nothing updatable.
+     */
+    public function updateProfile($accountId, array $fields) {
+        $allowed = ['username', 'email', 'display_name'];
+        $set     = [];
+        $args    = [];
+        foreach ($allowed as $col) {
+            if (array_key_exists($col, $fields)) {
+                $set[]  = "$col = ?";
+                $args[] = $fields[$col];
+            }
+        }
+        if (!$set) {
+            return false;
+        }
+        $args[] = (int)$accountId;
+        $stmt = $this->db->prepare("UPDATE accounts SET " . implode(', ', $set) . " WHERE id = ?");
+        return $stmt->execute($args);
+    }
+
+    /** Is $username already used by an account other than $exceptAccountId? */
+    public function usernameTaken($username, $exceptAccountId = null) {
+        $stmt = $this->db->prepare("SELECT id FROM accounts WHERE username = ? LIMIT 1");
+        $stmt->execute([$username]);
+        $id = $stmt->fetchColumn();
+        return $id !== false && (int)$id !== (int)$exceptAccountId;
+    }
+
+    /** Is $email already used by an account other than $exceptAccountId? */
+    public function emailTaken($email, $exceptAccountId = null) {
+        $stmt = $this->db->prepare("SELECT id FROM accounts WHERE email = ? LIMIT 1");
+        $stmt->execute([$email]);
+        $id = $stmt->fetchColumn();
+        return $id !== false && (int)$id !== (int)$exceptAccountId;
+    }
+
     public function setStatus($accountId, $status) {
         $stmt = $this->db->prepare("UPDATE accounts SET status = ? WHERE id = ?");
         return $stmt->execute([$status, (int)$accountId]);
@@ -173,11 +215,30 @@ class AccountRepository {
     }
 
     /**
+     * Verify a password against one known account, WITHOUT minting a token.
+     *
+     * This is the re-authentication check ("confirm your password to edit your
+     * profile"), not a sign-in. Deliberately separate from verifyDeviceLogin():
+     * issuing a token here would overwrite the caller's own uq_tokens_device row
+     * and silently invalidate the token it is currently authenticating with.
+     * Runs exactly one password_verify() like the other verify* methods.
+     */
+    public function verifyAccountPassword($accountId, $password) {
+        $stmt = $this->db->prepare("SELECT password_hash, status FROM accounts WHERE id = ?");
+        $stmt->execute([(int)$accountId]);
+        $row  = $stmt->fetch();
+        $hash = (!empty($row['password_hash'])) ? $row['password_hash'] : self::DUMMY_HASH;
+        $ok   = password_verify($password, $hash);
+        return (bool)($row && $row['status'] === 'active' && !empty($row['password_hash']) && $ok);
+    }
+
+    /**
      * Issue a device auth token for an account. Returns the RAW token once (to
      * hand to the client); only its sha256 hash is stored. $deviceId is the
-     * client's nduid/device id. $ttlDays null => no expiry.
+     * client's nduid/device id. $ttlDays null => no expiry. $deviceMeta may carry
+     * name/model/os for the account's device list (see 0005_device_profile_meta).
      */
-    public function issueDeviceToken($accountId, $deviceId = null, $userAgent = null, $ttlDays = 365) {
+    public function issueDeviceToken($accountId, $deviceId = null, $userAgent = null, $ttlDays = 365, array $deviceMeta = []) {
         $raw     = bin2hex(random_bytes(32));
         $hash    = hash('sha256', $raw);
         $expires = ($ttlDays === null) ? null : date('Y-m-d H:i:s', time() + ((int)$ttlDays * 86400));
@@ -186,20 +247,34 @@ class AccountRepository {
         // latest token, so the replaced row was unusable anyway. created_at is
         // preserved as "first seen". Tokens without a device id just insert
         // (unique index ignores NULLs).
+        // COALESCE on the metadata columns so a caller that knows nothing about
+        // the device (refreshDeviceToken, authenticateWeb) keeps whatever the
+        // sign-in captured instead of blanking the device list.
         $stmt = $this->db->prepare(
-            "INSERT INTO account_tokens (account_id, token_hash, device_id, user_agent, expires_at)
-             VALUES (?, ?, ?, ?, ?)
+            "INSERT INTO account_tokens
+                (account_id, token_hash, device_id, device_name, device_model, device_os, user_agent, expires_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
              ON DUPLICATE KEY UPDATE
                 account_id   = VALUES(account_id),
                 token_hash   = VALUES(token_hash),
+                device_name  = COALESCE(VALUES(device_name),  device_name),
+                device_model = COALESCE(VALUES(device_model), device_model),
+                device_os    = COALESCE(VALUES(device_os),    device_os),
                 user_agent   = VALUES(user_agent),
                 expires_at   = VALUES(expires_at),
                 last_seen_at = NOW()"
         );
+        $clip = function ($v, $n) {
+            $v = ($v === null) ? null : trim((string)$v);
+            return ($v === null || $v === '') ? null : substr($v, 0, $n);
+        };
         $stmt->execute([
             (int)$accountId,
             $hash,
             $deviceId  !== null ? substr((string)$deviceId, 0, 128)  : null,
+            $clip($deviceMeta['name']  ?? null, 64),
+            $clip($deviceMeta['model'] ?? null, 64),
+            $clip($deviceMeta['os']    ?? null, 64),
             $userAgent !== null ? substr((string)$userAgent, 0, 255) : null,
             $expires,
         ]);
@@ -209,13 +284,34 @@ class AccountRepository {
     /** Devices registered to an account (Q: "how many devices does an account have?"). */
     public function devicesForAccount($accountId) {
         $stmt = $this->db->prepare(
-            "SELECT device_id, user_agent, created_at, last_seen_at, expires_at
+            "SELECT device_id, device_name, device_model, device_os, user_agent,
+                    created_at, last_seen_at, expires_at
                FROM account_tokens
               WHERE account_id = ? AND device_id IS NOT NULL
               ORDER BY created_at"
         );
         $stmt->execute([(int)$accountId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Set the friendly name of one of an account's devices (the device names
+     * itself via assignDeviceName after sign-in). Scoped by account_id so a
+     * token can only rename devices on its own account.
+     */
+    public function setDeviceName($accountId, $deviceId, $name) {
+        if ($deviceId === null || $deviceId === '') {
+            return false;
+        }
+        $stmt = $this->db->prepare(
+            "UPDATE account_tokens SET device_name = ? WHERE account_id = ? AND device_id = ?"
+        );
+        $name = trim((string)$name);
+        return $stmt->execute([
+            $name === '' ? null : substr($name, 0, 64),
+            (int)$accountId,
+            substr((string)$deviceId, 0, 128),
+        ]);
     }
 
     /** Resolve a device id (nduid) to the account currently signed in on it, or null. */
