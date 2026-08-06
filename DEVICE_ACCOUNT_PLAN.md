@@ -107,6 +107,19 @@ Normal PHP in this repo; no device risk. New rate-limited endpoints under `WebSe
 > **Username** row where HP had the security question (we store no security answers). The
 > device publishes the chosen handle to every other app through `getAccountToken`'s new
 > `accountUsername` field.
+>
+> **Since (2026-08-06, later the same day):** `updateAccountInfo` (the NAME row) stopped
+> requiring a password — it inherited that requirement from the app's now-removed re-auth
+> gate, which left the endpoint uncallable once the gate came out; it authenticates on the
+> device token alone now, like every other write method here. `account_tokens` gained
+> `device_name`/`device_model`/`device_os` (migration `0005_device_profile_meta.sql`), captured
+> from the device block already sent at sign-in, so the DEVICES list shows more than a hardware
+> SKU. `authenticateWeb` takes an optional `device_name`, so a browser/PWA session reads as
+> `PWA-<name>` instead of falling through to the generic "webOS device" label. And the device
+> gained its own **`syncDeviceName`**/**`signOut`** service methods (in `webos-account-manager`,
+> not this repo) — `signOut` calls `deauthenticate` here and, on success or failure alike,
+> clears the local profile so the device always ends up signed out even if the network call
+> didn't land.
 
 **Transport:** the OTA ships modern TLS, so target **HTTPS** to the origin. Keep the base URL
 config-driven (one string) so it can fall back to HTTP or the `oauth.wosa.link` broker for any
