@@ -166,6 +166,7 @@ include 'includes/header.php';
                                 <a href="app-edit.php?id=<?php echo $app['id']; ?>">Edit</a>
                                 <a href="metadata-edit.php?id=<?php echo $app['id']; ?>">Metadata</a>
                                 <a href="app-images.php?id=<?php echo $app['id']; ?>">Images</a>
+                                <a href="../showMuseumDetails.php?app=<?php echo $app['id']; ?>" target="_blank" rel="noopener">View</a>
                             </div>
                         </div>
                     </td>

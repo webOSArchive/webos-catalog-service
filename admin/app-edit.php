@@ -188,14 +188,28 @@ if (isset($_GET['saved'])) {
     $success = true;
 }
 
+// Shared quick-actions row, rendered above and below the form so they're
+// reachable without scrolling either way.
+function admin_app_quick_actions($id, $isNew) {
+    if (!$isNew) {
+        ?>
+        <a href="app-images.php?id=<?php echo (int)$id; ?>" class="btn">Manage Images</a>
+        <a href="metadata-edit.php?id=<?php echo (int)$id; ?>" class="btn">Edit Metadata</a>
+        <a href="../showMuseumDetails.php?app=<?php echo (int)$id; ?>" class="btn" target="_blank" rel="noopener">View App</a>
+        <?php
+    }
+    ?>
+    <a href="apps.php" class="btn">Back to Apps</a>
+    <?php
+}
+
 include 'includes/header.php';
 ?>
 
 <div class="page-header">
     <h1><?php echo $pageTitle; ?><?php echo $id ? " (ID: $id)" : ''; ?></h1>
     <div>
-        <?php if (!$isNew): ?><a href="app-images.php?id=<?php echo (int)$id; ?>" class="btn">Manage Images</a><?php endif; ?>
-        <a href="apps.php" class="btn">Back to Apps</a>
+        <?php admin_app_quick_actions($id, $isNew); ?>
     </div>
 </div>
 
@@ -416,10 +430,7 @@ include 'includes/header.php';
 
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary"><?php echo $isNew ? 'Create App' : 'Save Changes'; ?></button>
-                <a href="apps.php" class="btn">Cancel</a>
-                <?php if (!$isNew): ?>
-                <a href="metadata-edit.php?id=<?php echo $id; ?>" class="btn">Edit Metadata</a>
-                <?php endif; ?>
+                <?php admin_app_quick_actions($id, $isNew); ?>
             </div>
         </form>
     </div>
