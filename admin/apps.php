@@ -6,9 +6,11 @@ $pageTitle = 'Apps';
 require_once __DIR__ . '/includes/security.php';
 require_once __DIR__ . '/../includes/Database.php';
 require_once __DIR__ . '/../includes/AppRepository.php';
+$config = require __DIR__ . '/../WebService/config.php';
 
 $db = Database::getInstance()->getConnection();
 $repo = new AppRepository();
+$imgBase = '//' . rtrim($config['image_host'] ?? '', '/') . '/'; // icon thumbnails
 
 // Apps area: full managers see everything; owners (e.g. developers) see only
 // the apps their account owns.
@@ -145,7 +147,10 @@ include 'includes/header.php';
                     <td><?php echo htmlspecialchars($app['id']); ?></td>
                     <td>
                         <?php if (!empty($app['appIcon'])): ?>
-                        <img src="<?php echo htmlspecialchars($app['appIcon']); ?>" alt="" onerror="this.style.display='none'">
+                        <?php $iconSrc = strpos($app['appIcon'], '://') === false
+                            ? $imgBase . strtolower(ltrim($app['appIcon'], '/'))
+                            : $app['appIcon']; ?>
+                        <img src="<?php echo htmlspecialchars($iconSrc); ?>" alt="" onerror="this.style.display='none'">
                         <?php endif; ?>
                     </td>
                     <td><?php echo htmlspecialchars($app['title']); ?></td>
@@ -155,9 +160,14 @@ include 'includes/header.php';
                     <td><?php echo (int)$app['recommendation_order']; ?></td>
                     <td><span class="status-badge status-<?php echo $app['status']; ?>"><?php echo $app['status']; ?></span></td>
                     <td>
-                        <a href="app-edit.php?id=<?php echo $app['id']; ?>" class="btn btn-sm">Edit</a>
-                        <a href="metadata-edit.php?id=<?php echo $app['id']; ?>" class="btn btn-sm">Metadata</a>
-                        <a href="app-images.php?id=<?php echo $app['id']; ?>" class="btn btn-sm">Images</a>
+                        <div class="action-menu">
+                            <button type="button" class="btn btn-sm action-menu-toggle" aria-haspopup="true" aria-expanded="false">Actions</button>
+                            <div class="action-menu-list">
+                                <a href="app-edit.php?id=<?php echo $app['id']; ?>">Edit</a>
+                                <a href="metadata-edit.php?id=<?php echo $app['id']; ?>">Metadata</a>
+                                <a href="app-images.php?id=<?php echo $app['id']; ?>">Images</a>
+                            </div>
+                        </div>
                     </td>
                 </tr>
                 <?php endforeach; ?>

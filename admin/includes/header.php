@@ -33,7 +33,7 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
         </button>
         <div class="nav-menu" id="navMenu">
         <ul class="nav-links">
-            <li><a href="index.php" class="<?php echo $currentPage === 'index' ? 'active' : ''; ?>">Dashboard</a></li>
+            <li><a href="index.php" class="<?php echo in_array($currentPage, ['index', 'stats'], true) ? 'active' : ''; ?>"><?php echo admin_has_capability('apps.edit') ? 'Dashboard' : 'Stats'; ?></a></li>
             <?php if (admin_has_capability('apps.edit') || admin_has_capability('apps.own')): ?>
             <li><a href="apps.php" class="<?php echo $currentPage === 'apps' ? 'active' : ''; ?>">Apps</a></li>
             <?php endif; ?>

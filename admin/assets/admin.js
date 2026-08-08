@@ -26,6 +26,42 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// Per-row action popup menus (.action-menu / .action-menu-toggle / .action-menu-list)
+document.addEventListener('click', function (e) {
+    var toggle = e.target.closest('.action-menu-toggle');
+    var openMenu = document.querySelector('.action-menu.open');
+
+    if (toggle) {
+        var menu = toggle.closest('.action-menu');
+        var wasOpen = menu.classList.contains('open');
+        if (openMenu && openMenu !== menu) {
+            openMenu.classList.remove('open');
+        }
+        menu.classList.toggle('open', !wasOpen);
+        toggle.setAttribute('aria-expanded', !wasOpen ? 'true' : 'false');
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+    }
+
+    if (openMenu && !openMenu.contains(e.target)) {
+        openMenu.classList.remove('open');
+        var t = openMenu.querySelector('.action-menu-toggle');
+        if (t) t.setAttribute('aria-expanded', 'false');
+    }
+});
+
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+        var openMenu = document.querySelector('.action-menu.open');
+        if (openMenu) {
+            openMenu.classList.remove('open');
+            var t = openMenu.querySelector('.action-menu-toggle');
+            if (t) t.setAttribute('aria-expanded', 'false');
+        }
+    }
+});
+
 // Select all checkboxes
 function toggleSelectAll(checkbox) {
     var checkboxes = document.querySelectorAll('input[name="selected[]"]');

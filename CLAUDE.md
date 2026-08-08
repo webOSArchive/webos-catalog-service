@@ -88,6 +88,8 @@ CRUD interface for managing catalog data. Secured via nginx basic auth + CSRF pr
 
 | Page | Purpose |
 |------|---------|
+| `index.php` | Dashboard with catalog stats + recently updated apps; requires `apps.edit`, otherwise redirects to `stats.php` |
+| `stats.php` | Read-only version of the Dashboard (same numbers, no edit links) for logged-in accounts without `apps.edit`, e.g. `developer` |
 | `apps.php` | App list with search/filter/sort (by title, recommendation, or ID) |
 | `app-edit.php` | Create/edit apps (includes recommendation_order) |
 | `metadata-edit.php` | Edit extended metadata, screenshots, and lastModifiedTime |
