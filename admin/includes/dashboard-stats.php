@@ -44,12 +44,15 @@ function admin_get_dashboard_stats() {
     // Session stats
     $stats['active_sessions'] = $sessionRepo->getActiveSessionCount();
 
-    // Recent apps (last 10 updated)
+    // Recent apps (last 10 updated, by app_metadata.last_modified_time - the
+    // catalog's "recent" sort field - not apps.updated_at, which just tracks
+    // when the row itself was last written)
     $stmt = $db->query("
-        SELECT a.id, a.title, a.author, a.status, a.updated_at, c.name as category
+        SELECT a.id, a.title, a.author, a.status, m.last_modified_time, c.name as category
         FROM apps a
         LEFT JOIN categories c ON a.category_id = c.id
-        ORDER BY a.updated_at DESC
+        LEFT JOIN app_metadata m ON a.id = m.app_id
+        ORDER BY m.last_modified_time IS NULL, m.last_modified_time DESC
         LIMIT 10
     ");
     $recentApps = $stmt->fetchAll();

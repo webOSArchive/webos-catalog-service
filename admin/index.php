@@ -100,7 +100,7 @@ include 'includes/header.php';
                     <td><?php echo htmlspecialchars($app['author']); ?></td>
                     <td><?php echo htmlspecialchars($app['category'] ?? '-'); ?></td>
                     <td><span class="status-badge status-<?php echo $app['status']; ?>"><?php echo $app['status']; ?></span></td>
-                    <td><?php echo date('M j, Y', strtotime($app['updated_at'])); ?></td>
+                    <td><?php echo $app['last_modified_time'] ? date('M j, Y', strtotime($app['last_modified_time'])) : '-'; ?></td>
                     <td>
                         <a href="app-edit.php?id=<?php echo $app['id']; ?>" class="btn btn-sm">Edit</a>
                     </td>
