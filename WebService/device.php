@@ -42,6 +42,11 @@
  *   ?m=authenticateWeb   {login, password, device_id} -> {token, expires_at, account}
  *   ?m=refreshToken      {token} -> {token, expires_at}   (old token is invalidated)
  *   ?m=deauthenticate    {token} -> {deauthenticated}     (sign-out; idempotent)
+ *   ?m=getAccountInfo    -> {username, email, display_name}  live lookup for SDK
+ *                        clients (webos-common/AppStorage), bypassing the
+ *                        on-device db8 profile cache. Token via "Authorization:
+ *                        PalmAuth token=…" (same convention as storage.php),
+ *                        falling back to query/body.
  *
  * A "webOS Account" IS a catalog `accounts` row; the device gets a per-device
  * token in `account_tokens` (device_id = nduid). Web self-signup stays disabled;
