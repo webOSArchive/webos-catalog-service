@@ -185,6 +185,9 @@ include 'includes/header.php';
         </p>
         <p style="color:#777;font-size:13px;">Values are opaque, client-scrambled blobs (not human-readable) — this downloads exactly what's stored, as JSON.</p>
         <a href="account.php?export_storage=1" class="btn" <?php echo $storageUsage['keys'] > 0 ? '' : 'aria-disabled="true" style="pointer-events:none;opacity:0.5;"'; ?>>Download My Data</a>
+        <?php if ($storageUsage['keys'] === 0): ?>
+        <span style="color:#999;font-size:13px;">(No data stored)</span>
+        <?php endif; ?>
 
         <?php if ($storageSuccess): ?>
         <div class="alert alert-success" style="margin-top:15px;"><?php echo htmlspecialchars($storageSuccess); ?></div>
@@ -201,6 +204,9 @@ include 'includes/header.php';
                 <?php echo csrf_field(); ?>
                 <input type="hidden" name="action" value="delete_storage">
                 <button type="submit" class="btn btn-danger" <?php echo $storageUsage['keys'] > 0 ? '' : 'disabled'; ?>>Delete My Data</button>
+                <?php if ($storageUsage['keys'] === 0): ?>
+                <span style="color:#999;font-size:13px;">(No data stored)</span>
+                <?php endif; ?>
             </form>
         </div>
     </div>
