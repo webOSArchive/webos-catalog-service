@@ -91,31 +91,27 @@ class RateLimit {
      * Get client IP address with proxy support
      * @return string
      */
+    /**
+     * Only CF-Connecting-IP and REMOTE_ADDR are trusted here. Every other
+     * "forwarded for" style header (X-Forwarded-For, X-Forwarded,
+     * X-Cluster-Client-IP, Forwarded-For, Forwarded, Client-IP) is set
+     * verbatim from whatever the client sends - a request can carry any
+     * value it likes, so keying rate limits (e.g. the admin login lockout)
+     * off them lets an attacker pick a fresh "IP" on every attempt and
+     * bypass the limit entirely. CF-Connecting-IP is safe to trust *because*
+     * this site sits behind Cloudflare's edge, which sets that header from
+     * the real TCP connection and overwrites any client-supplied value of
+     * the same name - but only as long as the origin server itself isn't
+     * reachable directly (bypassing Cloudflare); that's an infrastructure
+     * guarantee (origin firewalled to Cloudflare's IP ranges), not something
+     * this code can enforce.
+     */
     public function getClientIP() {
-        $headers_to_check = [
-            'HTTP_CF_CONNECTING_IP',     // Cloudflare
-            'HTTP_CLIENT_IP',
-            'HTTP_X_FORWARDED_FOR',
-            'HTTP_X_FORWARDED',
-            'HTTP_X_CLUSTER_CLIENT_IP',
-            'HTTP_FORWARDED_FOR',
-            'HTTP_FORWARDED',
-            'REMOTE_ADDR'
-        ];
-        
-        foreach ($headers_to_check as $header) {
-            if (!empty($_SERVER[$header])) {
-                $ip = $_SERVER[$header];
-                // Handle comma-separated IPs (X-Forwarded-For)
-                if (strpos($ip, ',') !== false) {
-                    $ip = trim(explode(',', $ip)[0]);
-                }
-                if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
-                    return $ip;
-                }
-            }
+        $ip = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? '';
+        if ($ip !== '' && filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+            return $ip;
         }
-        
+
         return $_SERVER['REMOTE_ADDR'] ?? 'unknown';
     }
     

@@ -58,6 +58,31 @@ class StorageRepository {
         return array_map([$this, 'publicRecord'], $stmt->fetchAll());
     }
 
+    /**
+     * Every stored record for this account, across all apps — for the
+     * self-service "download my data" export (admin/account.php).
+     * @return array app_id => [{key, value, revision, updated_at}, ...]
+     */
+    public function getAllForAccount($accountId) {
+        $stmt = $this->db->prepare(
+            "SELECT app_id, data_key, value, revision, updated_at
+               FROM account_app_storage
+              WHERE account_id = ?
+              ORDER BY app_id, data_key"
+        );
+        $stmt->execute([(int)$accountId]);
+        $out = [];
+        foreach ($stmt->fetchAll() as $row) {
+            $out[$row['app_id']][] = [
+                'key'        => $row['data_key'],
+                'value'      => $row['value'],
+                'revision'   => (int)$row['revision'],
+                'updated_at' => $row['updated_at'],
+            ];
+        }
+        return $out;
+    }
+
     /** Keys + revisions only — cheap "what changed" poll without the blobs. */
     public function listKeys($accountId, $appId) {
         $stmt = $this->db->prepare(

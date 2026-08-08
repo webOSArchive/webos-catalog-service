@@ -321,14 +321,18 @@ $app_detail = $metaRepo->getMetadata((int)$found_id);
 //Improve some strings for web output
 $img_path = $PROTOCOL . $config["image_host"] . "/";
 if (isset($app_detail["description"])) {
-	$app_detail["description"] = str_replace("\n", "<br>", $app_detail["description"]);
+	// Escape first so admin-entered text can't inject markup, then turn real
+	// newlines into <br> (order matters: \r\n before \n, or \n eats half of it).
+	$app_detail["description"] = htmlspecialchars($app_detail["description"]);
 	$app_detail["description"] = str_replace("\r\n", "<br>", $app_detail["description"]);
+	$app_detail["description"] = str_replace("\n", "<br>", $app_detail["description"]);
 } else {
 	$app_detail["description"] = "";
 }
 if (isset($app_detail["versionNote"])) {
-	$app_detail["versionNote"] = str_replace("\n", "<br>", $app_detail["versionNote"]);
+	$app_detail["versionNote"] = htmlspecialchars($app_detail["versionNote"]);
 	$app_detail["versionNote"] = str_replace("\r\n", "<br>", $app_detail["versionNote"]);
+	$app_detail["versionNote"] = str_replace("\n", "<br>", $app_detail["versionNote"]);
 } else {
 	$app_detail["versionNote"] = "";
 }
@@ -388,7 +392,7 @@ function mm_dev_on($app, $key) {
 	return isset($app[$key]) && !empty($app[$key]);
 }
 ?>
-<title><?php echo $found_app["title"] ?> - webOS App Museum</title>
+<title><?php echo htmlspecialchars($found_app["title"]); ?> - webOS App Museum</title>
 <link rel="stylesheet" href="museum-modern.css">
 <script src="downloadHelper.php"></script>
 </head>
@@ -424,7 +428,7 @@ function mm_dev_on($app, $key) {
 				if (strstr(strtolower($browserAsString), "webos") || strstr(strtolower($browserAsString), "hpwos")) {
 					$plainURI = str_replace("https://", "http://", $plainURI);
 				?>
-					<a class="mm-dl" href="<?php echo $plainURI ?>">Preware Link</a>
+					<a class="mm-dl" href="<?php echo htmlspecialchars($plainURI, ENT_QUOTES); ?>">Preware Link</a>
 					<a class="mm-dl-note" href="javascript:showHelp()">(?)</a>
 				<?php
 				} else {

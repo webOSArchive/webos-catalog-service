@@ -51,6 +51,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         'status'       => 'active',
                     ]);
                     $repo->assignRole($id, $role);
+                    // Baseline so a new account is never role-less (which
+                    // blocks login entirely, see AccountRepository/login.php's
+                    // admin.access check) even before its "real" role lands.
+                    if ($role !== 'viewer') {
+                        $repo->assignRole($id, 'viewer');
+                    }
                     $success = "Created account '{$username}'.";
                 } catch (PDOException $e) {
                     $errors[] = ($e->getCode() == 23000)

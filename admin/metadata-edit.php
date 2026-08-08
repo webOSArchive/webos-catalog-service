@@ -20,6 +20,7 @@ if (!$id) {
 
 // Apps area gate; owners may only touch metadata for apps they own.
 admin_require_any(['apps.edit', 'apps.own']);
+$canEditAll = admin_has_capability('apps.edit');
 if (admin_is_owner_only()) {
     $ownApp = $appRepo->getById($id);
     if (!$ownApp || (int)($ownApp['owner_account_id'] ?? 0) !== (int) current_account()['id']) {
@@ -70,6 +71,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'mediaLink' => trim($_POST['mediaLink'] ?? ''),
         'mediaIcon' => trim($_POST['mediaIcon'] ?? '')
     ];
+
+    if (!$canEditAll) {
+        // ipk-manager.php authorizes owner-scoped uploads by matching the
+        // upload filename against this app's publicApplicationId. Letting an
+        // owner-only account set it themselves would let them point it at
+        // another app's real IPK filename and overwrite that app's package.
+        $data['publicApplicationId'] = $metadata['public_application_id'] ?? '';
+    }
 
     // Process screenshots
     $imageData = [];
@@ -142,8 +151,12 @@ include 'includes/header.php';
         <form method="post" class="admin-form">
             <div class="form-group">
                 <label>Package ID (publicApplicationId)</label>
-                <input type="text" name="publicApplicationId" value="<?php echo htmlspecialchars($metadata['public_application_id'] ?? ''); ?>">
+                <input type="text" name="publicApplicationId" value="<?php echo htmlspecialchars($metadata['public_application_id'] ?? ''); ?>"<?php echo $canEditAll ? '' : ' readonly'; ?>>
+                <?php if ($canEditAll): ?>
                 <small>e.g., com.example.myapp</small>
+                <?php else: ?>
+                <small>IPK uploads are matched against this ID, so only full managers can change it.</small>
+                <?php endif; ?>
             </div>
 
             <div class="form-group">

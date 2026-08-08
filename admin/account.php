@@ -4,14 +4,34 @@
  * Any logged-in account may change its own password (no special capability).
  */
 require_once __DIR__ . '/includes/security.php';
+require_once __DIR__ . '/../includes/StorageRepository.php';
 $pageTitle = 'My Account';
 
-$repo    = new AccountRepository();
+$repo        = new AccountRepository();
+$storageRepo = new StorageRepository();
 $me      = current_account();
 $errors  = [];
 $usernameErrors = [];
 $success = '';
 $usernameSuccess = '';
+
+// Self-service data export (app storage is opaque, client-scrambled blobs -
+// see StorageRepository's docblock - so this hands back exactly what's
+// stored, not human-readable values). Handled before any HTML output so the
+// response can be a raw file download instead of a page render.
+if (isset($_GET['export_storage'])) {
+    $safeUsername = preg_replace('/[^A-Za-z0-9._-]/', '_', $me['username']);
+    header('Content-Type: application/json');
+    header('Content-Disposition: attachment; filename="app-storage-' . $safeUsername . '.json"');
+    echo json_encode([
+        'account'     => $me['username'],
+        'exported_at' => date('c'),
+        'apps'        => $storageRepo->getAllForAccount($me['id']),
+    ], JSON_PRETTY_PRINT);
+    exit;
+}
+
+$storageUsage = $storageRepo->usage($me['id'])['account'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'change_username') {
     if (!csrf_validate()) {
@@ -131,6 +151,21 @@ include 'includes/header.php';
             </div>
             <button type="submit" class="btn btn-primary">Change Password</button>
         </form>
+    </div>
+</div>
+
+<div class="card" style="max-width:480px;">
+    <div class="card-header"><h2>My App Storage Data</h2></div>
+    <div class="card-body">
+        <p style="color:#777;font-size:13px;margin-top:0;">
+            <?php if ($storageUsage['keys'] > 0): ?>
+            <?php echo number_format($storageUsage['keys']); ?> value<?php echo $storageUsage['keys'] === 1 ? '' : 's'; ?> stored, <?php echo number_format($storageUsage['bytes']); ?> bytes total.
+            <?php else: ?>
+            No app storage data on this account yet.
+            <?php endif; ?>
+        </p>
+        <p style="color:#777;font-size:13px;">Values are opaque, client-scrambled blobs (not human-readable) — this downloads exactly what's stored, as JSON.</p>
+        <a href="account.php?export_storage=1" class="btn" <?php echo $storageUsage['keys'] > 0 ? '' : 'aria-disabled="true" style="pointer-events:none;opacity:0.5;"'; ?>>Download My Data</a>
     </div>
 </div>
 
