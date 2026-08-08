@@ -61,6 +61,11 @@ body {
     text-decoration: none;
 }
 
+.nav-actions a:hover {
+    color: white;
+    text-decoration: underline;
+}
+
 /* --- Collapsible nav: hamburger only when the items don't fit --- */
 .nav-menu {
     display: flex;
