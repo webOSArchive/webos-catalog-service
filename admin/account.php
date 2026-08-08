@@ -184,7 +184,7 @@ include 'includes/header.php';
             <?php endif; ?>
         </p>
         <p style="color:#777;font-size:13px;">Stored values are client-scrambled blobs (not encrypted, but also not human-readable) — this downloads exactly what's stored, as JSON.</p>
-        <a href="account.php?export_storage=1" class="btn" <?php echo $storageUsage['keys'] > 0 ? '' : 'aria-disabled="true" style="pointer-events:none;opacity:0.5;"'; ?>>Download My Data</a>
+        <a href="account.php?export_storage=1" class="btn btn-primary" <?php echo $storageUsage['keys'] > 0 ? '' : 'aria-disabled="true" style="pointer-events:none;opacity:0.5;"'; ?>>Download My Data</a>
         <?php if ($storageUsage['keys'] === 0): ?>
         <span style="color:#999;font-size:13px;">(No data stored)</span>
         <?php endif; ?>

@@ -160,6 +160,25 @@ function device_account_or_fail($repo, $token) {
 }
 
 /**
+ * Bearer token for the plain-JSON SDK endpoints — header first (what the
+ * AppStorage SDK's _request() sends automatically, same as storage.php),
+ * falling back to query/body for clients that can't set headers.
+ */
+function device_bearer_token($body) {
+    $auth = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+    if ($auth !== '' && preg_match('/token=([A-Za-z0-9]+)/', $auth, $m)) {
+        return $m[1];
+    }
+    if (!empty($_GET['token'])) {
+        return (string)$_GET['token'];
+    }
+    if (!empty($body['token'])) {
+        return (string)$body['token'];
+    }
+    return null;
+}
+
+/**
  * Split a stored display_name back into the first/last pair the Accounts app
  * edits. Lossy for multi-word given names ("Mary Jo Smith" -> "Mary"/"Jo
  * Smith"), but it round-trips: the app rejoins them with a space on save.
@@ -545,6 +564,28 @@ switch ($method) {
             $repo->revokeDeviceToken($token);
         }
         echo json_encode(['deauthenticated' => true]);
+        break;
+
+    case 'getAccountInfo':
+        // Live account lookup for SDK clients (webos-common/AppStorage's
+        // useDeviceAccount) — a database read, not the on-device db8 profile
+        // cache. That cache (accountUsername in authenticate_info_ex() above,
+        // written to db8 by the patched getToken()) is only refreshed on the
+        // device's own sign-in/username-change flows, so it can go stale for
+        // minutes-to-forever after a change made through /admin. This method
+        // gives apps a way to always see the current value.
+        $token   = device_bearer_token($body);
+        $account = $token !== null ? $repo->verifyDeviceToken($token) : null;
+        if (!$account) {
+            http_response_code(401);
+            echo json_encode(['error' => 'unauthorized', 'message' => 'Invalid or expired account token']);
+            break;
+        }
+        echo json_encode([
+            'username'     => $account['username'],
+            'email'        => $account['email'] ?: '',
+            'display_name' => $account['display_name'] ?: '',
+        ]);
         break;
 
     default:

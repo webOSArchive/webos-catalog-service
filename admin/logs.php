@@ -161,9 +161,15 @@ include 'includes/header.php';
                     <?php foreach ($topDownloads as $row): ?>
                     <tr>
                         <td>
+                            <?php if ($canEditAll): ?>
                             <a href="app-edit.php?id=<?php echo $row['app_id']; ?>">
                                 <?php echo htmlspecialchars($row['title'] ?? "ID: {$row['app_id']}"); ?>
                             </a>
+                            <?php else: ?>
+                            <a href="../showMuseumDetails.php?app=<?php echo $row['app_id']; ?>" target="_blank" rel="noopener">
+                                <?php echo htmlspecialchars($row['title'] ?? "ID: {$row['app_id']}"); ?>
+                            </a>
+                            <?php endif; ?>
                         </td>
                         <td><?php echo number_format($row['download_count']); ?></td>
                     </tr>
