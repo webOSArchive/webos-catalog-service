@@ -612,7 +612,7 @@ function device_terms_html() {
       . '<h3>3. Privacy</h3>'
       . '<p>We store only what is needed to run the service: your account details and a per-device '
       . 'sign-in token, and any app data you choose to sync. We will not ever sell your data. '
-      . 'Your device sends a device identifier so a lost or retired device&rsquo;s access can be revoked.'
+      . 'Your device sends a device identifier so a lost or retired device&rsquo;s access can be revoked. '
       . 'You may access or delete your stored data at any time at appcatalog.webosarchive.org/admin </p>'
       . '<h3>4. Compliance</h3>'
       . '<p>This community makes every effort to comply with local and international laws, '
