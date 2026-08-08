@@ -178,33 +178,22 @@ include 'includes/header.php';
                     <td><?php echo htmlspecialchars($a['email'] ?? ''); ?></td>
                     <td><?php echo htmlspecialchars($a['status']); ?></td>
                     <td>
-                        <?php foreach ($a['roles'] as $r): ?>
-                            <span style="white-space:nowrap;"><?php echo htmlspecialchars($r); ?>
-                            <?php if (!$isMe): ?>
-                            <form method="post" style="display:inline;">
-                                <?php echo csrf_field(); ?>
-                                <input type="hidden" name="action" value="remove_role">
-                                <input type="hidden" name="account_id" value="<?php echo (int)$a['id']; ?>">
-                                <input type="hidden" name="role" value="<?php echo htmlspecialchars($r, ENT_QUOTES); ?>">
-                                <button type="submit" class="btn btn-sm" title="Remove role">&times;</button>
-                            </form>
-                            <?php endif; ?>
-                            </span>
-                        <?php endforeach; ?>
+                        <?php echo implode(', ', array_map('htmlspecialchars', $a['roles'])); ?>
                         <?php if (empty($a['roles'])): ?><em>none</em><?php endif; ?>
                     </td>
                     <td><?php echo $a['last_login_at'] ? htmlspecialchars($a['last_login_at']) : '<span style="color:#aaa;">never</span>'; ?></td>
                     <td>
                         <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
-                            <!-- add role -->
-                            <form method="post" style="display:flex;gap:3px;">
+                            <!-- add/remove role: picking a role the account already has flips
+                                 this to a removal instead of erroring on the duplicate add -->
+                            <form method="post" style="display:flex;gap:3px;" class="role-toggle-form" data-roles="<?php echo htmlspecialchars(json_encode($a['roles']), ENT_QUOTES); ?>">
                                 <?php echo csrf_field(); ?>
-                                <input type="hidden" name="action" value="add_role">
+                                <input type="hidden" name="action" value="add_role" class="role-toggle-action">
                                 <input type="hidden" name="account_id" value="<?php echo (int)$a['id']; ?>">
-                                <select name="role" style="padding:3px;">
+                                <select name="role" class="role-toggle-select" style="padding:3px;">
                                     <?php foreach ($roles as $r): ?><option value="<?php echo htmlspecialchars($r); ?>"><?php echo htmlspecialchars($r); ?></option><?php endforeach; ?>
                                 </select>
-                                <button type="submit" class="btn btn-sm">+ Role</button>
+                                <button type="submit" class="btn btn-sm role-toggle-btn">+ Role</button>
                             </form>
                             <?php if (!$isMe): ?>
                             <!-- enable/disable -->

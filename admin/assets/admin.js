@@ -26,6 +26,37 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// Add/remove role toggle (accounts.php): picking a role the account already
+// holds flips the form to submit remove_role instead of a duplicate add_role.
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.role-toggle-form').forEach(function (form) {
+        var roles = [];
+        try {
+            roles = JSON.parse(form.dataset.roles || '[]');
+        } catch (e) { /* leave roles empty */ }
+        var select = form.querySelector('.role-toggle-select');
+        var action = form.querySelector('.role-toggle-action');
+        var btn = form.querySelector('.role-toggle-btn');
+        if (!select || !action || !btn) return;
+
+        function sync() {
+            var has = roles.indexOf(select.value) !== -1;
+            action.value = has ? 'remove_role' : 'add_role';
+            btn.textContent = has ? '− Role' : '+ Role';
+            btn.classList.toggle('btn-danger', has);
+        }
+
+        select.addEventListener('change', sync);
+        sync();
+
+        form.addEventListener('submit', function (e) {
+            if (action.value === 'remove_role' && !confirm('Remove the "' + select.value + '" role from this account?')) {
+                e.preventDefault();
+            }
+        });
+    });
+});
+
 // Per-row action popup menus (.action-menu / .action-menu-toggle / .action-menu-list)
 document.addEventListener('click', function (e) {
     var toggle = e.target.closest('.action-menu-toggle');
