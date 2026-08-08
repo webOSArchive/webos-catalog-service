@@ -120,7 +120,7 @@ include 'includes/header.php';
             <a href="apps.php" class="btn">Manage Apps</a>
             <a href="app-edit.php" class="btn btn-primary">Add New App</a>
             <a href="categories.php" class="btn">Manage Categories</a>
-            <a href="authors.php" class="btn">Manage Authors</a>
+            <a href="vendors.php" class="btn">Manage Vendors</a>
             <a href="logs.php" class="btn">View Logs</a>
         </div>
     </div>

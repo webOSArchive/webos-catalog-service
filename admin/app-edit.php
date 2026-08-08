@@ -47,6 +47,9 @@ $success = false;
 // Get categories
 $categories = $repo->getCategories();
 
+// Get vendors (for the Vendor ID picklist)
+$vendors = $db->query("SELECT vendor_id, author_name FROM authors ORDER BY author_name")->fetchAll();
+
 // Get related apps (for existing apps)
 $relatedApps = [];
 $relatedAppIds = [];
@@ -285,8 +288,22 @@ include 'includes/header.php';
 
             <div class="form-group">
                 <label>Vendor ID</label>
-                <input type="text" name="vendor_id" value="<?php echo htmlspecialchars($app['vendor_id'] ?? $_POST['vendor_id'] ?? ''); ?>">
-                <small>Links to author metadata (optional)</small>
+                <div style="display:flex;gap:10px;align-items:center;">
+                    <?php $currentVendor = (string)($app['vendor_id'] ?? $_POST['vendor_id'] ?? ''); ?>
+                    <select name="vendor_id" style="flex:1;">
+                        <option value="">&mdash; none &mdash;</option>
+                        <?php $vendorFound = false; ?>
+                        <?php foreach ($vendors as $v): ?>
+                        <?php if ($currentVendor === $v['vendor_id']) { $vendorFound = true; } ?>
+                        <option value="<?php echo htmlspecialchars($v['vendor_id']); ?>"<?php echo $currentVendor === $v['vendor_id'] ? ' selected' : ''; ?>><?php echo htmlspecialchars($v['author_name']); ?> (<?php echo htmlspecialchars($v['vendor_id']); ?>)</option>
+                        <?php endforeach; ?>
+                        <?php if ($currentVendor !== '' && !$vendorFound): ?>
+                        <option value="<?php echo htmlspecialchars($currentVendor); ?>" selected><?php echo htmlspecialchars($currentVendor); ?> (not in Vendors list)</option>
+                        <?php endif; ?>
+                    </select>
+                    <a href="vendors.php" class="btn btn-sm" target="_blank" rel="noopener">Manage Vendors</a>
+                </div>
+                <small>Links to vendor metadata (optional)</small>
             </div>
 
             <?php if ($canEditAll): ?>

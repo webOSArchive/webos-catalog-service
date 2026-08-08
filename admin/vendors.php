@@ -1,10 +1,13 @@
 <?php
 /**
- * Authors/Vendors Management Page
+ * Vendors Management Page
+ *
+ * Underlying table/columns are still `authors` / `author_name` / vendor_id
+ * (unchanged) - only the admin-facing page and nav label are "Vendors".
  */
 require_once __DIR__ . '/includes/security.php';
 admin_require_capability('authors.manage');
-$pageTitle = 'Authors';
+$pageTitle = 'Vendors';
 require_once __DIR__ . '/../includes/Database.php';
 
 $db = Database::getInstance()->getConnection();
@@ -28,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $errors[] = 'Vendor ID is required';
         }
         if (empty($authorName)) {
-            $errors[] = 'Author name is required';
+            $errors[] = 'Vendor name is required';
         }
 
         if (empty($errors)) {
@@ -71,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $socialLinks = trim($_POST['social_links'] ?? '');
 
         if (empty($authorName)) {
-            $errors[] = 'Author name is required';
+            $errors[] = 'Vendor name is required';
         }
 
         if (empty($errors)) {
@@ -148,23 +151,23 @@ $stmt = $db->prepare($sql);
 $stmt->execute($params);
 $authors = $stmt->fetchAll();
 
-// Get editing author if specified
-$editAuthor = null;
+// Get editing vendor if specified
+$editVendor = null;
 if (isset($_GET['edit'])) {
     $stmt = $db->prepare("SELECT * FROM authors WHERE vendor_id = ?");
     $stmt->execute([$_GET['edit']]);
-    $editAuthor = $stmt->fetch();
+    $editVendor = $stmt->fetch();
 }
 
 include 'includes/header.php';
 ?>
 
 <div class="page-header">
-    <h1>Authors <small style="color:#7f8c8d;font-size:0.6em">(<?php echo number_format($totalCount); ?> total)</small></h1>
+    <h1>Vendors <small style="color:#7f8c8d;font-size:0.6em">(<?php echo number_format($totalCount); ?> total)</small></h1>
 </div>
 
 <?php if ($success): ?>
-<div class="alert alert-success">Author saved successfully!</div>
+<div class="alert alert-success">Vendor saved successfully!</div>
 <?php endif; ?>
 
 <?php if (!empty($errors)): ?>
@@ -177,46 +180,46 @@ include 'includes/header.php';
 
 <div class="card">
     <div class="card-header">
-        <h2><?php echo $editAuthor ? 'Edit Author' : 'Add New Author'; ?></h2>
+        <h2><?php echo $editVendor ? 'Edit Vendor' : 'Add New Vendor'; ?></h2>
     </div>
     <div class="card-body">
         <form method="post" class="admin-form">
-            <input type="hidden" name="action" value="<?php echo $editAuthor ? 'update' : 'add'; ?>">
+            <input type="hidden" name="action" value="<?php echo $editVendor ? 'update' : 'add'; ?>">
 
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
                 <div class="form-group" style="margin:0;">
                     <label>Vendor ID *</label>
-                    <input type="text" name="vendor_id" value="<?php echo htmlspecialchars($editAuthor['vendor_id'] ?? ''); ?>"
-                           <?php echo $editAuthor ? 'readonly' : 'required'; ?>>
-                    <?php if ($editAuthor): ?>
+                    <input type="text" name="vendor_id" value="<?php echo htmlspecialchars($editVendor['vendor_id'] ?? ''); ?>"
+                           <?php echo $editVendor ? 'readonly' : 'required'; ?>>
+                    <?php if ($editVendor): ?>
                     <small>Vendor ID cannot be changed</small>
                     <?php endif; ?>
                 </div>
                 <div class="form-group" style="margin:0;">
-                    <label>Author Name *</label>
-                    <input type="text" name="author_name" value="<?php echo htmlspecialchars($editAuthor['author_name'] ?? ''); ?>" required>
+                    <label>Vendor Name *</label>
+                    <input type="text" name="author_name" value="<?php echo htmlspecialchars($editVendor['author_name'] ?? ''); ?>" required>
                 </div>
             </div>
 
             <div class="form-group">
                 <label>Summary</label>
-                <textarea name="summary" rows="3"><?php echo htmlspecialchars($editAuthor['summary'] ?? ''); ?></textarea>
+                <textarea name="summary" rows="3"><?php echo htmlspecialchars($editVendor['summary'] ?? ''); ?></textarea>
             </div>
 
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:15px;">
                 <div class="form-group" style="margin:0;">
                     <label>Icon Path</label>
-                    <input type="text" name="icon" value="<?php echo htmlspecialchars($editAuthor['icon'] ?? ''); ?>" placeholder="icon.jpg">
+                    <input type="text" name="icon" value="<?php echo htmlspecialchars($editVendor['icon'] ?? ''); ?>" placeholder="icon.jpg">
                     <small>Filename in /authors/{vendor_id}/</small>
                 </div>
                 <div class="form-group" style="margin:0;">
                     <label>Icon Big Path</label>
-                    <input type="text" name="icon_big" value="<?php echo htmlspecialchars($editAuthor['icon_big'] ?? ''); ?>" placeholder="iconBig.png">
+                    <input type="text" name="icon_big" value="<?php echo htmlspecialchars($editVendor['icon_big'] ?? ''); ?>" placeholder="iconBig.png">
                     <small>Filename in /authors/{vendor_id}/</small>
                 </div>
                 <div class="form-group" style="margin:0;">
                     <label>Favicon Path</label>
-                    <input type="text" name="favicon" value="<?php echo htmlspecialchars($editAuthor['favicon'] ?? ''); ?>" placeholder="favicon.ico">
+                    <input type="text" name="favicon" value="<?php echo htmlspecialchars($editVendor['favicon'] ?? ''); ?>" placeholder="favicon.ico">
                     <small>Filename in /authors/{vendor_id}/</small>
                 </div>
             </div>
@@ -224,24 +227,24 @@ include 'includes/header.php';
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
                 <div class="form-group" style="margin:0;">
                     <label>Sponsor Message</label>
-                    <input type="text" name="sponsor_message" value="<?php echo htmlspecialchars($editAuthor['sponsor_message'] ?? ''); ?>" placeholder="Like my apps? Buy me a coffee!">
+                    <input type="text" name="sponsor_message" value="<?php echo htmlspecialchars($editVendor['sponsor_message'] ?? ''); ?>" placeholder="Like my apps? Buy me a coffee!">
                 </div>
                 <div class="form-group" style="margin:0;">
                     <label>Sponsor Link</label>
-                    <input type="text" name="sponsor_link" value="<?php echo htmlspecialchars($editAuthor['sponsor_link'] ?? ''); ?>" placeholder="https://...">
+                    <input type="text" name="sponsor_link" value="<?php echo htmlspecialchars($editVendor['sponsor_link'] ?? ''); ?>" placeholder="https://...">
                 </div>
             </div>
 
             <div class="form-group">
                 <label>Social Links (JSON)</label>
-                <textarea name="social_links" rows="3" placeholder='["https://github.com/...", "https://twitter.com/..."]'><?php echo htmlspecialchars($editAuthor['social_links'] ?? ''); ?></textarea>
+                <textarea name="social_links" rows="3" placeholder='["https://github.com/...", "https://twitter.com/..."]'><?php echo htmlspecialchars($editVendor['social_links'] ?? ''); ?></textarea>
                 <small>JSON array of social media URLs</small>
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn btn-primary"><?php echo $editAuthor ? 'Update Author' : 'Add Author'; ?></button>
-                <?php if ($editAuthor): ?>
-                <a href="authors.php" class="btn">Cancel</a>
+                <button type="submit" class="btn btn-primary"><?php echo $editVendor ? 'Update Vendor' : 'Add Vendor'; ?></button>
+                <?php if ($editVendor): ?>
+                <a href="vendors.php" class="btn">Cancel</a>
                 <?php endif; ?>
             </div>
         </form>
@@ -250,14 +253,14 @@ include 'includes/header.php';
 
 <div class="card">
     <div class="card-header">
-        <h2>All Authors</h2>
+        <h2>All Vendors</h2>
     </div>
     <div class="card-body">
         <form method="get" class="search-form" style="margin-bottom:15px;">
             <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Search by vendor ID or name...">
             <button type="submit" class="btn">Search</button>
             <?php if ($search): ?>
-            <a href="authors.php" class="btn">Clear</a>
+            <a href="vendors.php" class="btn">Clear</a>
             <?php endif; ?>
         </form>
     </div>
@@ -266,7 +269,7 @@ include 'includes/header.php';
             <thead>
                 <tr>
                     <th>Vendor ID</th>
-                    <th>Author Name</th>
+                    <th>Vendor Name</th>
                     <th>Apps</th>
                     <th>Icon</th>
                     <th>Actions</th>
@@ -276,7 +279,7 @@ include 'includes/header.php';
                 <?php if (empty($authors)): ?>
                 <tr>
                     <td colspan="5" style="text-align:center;padding:40px;color:#7f8c8d;">
-                        No authors found.
+                        No vendors found.
                     </td>
                 </tr>
                 <?php else: ?>
@@ -296,7 +299,7 @@ include 'includes/header.php';
                         <a href="?edit=<?php echo urlencode($author['vendor_id']); ?>" class="btn btn-sm">Edit</a>
                         <a href="apps.php?search=<?php echo urlencode($author['author_name']); ?>" class="btn btn-sm">View Apps</a>
                         <?php if ($author['app_count'] == 0): ?>
-                        <form method="post" style="display:inline;" onsubmit="return confirm('Delete this author?');">
+                        <form method="post" style="display:inline;" onsubmit="return confirm('Delete this vendor?');">
                             <input type="hidden" name="action" value="delete">
                             <input type="hidden" name="vendor_id" value="<?php echo htmlspecialchars($author['vendor_id']); ?>">
                             <button type="submit" class="btn btn-sm btn-danger">Delete</button>
