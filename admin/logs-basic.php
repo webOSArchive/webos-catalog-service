@@ -1,17 +1,11 @@
 <?php
 /**
- * Logs Viewer Page
+ * Logs Viewer Page — IP-redacted version for accounts without logs.view
+ * (e.g. the read-only Viewer role). Same data as logs.php, minus the IP
+ * column; see admin/includes/logs-data.php for the shared query logic.
  */
 $pageTitle = 'Logs';
 require_once __DIR__ . '/includes/security.php';
-
-// Full logs (with IP addresses) need logs.view; accounts without it (e.g.
-// Viewers) get the IP-redacted version instead.
-if (!admin_has_capability('logs.view')) {
-    header('Location: logs-basic.php');
-    exit;
-}
-
 require_once __DIR__ . '/includes/logs-data.php';
 
 // Get filter parameters
@@ -54,7 +48,7 @@ include 'includes/header.php';
             <input type="number" name="app_id" value="<?php echo $appId ?: ''; ?>" placeholder="App ID (optional)" style="width:120px;">
 
             <button type="submit" class="btn">Filter</button>
-            <a href="logs.php" class="btn">Reset</a>
+            <a href="logs-basic.php" class="btn">Reset</a>
         </form>
     </div>
 </div>
@@ -89,13 +83,12 @@ include 'includes/header.php';
                         <th>Device</th>
                         <th>Client</th>
                         <?php endif; ?>
-                        <th>IP</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($logs)): ?>
                     <tr>
-                        <td colspan="<?php echo $logType === 'downloads' ? 4 : 5; ?>" style="text-align:center;padding:40px;color:#7f8c8d;">
+                        <td colspan="<?php echo $logType === 'downloads' ? 3 : 4; ?>" style="text-align:center;padding:40px;color:#7f8c8d;">
                             No logs found for this period.
                         </td>
                     </tr>
@@ -118,7 +111,6 @@ include 'includes/header.php';
                         <td><?php echo htmlspecialchars($log['device_data'] ?? '-'); ?></td>
                         <td><?php echo htmlspecialchars($log['client_info'] ?? '-'); ?></td>
                         <?php endif; ?>
-                        <td><?php echo htmlspecialchars($log['ip_address'] ?? '-'); ?></td>
                     </tr>
                     <?php endforeach; ?>
                     <?php endif; ?>

@@ -46,9 +46,7 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
             <?php if (admin_has_capability('ipk.manage') || admin_has_capability('ipk.view')): ?>
             <li><a href="ipk-manager.php" class="<?php echo $currentPage === 'ipk-manager' ? 'active' : ''; ?>">IPKs</a></li>
             <?php endif; ?>
-            <?php if (admin_has_capability('logs.view')): ?>
-            <li><a href="logs.php" class="<?php echo $currentPage === 'logs' ? 'active' : ''; ?>">Logs</a></li>
-            <?php endif; ?>
+            <li><a href="logs.php" class="<?php echo in_array($currentPage, ['logs', 'logs-basic'], true) ? 'active' : ''; ?>">Logs</a></li>
             <?php if (admin_has_capability('accounts.manage')): ?>
             <li><a href="accounts.php" class="<?php echo $currentPage === 'accounts' ? 'active' : ''; ?>">Accounts</a></li>
             <?php endif; ?>

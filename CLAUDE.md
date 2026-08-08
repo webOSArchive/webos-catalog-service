@@ -92,6 +92,8 @@ CRUD interface for managing catalog data. Secured via nginx basic auth + CSRF pr
 | `stats.php` | Read-only version of the Dashboard (same numbers, no edit links) for logged-in accounts without `apps.edit`, e.g. `developer` or the read-only `viewer` role |
 | `apps.php` | App list with search/filter/sort (by title, recommendation, or ID) |
 | `app-edit.php` | Create/edit apps (includes recommendation_order) |
+| `logs.php` | Download/update-check logs incl. IP address; requires `logs.view`, otherwise redirects to `logs-basic.php` |
+| `logs-basic.php` | Same log data minus the IP column, for accounts without `logs.view` (e.g. `viewer`) |
 | `metadata-edit.php` | Edit extended metadata, screenshots, and lastModifiedTime |
 
 ### Web Interface

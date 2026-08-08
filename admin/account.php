@@ -134,7 +134,7 @@ include 'includes/header.php';
             <div class="form-group">
                 <label>Username</label>
                 <input type="text" name="username" value="<?php echo htmlspecialchars($me['username']); ?>" required minlength="3" maxlength="32">
-                <small>3-32 characters: letters, numbers, ".", "_" or "-", starting with a letter or number.</small>
+                <small>3-32 letters or numbers. NOTE: this will not take effect on-device until you open the Accounts app, then edit and save your account.</small>
             </div>
             <button type="submit" class="btn btn-primary">Change Username</button>
         </form>
@@ -183,7 +183,7 @@ include 'includes/header.php';
             No app storage data on this account yet.
             <?php endif; ?>
         </p>
-        <p style="color:#777;font-size:13px;">Values are opaque, client-scrambled blobs (not human-readable) — this downloads exactly what's stored, as JSON.</p>
+        <p style="color:#777;font-size:13px;">Stored values are client-scrambled blobs (not encrypted, but also not human-readable) — this downloads exactly what's stored, as JSON.</p>
         <a href="account.php?export_storage=1" class="btn" <?php echo $storageUsage['keys'] > 0 ? '' : 'aria-disabled="true" style="pointer-events:none;opacity:0.5;"'; ?>>Download My Data</a>
         <?php if ($storageUsage['keys'] === 0): ?>
         <span style="color:#999;font-size:13px;">(No data stored)</span>
@@ -199,8 +199,8 @@ include 'includes/header.php';
         <?php endif; ?>
 
         <div style="margin-top:20px;padding-top:15px;border-top:1px solid #eee;">
-            <p style="color:#a12;font-size:13px;"><strong>Warning:</strong> deleting this data is permanent. Any app that relies on it to sync settings, progress, or other state may misbehave, lose your place, or reset to defaults the next time it looks for that data.</p>
-            <form method="post" onsubmit="return confirm('Permanently delete all app storage data for this account? Apps that depend on it may misbehave or reset. This cannot be undone.');">
+            <p style="font-size:13px;"><strong>Warning:</strong> deleting this data is permanent. All apps that rely on it to sync settings, progress, or other state may misbehave, lose your place, or reset to defaults.</p>
+            <form method="post" onsubmit="return confirm('Permanently delete all app storage data for this account? This cannot be undone.');">
                 <?php echo csrf_field(); ?>
                 <input type="hidden" name="action" value="delete_storage">
                 <button type="submit" class="btn btn-danger" <?php echo $storageUsage['keys'] > 0 ? '' : 'disabled'; ?>>Delete My Data</button>
