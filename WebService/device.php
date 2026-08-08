@@ -629,5 +629,5 @@ function device_terms_html() {
       . '<p>This is a free, volunteer-run archive provided &ldquo;as is,&rdquo; without warranty of '
       . 'any kind. Service may change or end at any time.</p>'
       . '<h3>6. Contact</h3>'
-      . '<p>Questions? Visit docs.webosarchive.org. By tapping Accept you agree to these terms.</p>';
+      . '<p>Questions? Visit docs.webosarchive.org. By tapping Continue you agree to these terms.</p>';
 }

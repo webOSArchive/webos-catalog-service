@@ -168,8 +168,11 @@ include 'includes/header.php';
                 <legend>Upload IPK to Azure</legend>
                 <div class="form-group">
                     <label>IPK File</label>
-                    <input type="file" name="ipk_file" accept=".ipk" required>
-                    <small>Select a .ipk file to upload (max 200MB)</small>
+                    <div id="ipk-dropzone" class="dropzone">
+                        <p id="ipk-dropzone-text">Drag &amp; drop a .ipk file here, or browse below</p>
+                        <input type="file" name="ipk_file" id="ipk-file-input" accept=".ipk" required>
+                    </div>
+                    <small>Max 200MB</small>
                 </div>
                 <?php if ($scopedUploads): ?>
                 <p style="font-size:0.85em;color:#7f8c8d;margin:0 0 8px;">
@@ -253,6 +256,69 @@ function toggleUploadForm() {
     var form = document.getElementById('upload-form');
     form.style.display = form.style.display === 'none' ? 'block' : 'none';
 }
+
+(function () {
+    var dropzone = document.getElementById('ipk-dropzone');
+    var fileInput = document.getElementById('ipk-file-input');
+    var dropzoneText = document.getElementById('ipk-dropzone-text');
+    if (!dropzone || !fileInput) {
+        return;
+    }
+
+    function showFileName(file) {
+        dropzoneText.textContent = file
+            ? 'Selected: ' + file.name
+            : 'Drag & drop a .ipk file here, or browse below';
+    }
+
+    fileInput.addEventListener('change', function () {
+        showFileName(fileInput.files[0]);
+    });
+
+    dropzone.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        dropzone.classList.add('dragover');
+    });
+
+    dropzone.addEventListener('dragleave', function () {
+        dropzone.classList.remove('dragover');
+    });
+
+    dropzone.addEventListener('drop', function (e) {
+        e.preventDefault();
+        dropzone.classList.remove('dragover');
+        var files = e.dataTransfer.files;
+        if (!files.length) {
+            return;
+        }
+        var file = files[0];
+        if (!/\.ipk$/i.test(file.name)) {
+            alert('Only .ipk files can be uploaded.');
+            return;
+        }
+        fileInput.files = e.dataTransfer.files;
+        showFileName(file);
+    });
+
+    // A file dropped anywhere else on the page would otherwise navigate the
+    // browser to it; swallow that, and pop the (possibly still-collapsed)
+    // upload form open so a drag started outside the dropzone still works.
+    ['dragover', 'drop'].forEach(function (evt) {
+        document.addEventListener(evt, function (e) {
+            if (!dropzone.contains(e.target)) {
+                e.preventDefault();
+            }
+        });
+    });
+    document.addEventListener('dragenter', function (e) {
+        if (e.dataTransfer && e.dataTransfer.types && e.dataTransfer.types.indexOf('Files') !== -1) {
+            var form = document.getElementById('upload-form');
+            if (form && form.style.display === 'none') {
+                form.style.display = 'block';
+            }
+        }
+    });
+})();
 
 function copyUrl(url) {
     if (navigator.clipboard && navigator.clipboard.writeText) {

@@ -352,6 +352,40 @@ body {
     background: #f8f9fa;
 }
 
+/* Drag-and-drop file zone (e.g. ipk-manager.php) */
+.dropzone {
+    border: 2px dashed #ccc;
+    border-radius: 6px;
+    padding: 24px;
+    text-align: center;
+    cursor: pointer;
+    background: #fafafa;
+    transition: all 0.2s;
+}
+
+.dropzone:hover {
+    border-color: #3498db;
+    background: #f4f9fd;
+}
+
+.dropzone.dragover {
+    border-color: #3498db;
+    background: #eaf4fc;
+}
+
+.dropzone p {
+    margin: 0 0 10px;
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    pointer-events: none;
+}
+
+.dropzone input[type="file"] {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+}
+
 /* Forms */
 .admin-form {
     max-width: 800px;
