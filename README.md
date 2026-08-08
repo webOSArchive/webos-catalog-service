@@ -17,7 +17,7 @@ You can use this app on a Pre3 or Touchpad, or access the catalog in a browser a
 1. Copy `WebService/config-example.php` to `WebService/config.php`
 2. Configure database credentials (db_host, db_name, db_user, db_pass)
 3. Configure external hosts for images and packages
-4. Secure the `/admin` path with nginx basic auth
+4. (Optional) Add nginx basic auth in front of `/admin` as an extra layer — the app-level login (`admin/login.php`) plus role/capability gating is the actual security boundary and works without it
 
 ### Upload Limits (for IPK management)
 
@@ -95,7 +95,9 @@ The `post_shutdown` flag identifies community-created apps after platform EOL.
 
 ### Admin UI (/admin)
 
-CRUD interface for managing catalog data, secured via nginx basic auth.
+CRUD interface for managing catalog data. Security is app-level (login +
+capability gating, see User Accounts below); nginx basic auth in front of
+`/admin` is an optional extra layer, not required.
 
 ### User Accounts
 
@@ -132,14 +134,15 @@ php scripts/create-account.php alice curator       # a curator
 | `superadmin` | Everything, including managing other accounts |
 | `admin` | Full catalog management (no account management) |
 | `curator` | Edit apps / categories / authors, moderate reviews |
-| `developer` | Submit and manage their own apps (no admin portal) |
+| `developer` | Submit and manage their own apps; gets full Logs (has `logs.view`) but the read-only Dashboard (no `apps.edit`) |
+| `viewer` | Read-only: Dashboard stats and Logs (IP-redacted) only, nothing else |
 
-**Signing in:** `/admin` now requires an app-level login *in addition to* the
-nginx basic auth (basic auth stays as an outer gate for now). After the basic
-auth prompt, you land on a sign-in page; log in with an account that has the
-`admin.access` capability (superadmin/admin/curator). `developer` accounts have
-no admin access. Sessions are isolated from the front-end site; "Log out" is in
-the admin nav.
+**Signing in:** every role above includes `admin.access`, so any of them can
+sign in at `/admin/login.php` (rate-limited, generic error on failure).
+Sessions are isolated from the front-end site; "Log out" is in the admin nav.
+Accounts created via `accounts.php` or `scripts/create-account.php` also get
+the `viewer` role baked in automatically, so an account is never left
+role-less (which would otherwise block login entirely).
 
 Bootstrap order on a fresh install: run the migration, create the first account
 with `scripts/create-account.php` (make it a `superadmin`), then sign in.

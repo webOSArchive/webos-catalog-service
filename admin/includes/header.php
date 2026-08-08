@@ -3,8 +3,10 @@ if (!defined('ADMIN_BOOTSTRAP')) { http_response_code(403); exit('Forbidden'); }
 /**
  * Admin UI Header
  *
- * Security: This folder should be protected by nginx basic auth.
- * Add to your nginx server block:
+ * Security: app-level login + capability gating (includes/security.php) is
+ * the actual boundary. nginx basic auth in front of this folder is an
+ * optional extra layer, not required — add it to your nginx server block if
+ * wanted:
  *
  * location /admin {
  *     auth_basic "webOS Catalog Admin";

@@ -84,7 +84,7 @@ The patched HP clients also self-update from static manifests at the domain root
 
 ### Admin UI (admin/)
 
-CRUD interface for managing catalog data. Secured via nginx basic auth + CSRF protection (Referer header validation in `includes/security.php`).
+CRUD interface for managing catalog data. Security is app-level: login (`admin/login.php`, rate-limited + generic error message) plus capability gating (`includes/Capabilities.php`) and CSRF protection (Referer header validation in `includes/security.php`, token-based on sensitive forms). nginx basic auth in front of `/admin` is supported (see INSTALL.md) but is an optional extra layer, not assumed active — it's intentionally disabled on the live deployment.
 
 | Page | Purpose |
 |------|---------|
@@ -95,6 +95,9 @@ CRUD interface for managing catalog data. Secured via nginx basic auth + CSRF pr
 | `logs.php` | Download/update-check logs incl. IP address; requires `logs.view`, otherwise redirects to `logs-basic.php` |
 | `logs-basic.php` | Same log data minus the IP column, for accounts without `logs.view` (e.g. `viewer`) |
 | `metadata-edit.php` | Edit extended metadata, screenshots, and lastModifiedTime |
+| `account.php` | Self-service for the signed-in account: change username/password, download or delete this account's app storage data (see StorageRepository) |
+| `accounts.php` | Superadmin account management: create accounts, assign/remove roles (`accounts.manage`), enable/disable, reset passwords, delete (once disabled) |
+| `vendors.php` | Manage vendors (`authors.manage`); underlying table is still `authors` |
 
 ### Web Interface
 

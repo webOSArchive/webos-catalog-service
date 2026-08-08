@@ -9,7 +9,7 @@ browse. Accounts are admin-provisioned.
 | Phase | What | State |
 |-------|------|-------|
 | 0 | Schema / foundation | ✅ done |
-| 1 | Admin login + permissions (inside basic auth) | ✅ done (pen-tested + hardened) |
+| 1 | Admin login + permissions (basic auth optional, not assumed) | ✅ done (pen-tested + hardened) |
 | 2 | Link apps to an owner account (#4) | ✅ done |
 | 3 | App submission + moderation (#3) | 🔶 partial — trusted submission + claims live; moderation queue planned |
 | 4 | Legacy-client auth + reviews/ratings writes (#5) | ⏭ planned |

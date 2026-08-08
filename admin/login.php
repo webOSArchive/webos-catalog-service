@@ -2,9 +2,10 @@
 /**
  * Admin login (Phase 1).
  *
- * Runs inside the nginx basic auth. Authenticates against the accounts table
- * and requires the 'admin.access' capability. On success, stores the account id
- * in the isolated admin session.
+ * Authenticates against the accounts table and requires the 'admin.access'
+ * capability. On success, stores the account id in the isolated admin
+ * session. nginx basic auth in front of /admin is supported as an optional
+ * extra layer (see INSTALL.md) but is not assumed to be present.
  */
 require_once __DIR__ . '/includes/security.php';
 require_once __DIR__ . '/../WebService/ratelimit.php';

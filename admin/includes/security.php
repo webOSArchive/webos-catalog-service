@@ -5,8 +5,9 @@
  * Include this FIRST on every admin page (before any output or POST handling).
  * It provides, in order:
  *   1. An isolated admin session.
- *   2. App-level authentication + capability gating (Phase 1). This runs
- *      *inside* the existing nginx basic auth, which stays as an outer gate.
+ *   2. App-level authentication + capability gating (Phase 1) — this is the
+ *      actual security boundary. nginx basic auth is supported as an
+ *      optional additional outer gate but is not assumed to be present.
  *   3. CSRF protection: the original Referer check (all POSTs) plus a
  *      token helper for sensitive forms (login, account management).
  *

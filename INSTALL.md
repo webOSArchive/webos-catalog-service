@@ -91,7 +91,9 @@ server {
         include fastcgi_params;
     }
 
-    # Admin area - Basic Auth
+    # Admin area - Basic Auth (OPTIONAL extra layer; app-level login +
+    # capability gating in admin/includes/security.php is the real boundary
+    # and works fine without this block)
     location /admin {
         auth_basic "Admin Area";
         auth_basic_user_file /etc/nginx/.htpasswd;
@@ -177,15 +179,17 @@ sudo certbot --nginx -d appcatalog.yourdomain.org
 # Test API
 curl http://appcatalog.yourdomain.org/WebService/getMuseumMaster.php?count=1&key=test&museumVersion=web
 
-# Test admin (should prompt for password)
+# Test admin (redirects to login.php; also prompts for a basic-auth password
+# first if you configured that optional nginx layer above)
 curl -I http://appcatalog.yourdomain.org/admin/
 ```
 
 ## 12. User Accounts
 
-App-level login for `/admin`, layered **inside** the nginx basic auth (which
-stays as an outer gate). Accounts are **admin-provisioned only** — there is no
-web self-signup.
+App-level login for `/admin` (`admin/login.php`) plus role/capability gating
+is the actual security boundary; the nginx basic auth from step 6 is an
+optional extra layer on top of it, not a dependency. Accounts are
+**admin-provisioned only** — there is no web self-signup.
 
 The `accounts` / `roles` / `account_roles` / `account_tokens` tables (and the
 `apps.owner_account_id` / `app_reviews.author_account_id` columns) are part of
