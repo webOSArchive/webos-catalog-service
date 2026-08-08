@@ -12,8 +12,10 @@ $storageRepo = new StorageRepository();
 $me      = current_account();
 $errors  = [];
 $usernameErrors = [];
+$storageErrors = [];
 $success = '';
 $usernameSuccess = '';
+$storageSuccess = '';
 
 // Self-service data export (app storage is opaque, client-scrambled blobs -
 // see StorageRepository's docblock - so this hands back exactly what's
@@ -87,6 +89,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'chang
             $success = 'Your password has been changed.';
         }
     }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete_storage') {
+    if (!csrf_validate()) {
+        $storageErrors[] = 'Your session expired. Please try again.';
+    } else {
+        // deleteAccount() here just means "every account_app_storage row for
+        // this account_id" - it's the same method AccountRepository::deleteAccount()
+        // calls as part of a full account deletion; the account itself is untouched.
+        $storageRepo->deleteAccount($me['id']);
+        header('Location: account.php?storage_deleted=1');
+        exit;
+    }
+}
+
+if (isset($_GET['storage_deleted'])) {
+    $storageSuccess = 'Your app storage data has been deleted.';
 }
 
 include 'includes/header.php';
@@ -166,6 +185,24 @@ include 'includes/header.php';
         </p>
         <p style="color:#777;font-size:13px;">Values are opaque, client-scrambled blobs (not human-readable) — this downloads exactly what's stored, as JSON.</p>
         <a href="account.php?export_storage=1" class="btn" <?php echo $storageUsage['keys'] > 0 ? '' : 'aria-disabled="true" style="pointer-events:none;opacity:0.5;"'; ?>>Download My Data</a>
+
+        <?php if ($storageSuccess): ?>
+        <div class="alert alert-success" style="margin-top:15px;"><?php echo htmlspecialchars($storageSuccess); ?></div>
+        <?php endif; ?>
+        <?php if (!empty($storageErrors)): ?>
+        <div class="alert alert-error" style="margin-top:15px;">
+            <?php foreach ($storageErrors as $e): ?><?php echo htmlspecialchars($e); ?><br><?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+
+        <div style="margin-top:20px;padding-top:15px;border-top:1px solid #eee;">
+            <p style="color:#a12;font-size:13px;"><strong>Warning:</strong> deleting this data is permanent. Any app that relies on it to sync settings, progress, or other state may misbehave, lose your place, or reset to defaults the next time it looks for that data.</p>
+            <form method="post" onsubmit="return confirm('Permanently delete all app storage data for this account? Apps that depend on it may misbehave or reset. This cannot be undone.');">
+                <?php echo csrf_field(); ?>
+                <input type="hidden" name="action" value="delete_storage">
+                <button type="submit" class="btn btn-danger" <?php echo $storageUsage['keys'] > 0 ? '' : 'disabled'; ?>>Delete My Data</button>
+            </form>
+        </div>
     </div>
 </div>
 
