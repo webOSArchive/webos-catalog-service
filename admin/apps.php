@@ -22,8 +22,14 @@ $ownerFilter = $canEditAll ? null : (int) current_account()['id'];
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $status = isset($_GET['status']) ? $_GET['status'] : '';
 $category = isset($_GET['category']) ? $_GET['category'] : '';
-$sort = isset($_GET['sort']) ? $_GET['sort'] : 'title';
-$dir = isset($_GET['dir']) ? (strtolower($_GET['dir']) === 'desc' ? 'desc' : 'asc') : null;
+// Default (no ?sort at all) is ID ascending. An explicit ?sort with no ?dir
+// (e.g. the "Sort: ID (newest)" filter option) still falls through to
+// AppRepository::adminSearch()'s own per-column default direction below.
+$sortRequested = isset($_GET['sort']);
+$sort = $sortRequested ? $_GET['sort'] : 'id';
+$dir = isset($_GET['dir'])
+    ? (strtolower($_GET['dir']) === 'desc' ? 'desc' : 'asc')
+    : ($sortRequested ? null : 'asc');
 $page = max(1, isset($_GET['page']) ? (int)$_GET['page'] : 1);
 $perPage = 50;
 
@@ -104,10 +110,17 @@ include 'includes/header.php';
                 <?php endforeach; ?>
             </select>
 
+            <?php
+            // The page default (no ?sort in the URL) is ID ascending, not the
+            // "ID (newest)" option below (that one explicitly means ID
+            // descending) - so on a bare page load, leave this dropdown
+            // showing no selection rather than falsely highlighting "newest".
+            $sortForUI = $sortRequested ? $sort : '';
+            ?>
             <select name="sort">
-                <option value="title" <?php echo $sort === 'title' ? 'selected' : ''; ?>>Sort: Title</option>
-                <option value="recommendation" <?php echo $sort === 'recommendation' ? 'selected' : ''; ?>>Sort: Recommendation</option>
-                <option value="id" <?php echo $sort === 'id' ? 'selected' : ''; ?>>Sort: ID (newest)</option>
+                <option value="title" <?php echo $sortForUI === 'title' ? 'selected' : ''; ?>>Sort: Title</option>
+                <option value="recommendation" <?php echo $sortForUI === 'recommendation' ? 'selected' : ''; ?>>Sort: Recommendation</option>
+                <option value="id" <?php echo $sortForUI === 'id' ? 'selected' : ''; ?>>Sort: ID (newest)</option>
             </select>
 
             <button type="submit" class="btn">Search</button>
@@ -186,7 +199,7 @@ include 'includes/header.php';
     if ($search) $queryParams['search'] = $search;
     if ($status) $queryParams['status'] = $status;
     if ($category) $queryParams['category'] = $category;
-    if ($sort && $sort !== 'title') $queryParams['sort'] = $sort;
+    if ($sort && $sort !== 'id') $queryParams['sort'] = $sort;
     if ($dir !== null) $queryParams['dir'] = $dir;
     $queryString = http_build_query($queryParams);
     ?>
