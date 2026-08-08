@@ -21,7 +21,8 @@ browse. Accounts are admin-provisioned.
   `app_reviews.author_account_id`. Rescued reviews keep their historical numeric
   `app_reviews.account_id`; `accounts.legacy_account_id` exists to map to it later.
 - **`includes/Capabilities.php`** — role → capability map. Roles: `superadmin`
-  (wildcard), `admin`, `curator`, `developer`. Capabilities include `admin.access`,
+  (wildcard), `admin`, `curator`, `developer`, `viewer` (read-only; `admin.access`
+  only, redirected to `admin/stats.php`). Capabilities include `admin.access`,
   `accounts.manage`, `apps.edit`, `apps.submit`, `apps.own`, `reviews.moderate`,
   `ipk.manage`, `categories.manage`, `authors.manage`, `logs.view`.
 - **`includes/AccountRepository.php`** — account CRUD, constant-time `verifyLogin`,

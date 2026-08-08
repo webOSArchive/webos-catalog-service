@@ -9,7 +9,7 @@
  * Usage:
  *   php scripts/create-account.php <username> [role]
  *
- *   role defaults to "superadmin". Valid roles: superadmin, admin, curator, developer.
+ *   role defaults to "superadmin". Valid roles: superadmin, admin, curator, developer, viewer.
  *
  * The password is read from a hidden prompt (never passed on the command line,
  * so it stays out of shell history and the process list).

@@ -41,6 +41,11 @@ class Capabilities {
             'authors.manage', 'reviews.moderate', 'logs.view', 'ipk.view',
         ],
         'developer'  => ['admin.access', 'apps.submit', 'apps.own', 'logs.view', 'ipk.manage'],
+        // Read-only: can sign into /admin but holds no other capability, so
+        // every gated page (Apps, Categories, Vendors, IPKs, Logs, Accounts)
+        // stays hidden/forbidden and admin/index.php redirects them to the
+        // read-only admin/stats.php dashboard.
+        'viewer'     => ['admin.access'],
     ];
 
     /**
