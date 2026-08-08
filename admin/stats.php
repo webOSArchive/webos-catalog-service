@@ -33,7 +33,7 @@ include 'includes/header.php';
     </div>
     <div class="stat-card warning">
         <h3><?php echo number_format($stats['missing_apps']); ?></h3>
-        <p>Missing IPKs</p>
+        <p><a href="https://appcatalog.webosarchive.org/wanted.txt" target="_blank" rel="noopener">Missing IPKs</a></p>
     </div>
     <div class="stat-card">
         <h3><?php echo number_format($stats['metadata_count']); ?></h3>

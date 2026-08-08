@@ -175,26 +175,6 @@ function device_split_name($display) {
         : [substr($display, 0, $sp), trim(substr($display, $sp + 1))];
 }
 
-/**
- * Username rules. Deliberately narrower than accounts.username's VARCHAR(64):
- * this is a public handle, so keep it short, typeable and free of the '@' that
- * would make it ambiguous with an email at sign-in (verifyDeviceLogin matches
- * username OR email). Uniqueness is case-insensitive via the column collation.
- *
- * @return string|null error code, or null when acceptable.
- */
-function device_username_error($username) {
-    static $reserved = ['admin', 'administrator', 'root', 'system', 'support', 'help',
-                        'moderator', 'webos', 'webosarchive', 'museum', 'palm', 'hp', 'null'];
-    if (!preg_match('/^[A-Za-z0-9][A-Za-z0-9._-]{2,31}$/', $username)) {
-        return 'USERNAME_INVALID';
-    }
-    if (in_array(strtolower($username), $reserved, true)) {
-        return 'USERNAME_RESERVED';
-    }
-    return null;
-}
-
 /** The account's devices, in the shape the Accounts app's DEVICES list renders. */
 function device_list_for($repo, $accountId) {
     $out = [];
@@ -437,7 +417,7 @@ switch ($method) {
             echo json_encode(['OutUpdateUsername' => ['username' => $account['username']]]);
             break;
         }
-        if ($err = device_username_error($username)) {
+        if ($err = AccountRepository::usernameError($username)) {
             device_fail($err);
         }
         if ($repo->usernameTaken($username, $account['id'])) {

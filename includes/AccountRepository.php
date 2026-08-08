@@ -133,6 +133,28 @@ class AccountRepository {
         return $stmt->execute($args);
     }
 
+    /**
+     * Username rules, shared by every place an account can change its own
+     * username (device.php's updateUsername, admin/account.php). Deliberately
+     * narrower than accounts.username's VARCHAR(64): this is a public handle,
+     * so keep it short, typeable and free of the '@' that would make it
+     * ambiguous with an email at sign-in (verifyLogin matches username OR
+     * email). Uniqueness is case-insensitive via the column collation.
+     *
+     * @return string|null error code, or null when acceptable.
+     */
+    public static function usernameError($username) {
+        static $reserved = ['admin', 'administrator', 'root', 'system', 'support', 'help',
+                            'moderator', 'webos', 'webosarchive', 'museum', 'palm', 'hp', 'null'];
+        if (!preg_match('/^[A-Za-z0-9][A-Za-z0-9._-]{2,31}$/', $username)) {
+            return 'USERNAME_INVALID';
+        }
+        if (in_array(strtolower($username), $reserved, true)) {
+            return 'USERNAME_RESERVED';
+        }
+        return null;
+    }
+
     /** Is $username already used by an account other than $exceptAccountId? */
     public function usernameTaken($username, $exceptAccountId = null) {
         $stmt = $this->db->prepare("SELECT id FROM accounts WHERE username = ? LIMIT 1");

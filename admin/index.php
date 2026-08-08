@@ -40,11 +40,11 @@ include 'includes/header.php';
         <h3><?php echo number_format($stats['post_shutdown_apps']); ?></h3>
         <p>Post-Shutdown</p>
     </div>
-    <a href="generate-missing.php" class="stat-card warning" style="text-decoration:none;">
+    <div class="stat-card warning">
         <h3><?php echo number_format($stats['missing_apps']); ?></h3>
-        <p>Missing IPKs</p>
-        <small>Click to generate lists</small>
-    </a>
+        <p><a href="https://appcatalog.webosarchive.org/wanted.txt" target="_blank" rel="noopener">Missing IPKs</a></p>
+        <small><a href="generate-missing.php">Click to generate lists</a></small>
+    </div>
     <div class="stat-card">
         <h3><?php echo number_format($stats['metadata_count']); ?></h3>
         <p>Metadata Records</p>
