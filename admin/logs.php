@@ -14,6 +14,11 @@ if (!admin_has_capability('logs.view')) {
 
 require_once __DIR__ . '/includes/logs-data.php';
 
+// logs.view doesn't imply apps.edit (e.g. the developer role has the former
+// but not the latter) - accounts without it can't open app-edit.php for an
+// app they don't own, so send them to the public detail page instead.
+$canEditAll = admin_has_capability('apps.edit');
+
 // Get filter parameters
 $logType = isset($_GET['type']) ? $_GET['type'] : 'downloads';
 $dateFrom = isset($_GET['date_from']) ? $_GET['date_from'] : date('Y-m-d', strtotime('-7 days'));
@@ -105,9 +110,15 @@ include 'includes/header.php';
                         <td style="white-space:nowrap;"><?php echo date('M j, H:i', strtotime($log['created_at'])); ?></td>
                         <td>
                             <?php if ($log['app_id']): ?>
+                            <?php if ($canEditAll): ?>
                             <a href="app-edit.php?id=<?php echo $log['app_id']; ?>">
                                 <?php echo htmlspecialchars($log['app_title'] ?? "ID: {$log['app_id']}"); ?>
                             </a>
+                            <?php else: ?>
+                            <a href="../showMuseumDetails.php?app=<?php echo $log['app_id']; ?>" target="_blank" rel="noopener">
+                                <?php echo htmlspecialchars($log['app_title'] ?? "ID: {$log['app_id']}"); ?>
+                            </a>
+                            <?php endif; ?>
                             <?php else: ?>
                             -
                             <?php endif; ?>

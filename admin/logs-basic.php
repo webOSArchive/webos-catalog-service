@@ -98,7 +98,7 @@ include 'includes/header.php';
                         <td style="white-space:nowrap;"><?php echo date('M j, H:i', strtotime($log['created_at'])); ?></td>
                         <td>
                             <?php if ($log['app_id']): ?>
-                            <a href="app-edit.php?id=<?php echo $log['app_id']; ?>">
+                            <a href="../showMuseumDetails.php?app=<?php echo $log['app_id']; ?>" target="_blank" rel="noopener">
                                 <?php echo htmlspecialchars($log['app_title'] ?? "ID: {$log['app_id']}"); ?>
                             </a>
                             <?php else: ?>
@@ -142,7 +142,7 @@ include 'includes/header.php';
                     <?php foreach ($topDownloads as $row): ?>
                     <tr>
                         <td>
-                            <a href="app-edit.php?id=<?php echo $row['app_id']; ?>">
+                            <a href="../showMuseumDetails.php?app=<?php echo $row['app_id']; ?>" target="_blank" rel="noopener">
                                 <?php echo htmlspecialchars($row['title'] ?? "ID: {$row['app_id']}"); ?>
                             </a>
                         </td>
