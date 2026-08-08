@@ -180,6 +180,101 @@ include 'includes/header.php';
 
 <div class="card">
     <div class="card-header">
+        <h2>All Vendors</h2>
+    </div>
+    <div class="card-body">
+        <form method="get" class="search-form" style="margin-bottom:15px;">
+            <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Search by vendor ID or name...">
+            <button type="submit" class="btn">Search</button>
+            <?php if ($search): ?>
+            <a href="vendors.php" class="btn">Clear</a>
+            <?php endif; ?>
+        </form>
+    </div>
+    <div class="card-body" style="padding:0;">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Vendor ID</th>
+                    <th>Vendor Name</th>
+                    <th>Apps</th>
+                    <th>Icon</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (empty($authors)): ?>
+                <tr>
+                    <td colspan="5" style="text-align:center;padding:40px;color:#7f8c8d;">
+                        No vendors found.
+                    </td>
+                </tr>
+                <?php else: ?>
+                <?php foreach ($authors as $author): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($author['vendor_id']); ?></td>
+                    <td><?php echo htmlspecialchars($author['author_name']); ?></td>
+                    <td><?php echo number_format($author['app_count']); ?></td>
+                    <td>
+                        <?php if (!empty($author['icon'])): ?>
+                        <img src="<?php echo htmlspecialchars($author['icon']); ?>" alt="" style="max-height:24px;" onerror="this.style.display='none'">
+                        <?php else: ?>
+                        -
+                        <?php endif; ?>
+                    </td>
+                    <td>
+                        <a href="?edit=<?php echo urlencode($author['vendor_id']); ?>#vendor-form" class="btn btn-sm">Edit</a>
+                        <a href="apps.php?search=<?php echo urlencode($author['author_name']); ?>" class="btn btn-sm">View Apps</a>
+                        <?php if ($author['app_count'] == 0): ?>
+                        <form method="post" style="display:inline;" onsubmit="return confirm('Delete this vendor?');">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="vendor_id" value="<?php echo htmlspecialchars($author['vendor_id']); ?>">
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<?php if ($totalPages > 1): ?>
+<div class="pagination">
+    <?php
+    $queryParams = [];
+    if ($search) $queryParams['search'] = $search;
+    $queryString = http_build_query($queryParams);
+    ?>
+
+    <?php if ($page > 1): ?>
+    <a href="?page=1&<?php echo $queryString; ?>">&laquo; First</a>
+    <a href="?page=<?php echo $page - 1; ?>&<?php echo $queryString; ?>">&lsaquo; Prev</a>
+    <?php endif; ?>
+
+    <?php
+    $start = max(1, $page - 2);
+    $end = min($totalPages, $page + 2);
+    for ($i = $start; $i <= $end; $i++):
+    ?>
+    <?php if ($i == $page): ?>
+    <span class="current"><?php echo $i; ?></span>
+    <?php else: ?>
+    <a href="?page=<?php echo $i; ?>&<?php echo $queryString; ?>"><?php echo $i; ?></a>
+    <?php endif; ?>
+    <?php endfor; ?>
+
+    <?php if ($page < $totalPages): ?>
+    <a href="?page=<?php echo $page + 1; ?>&<?php echo $queryString; ?>">Next &rsaquo;</a>
+    <a href="?page=<?php echo $totalPages; ?>&<?php echo $queryString; ?>">Last &raquo;</a>
+    <?php endif; ?>
+</div>
+<?php endif; ?>
+
+<div class="card" id="vendor-form">
+    <div class="card-header">
         <h2><?php echo $editVendor ? 'Edit Vendor' : 'Add New Vendor'; ?></h2>
     </div>
     <div class="card-body">
@@ -250,100 +345,5 @@ include 'includes/header.php';
         </form>
     </div>
 </div>
-
-<div class="card">
-    <div class="card-header">
-        <h2>All Vendors</h2>
-    </div>
-    <div class="card-body">
-        <form method="get" class="search-form" style="margin-bottom:15px;">
-            <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Search by vendor ID or name...">
-            <button type="submit" class="btn">Search</button>
-            <?php if ($search): ?>
-            <a href="vendors.php" class="btn">Clear</a>
-            <?php endif; ?>
-        </form>
-    </div>
-    <div class="card-body" style="padding:0;">
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>Vendor ID</th>
-                    <th>Vendor Name</th>
-                    <th>Apps</th>
-                    <th>Icon</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (empty($authors)): ?>
-                <tr>
-                    <td colspan="5" style="text-align:center;padding:40px;color:#7f8c8d;">
-                        No vendors found.
-                    </td>
-                </tr>
-                <?php else: ?>
-                <?php foreach ($authors as $author): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($author['vendor_id']); ?></td>
-                    <td><?php echo htmlspecialchars($author['author_name']); ?></td>
-                    <td><?php echo number_format($author['app_count']); ?></td>
-                    <td>
-                        <?php if (!empty($author['icon'])): ?>
-                        <img src="<?php echo htmlspecialchars($author['icon']); ?>" alt="" style="max-height:24px;" onerror="this.style.display='none'">
-                        <?php else: ?>
-                        -
-                        <?php endif; ?>
-                    </td>
-                    <td>
-                        <a href="?edit=<?php echo urlencode($author['vendor_id']); ?>" class="btn btn-sm">Edit</a>
-                        <a href="apps.php?search=<?php echo urlencode($author['author_name']); ?>" class="btn btn-sm">View Apps</a>
-                        <?php if ($author['app_count'] == 0): ?>
-                        <form method="post" style="display:inline;" onsubmit="return confirm('Delete this vendor?');">
-                            <input type="hidden" name="action" value="delete">
-                            <input type="hidden" name="vendor_id" value="<?php echo htmlspecialchars($author['vendor_id']); ?>">
-                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                        </form>
-                        <?php endif; ?>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
-                <?php endif; ?>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<?php if ($totalPages > 1): ?>
-<div class="pagination">
-    <?php
-    $queryParams = [];
-    if ($search) $queryParams['search'] = $search;
-    $queryString = http_build_query($queryParams);
-    ?>
-
-    <?php if ($page > 1): ?>
-    <a href="?page=1&<?php echo $queryString; ?>">&laquo; First</a>
-    <a href="?page=<?php echo $page - 1; ?>&<?php echo $queryString; ?>">&lsaquo; Prev</a>
-    <?php endif; ?>
-
-    <?php
-    $start = max(1, $page - 2);
-    $end = min($totalPages, $page + 2);
-    for ($i = $start; $i <= $end; $i++):
-    ?>
-    <?php if ($i == $page): ?>
-    <span class="current"><?php echo $i; ?></span>
-    <?php else: ?>
-    <a href="?page=<?php echo $i; ?>&<?php echo $queryString; ?>"><?php echo $i; ?></a>
-    <?php endif; ?>
-    <?php endfor; ?>
-
-    <?php if ($page < $totalPages): ?>
-    <a href="?page=<?php echo $page + 1; ?>&<?php echo $queryString; ?>">Next &rsaquo;</a>
-    <a href="?page=<?php echo $totalPages; ?>&<?php echo $queryString; ?>">Last &raquo;</a>
-    <?php endif; ?>
-</div>
-<?php endif; ?>
 
 <?php include 'includes/footer.php'; ?>
