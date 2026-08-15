@@ -13,12 +13,12 @@ require_once __DIR__ . '/../includes/AppRepository.php';
 $errors = [];
 $success = '';
 
-// Uploading requires ipk.manage; ipk.view accounts (e.g. curators) can only
-// view + download.
+// Uploading requires ipk.manage; ipk.view-only accounts can only view + download.
 $canUpload = admin_has_capability('ipk.manage');
 
-// Owner-only uploaders (developers) may only upload IPKs for apps they own:
-// the file name must start with one of their apps' public_application_id.
+// Owner-only uploaders (developers, who lack apps.edit) may only upload IPKs
+// for apps they own: the file name must start with one of their apps'
+// public_application_id. Curators hold apps.edit, so they upload unscoped.
 $scopedUploads = $canUpload && !admin_has_capability('apps.edit');
 $allowedPackageIds = $scopedUploads
     ? (new AppRepository())->getOwnedApplicationIds((int) current_account()['id'])

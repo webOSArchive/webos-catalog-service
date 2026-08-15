@@ -38,7 +38,7 @@ class Capabilities {
         ],
         'curator'    => [
             'admin.access', 'apps.edit', 'categories.manage',
-            'authors.manage', 'reviews.moderate', 'logs.view', 'ipk.view',
+            'authors.manage', 'reviews.moderate', 'logs.view', 'ipk.manage',
         ],
         'developer'  => ['admin.access', 'apps.submit', 'apps.own', 'logs.view', 'ipk.manage'],
         // Read-only: can sign into /admin but holds no other capability, so
