@@ -1,0 +1,138 @@
+{
+    "lang": "it",
+    "magazineVersion": 1,
+    "assets": [
+        {
+            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/it/page0/images/tool-tip-bg.png",
+            "targetFilename": "page0__images__tool-tip-bg.png",
+            "logicalPath": "page0/images/tool-tip-bg.png",
+            "type": "image",
+            "section": "page0",
+            "size": 3329
+        },
+        {
+            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/it/page0/images/hp-app-catalog.png",
+            "targetFilename": "page0__images__hp-app-catalog.png",
+            "logicalPath": "page0/images/hp-app-catalog.png",
+            "type": "image",
+            "section": "page0",
+            "size": 7808
+        },
+        {
+            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/it/page0/images/hp-bag.png",
+            "targetFilename": "page0__images__hp-bag.png",
+            "logicalPath": "page0/images/hp-bag.png",
+            "type": "image",
+            "section": "page0",
+            "size": 10038
+        },
+        {
+            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/it/page0/images/latest-apps.png",
+            "targetFilename": "page0__images__latest-apps.png",
+            "logicalPath": "page0/images/latest-apps.png",
+            "type": "image",
+            "section": "page0",
+            "size": 37761
+        },
+        {
+            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/it/page0/images/top-apps.png",
+            "targetFilename": "page0__images__top-apps.png",
+            "logicalPath": "page0/images/top-apps.png",
+            "type": "image",
+            "section": "page0",
+            "size": 38331
+        },
+        {
+            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/it/page0/images/landscape-bg.jpg",
+            "targetFilename": "page0__images__landscape-bg.jpg",
+            "logicalPath": "page0/images/landscape-bg.jpg",
+            "type": "image",
+            "section": "page0",
+            "size": 49435
+        },
+        {
+            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/it/page0/images/tool-tip-arrow.png",
+            "targetFilename": "page0__images__tool-tip-arrow.png",
+            "logicalPath": "page0/images/tool-tip-arrow.png",
+            "type": "image",
+            "section": "page0",
+            "size": 483
+        },
+        {
+            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/it/page0/images/portrait-bg.jpg",
+            "targetFilename": "page0__images__portrait-bg.jpg",
+            "logicalPath": "page0/images/portrait-bg.jpg",
+            "type": "image",
+            "section": "page0",
+            "size": 43554
+        },
+        {
+            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/it/page0/images/featured-apps.png",
+            "targetFilename": "page0__images__featured-apps.png",
+            "logicalPath": "page0/images/featured-apps.png",
+            "type": "image",
+            "section": "page0",
+            "size": 38141
+        },
+        {
+            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/it/page0/images/free-apps.png",
+            "targetFilename": "page0__images__free-apps.png",
+            "logicalPath": "page0/images/free-apps.png",
+            "type": "image",
+            "section": "page0",
+            "size": 37037
+        },
+        {
+            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/it/page0/landscape.lo.js",
+            "targetFilename": "page0__landscape.lo.js",
+            "logicalPath": "page0/landscape.lo.js",
+            "type": "layout",
+            "section": "page0",
+            "size": 2812
+        },
+        {
+            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/it/page0/bindings.json",
+            "targetFilename": "page0__bindings.json",
+            "logicalPath": "page0/bindings.json",
+            "type": "binding",
+            "section": "page0",
+            "size": 2775
+        },
+        {
+            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/it/page0/portrait.lo.js",
+            "targetFilename": "page0__portrait.lo.js",
+            "logicalPath": "page0/portrait.lo.js",
+            "type": "layout",
+            "section": "page0",
+            "size": 4264
+        },
+        {
+            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/it/common/images/light-bg.png",
+            "targetFilename": "common__images__light-bg.png",
+            "logicalPath": "common/images/light-bg.png",
+            "type": "image",
+            "section": "common",
+            "size": 1087
+        },
+        {
+            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/it/common/css/magazine.css",
+            "targetFilename": "common__css__magazine.css",
+            "logicalPath": "common/css/magazine.css",
+            "type": "css",
+            "section": "common",
+            "size": 5286
+        },
+        {
+            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/it/common/css/page.css",
+            "targetFilename": "common__css__page.css",
+            "logicalPath": "common/css/page.css",
+            "type": "css",
+            "section": "common",
+            "size": 129
+        }
+    ],
+    "self": {
+        "sourceUrl": "https://appcatalog.webosarchive.org/pivot/it/manifest.local.json",
+        "targetFilename": "manifest.json"
+    }
+}
