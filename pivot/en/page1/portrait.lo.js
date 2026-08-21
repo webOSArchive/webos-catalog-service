@@ -1,9 +1,9 @@
 [
-	{kind: "VFlexBox", className: "portrait", style: "background-image: url({$portraitBgImage});height:1024px;width:768px;", components: [
-        {kind: 'enyo.FindApps.Magazine.BindableLayout',
-         templatePath: "{$portraitHeaderTemplate}", bindingPath: "{$headerTemplateBindings}"
-        },
-        {content: '<a class="letter-email" href="mailto:{$email}"></a>'},
-        {content: "{$version}", className: "version hidden"}
-	]}
+    {kind: "VFlexBox", className: "portrait", style: "background:#402020;height:1024px;width:768px;",
+     pack: "center", align: "center", components: [
+        {kind: "Control", content: "Page 2",
+         style: "color:#fff;font-size:40px;font-weight:bold;text-align:center;margin-bottom:16px;"},
+        {kind: "Control", content: "If you can swipe here from page 1, hydration + navigation both work.",
+         style: "color:#fff;font-size:18px;text-align:center;padding:0 40px;"}
+    ]}
 ]
