@@ -10,7 +10,7 @@
             "section": "page0",
             "type": "binding",
             "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page0__bindings.json",
+            "physicalPath": "/media/internal/.pivot/en/v3/page0__bindings.json",
             "size": 3
         },
         {
@@ -19,7 +19,7 @@
             "section": "page0",
             "type": "layout",
             "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page0__landscape.lo.js",
+            "physicalPath": "/media/internal/.pivot/en/v3/page0__landscape.lo.js",
             "size": 463
         },
         {
@@ -28,7 +28,7 @@
             "section": "page0",
             "type": "layout",
             "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page0__portrait.lo.js",
+            "physicalPath": "/media/internal/.pivot/en/v3/page0__portrait.lo.js",
             "size": 461
         },
         {
@@ -37,7 +37,7 @@
             "section": "page1",
             "type": "binding",
             "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page1__bindings.json",
+            "physicalPath": "/media/internal/.pivot/en/v3/page1__bindings.json",
             "size": 3
         },
         {
@@ -46,7 +46,7 @@
             "section": "page1",
             "type": "layout",
             "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page1__landscape.lo.js",
+            "physicalPath": "/media/internal/.pivot/en/v3/page1__landscape.lo.js",
             "size": 498
         },
         {
@@ -55,7 +55,7 @@
             "section": "page1",
             "type": "layout",
             "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page1__portrait.lo.js",
+            "physicalPath": "/media/internal/.pivot/en/v3/page1__portrait.lo.js",
             "size": 497
         }
     ]
