@@ -1,0 +1,24 @@
+{
+	"portraitBgImage": "page2/images/portrait-bg.jpg",
+	"landscapeBgImage": "page2/images/landscape-bg.jpg",
+
+    "portraitHeaderTemplate": "common/layouts/portraitHeader.lo.js",
+    "landscapeHeaderTemplate": "common/layouts/landscapeHeader.lo.js",
+    "headerTemplateBindings": "common/layouts/header.json",
+
+    "targetHinge": "page1",
+    "targetSphere1": "page4",
+    "targetSphere2": "page5",
+    "targetSphere3": "page6",
+    "targetSphere4": "page7",
+    "targetSphere5": "page8",
+    "targetSphere6": "page9",
+    "targetSphere7": "",
+    "targetSphere8": "",
+    "targetHub": "",
+    "targetOrient1": "",
+    "targetOrient2": "",
+    "targetOrient3": "",
+    "targetOrient4": "",
+    "targetTOC2": "page3"
+}
