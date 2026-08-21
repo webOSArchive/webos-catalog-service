@@ -3,7 +3,7 @@
         {kind: 'enyo.FindApps.Magazine.BindableLayout',
          templatePath: "{$landscapeHeaderTemplate}", bindingPath: "{$headerTemplateBindings}"
         },
-        {content: '<a class="letter-email" href="mailto:{$email}"></a>'},
-        {content: "{$version}", className: "version hidden"}
+
+    	{kind: "enyo.FindApps.Magazine.BindableLayout", className: "sphere1-app1", templatePath: "{$appTemplate}", bindingPath: "{$app1Bindings}"}
 	]}
 ]
