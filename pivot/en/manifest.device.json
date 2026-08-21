@@ -1,9 +1,9 @@
 {
     "lang": "en",
-    "magazineVersion": 12,
+    "magazineVersion": 13,
     "assets": [
         {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/v12/page0/bindings.json",
+            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/v13/page0/bindings.json",
             "targetFilename": "page0__bindings.json",
             "logicalPath": "page0/bindings.json",
             "type": "binding",
@@ -11,7 +11,7 @@
             "size": 3
         },
         {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/v12/page0/landscape.lo.js",
+            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/v13/page0/landscape.lo.js",
             "targetFilename": "page0__landscape.lo.js",
             "logicalPath": "page0/landscape.lo.js",
             "type": "layout",
@@ -19,7 +19,7 @@
             "size": 480
         },
         {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/v12/page0/portrait.lo.js",
+            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/v13/page0/portrait.lo.js",
             "targetFilename": "page0__portrait.lo.js",
             "logicalPath": "page0/portrait.lo.js",
             "type": "layout",
@@ -27,7 +27,7 @@
             "size": 478
         },
         {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/v12/page1/bindings.json",
+            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/v13/page1/bindings.json",
             "targetFilename": "page1__bindings.json",
             "logicalPath": "page1/bindings.json",
             "type": "binding",
@@ -35,7 +35,7 @@
             "size": 3
         },
         {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/v12/page1/landscape.lo.js",
+            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/v13/page1/landscape.lo.js",
             "targetFilename": "page1__landscape.lo.js",
             "logicalPath": "page1/landscape.lo.js",
             "type": "layout",
@@ -43,7 +43,7 @@
             "size": 498
         },
         {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/v12/page1/portrait.lo.js",
+            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/v13/page1/portrait.lo.js",
             "targetFilename": "page1__portrait.lo.js",
             "logicalPath": "page1/portrait.lo.js",
             "type": "layout",

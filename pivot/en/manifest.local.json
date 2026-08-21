@@ -1,6 +1,6 @@
 {
     "publishDate": "08/21/2026 12:00:00",
-    "magazineVersion": 12,
+    "magazineVersion": 13,
     "numPages": 2,
     "packageSize": 1959,
     "results": [
@@ -10,7 +10,7 @@
             "section": "page0",
             "type": "binding",
             "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/v12/page0__bindings.json",
+            "physicalPath": "/media/internal/.pivot/en/v13/page0__bindings.json",
             "size": 3
         },
         {
@@ -19,7 +19,7 @@
             "section": "page0",
             "type": "layout",
             "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/v12/page0__landscape.lo.js",
+            "physicalPath": "/media/internal/.pivot/en/v13/page0__landscape.lo.js",
             "size": 480
         },
         {
@@ -28,7 +28,7 @@
             "section": "page0",
             "type": "layout",
             "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/v12/page0__portrait.lo.js",
+            "physicalPath": "/media/internal/.pivot/en/v13/page0__portrait.lo.js",
             "size": 478
         },
         {
@@ -37,7 +37,7 @@
             "section": "page1",
             "type": "binding",
             "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/v12/page1__bindings.json",
+            "physicalPath": "/media/internal/.pivot/en/v13/page1__bindings.json",
             "size": 3
         },
         {
@@ -46,7 +46,7 @@
             "section": "page1",
             "type": "layout",
             "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/v12/page1__landscape.lo.js",
+            "physicalPath": "/media/internal/.pivot/en/v13/page1__landscape.lo.js",
             "size": 498
         },
         {
@@ -55,7 +55,7 @@
             "section": "page1",
             "type": "layout",
             "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/v12/page1__portrait.lo.js",
+            "physicalPath": "/media/internal/.pivot/en/v13/page1__portrait.lo.js",
             "size": 497
         }
     ]
