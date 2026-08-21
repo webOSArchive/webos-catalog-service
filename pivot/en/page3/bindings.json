@@ -6,8 +6,8 @@
     "landscapeHeaderTemplate": "common/layouts/landscapeHeader.lo.js",
     "headerTemplateBindings": "common/layouts/header.json",
 
-    "targetFeature1": "page13",
-    "targetShutter": "page27",
-    "targetIndex": "page28",
-    "targetTeaser": "page31"
+    "targetFeature1": "",
+    "targetShutter": "",
+    "targetIndex": "",
+    "targetTeaser": "page9"
 }

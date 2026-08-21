@@ -1,6 +1,6 @@
 {
     "lang": "en",
-    "magazineVersion": 1,
+    "magazineVersion": 2,
     "assets": [
         {
             "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/common/apps/auctionmate/info.json",
@@ -387,412 +387,12 @@
             "size": 439
         },
         {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page10/bindings.json",
-            "targetFilename": "page10__bindings.json",
-            "logicalPath": "page10/bindings.json",
-            "type": "binding",
-            "section": "page10",
-            "size": 463
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page10/images/landscape-bg.jpg",
-            "targetFilename": "page10__images__landscape-bg.jpg",
-            "logicalPath": "page10/images/landscape-bg.jpg",
-            "type": "image",
-            "section": "page10",
-            "size": 179380
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page10/images/portrait-bg.jpg",
-            "targetFilename": "page10__images__portrait-bg.jpg",
-            "logicalPath": "page10/images/portrait-bg.jpg",
-            "type": "image",
-            "section": "page10",
-            "size": 204817
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page10/landscape.lo.js",
-            "targetFilename": "page10__landscape.lo.js",
-            "logicalPath": "page10/landscape.lo.js",
-            "type": "layout",
-            "section": "page10",
-            "size": 452
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page10/portrait.lo.js",
-            "targetFilename": "page10__portrait.lo.js",
-            "logicalPath": "page10/portrait.lo.js",
-            "type": "layout",
-            "section": "page10",
-            "size": 449
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page11/bindings.json",
-            "targetFilename": "page11__bindings.json",
-            "logicalPath": "page11/bindings.json",
-            "type": "binding",
-            "section": "page11",
-            "size": 312
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page11/images/landscape-bg.jpg",
-            "targetFilename": "page11__images__landscape-bg.jpg",
-            "logicalPath": "page11/images/landscape-bg.jpg",
-            "type": "image",
-            "section": "page11",
-            "size": 186930
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page11/images/portrait-bg.jpg",
-            "targetFilename": "page11__images__portrait-bg.jpg",
-            "logicalPath": "page11/images/portrait-bg.jpg",
-            "type": "image",
-            "section": "page11",
-            "size": 197293
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page11/landscape.lo.js",
-            "targetFilename": "page11__landscape.lo.js",
-            "logicalPath": "page11/landscape.lo.js",
-            "type": "layout",
-            "section": "page11",
-            "size": 306
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page11/portrait.lo.js",
-            "targetFilename": "page11__portrait.lo.js",
-            "logicalPath": "page11/portrait.lo.js",
-            "type": "layout",
-            "section": "page11",
-            "size": 303
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page12/bindings.json",
-            "targetFilename": "page12__bindings.json",
-            "logicalPath": "page12/bindings.json",
-            "type": "binding",
-            "section": "page12",
-            "size": 312
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page12/images/landscape-bg.jpg",
-            "targetFilename": "page12__images__landscape-bg.jpg",
-            "logicalPath": "page12/images/landscape-bg.jpg",
-            "type": "image",
-            "section": "page12",
-            "size": 224772
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page12/images/portrait-bg.jpg",
-            "targetFilename": "page12__images__portrait-bg.jpg",
-            "logicalPath": "page12/images/portrait-bg.jpg",
-            "type": "image",
-            "section": "page12",
-            "size": 244615
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page12/landscape.lo.js",
-            "targetFilename": "page12__landscape.lo.js",
-            "logicalPath": "page12/landscape.lo.js",
-            "type": "layout",
-            "section": "page12",
-            "size": 306
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page12/portrait.lo.js",
-            "targetFilename": "page12__portrait.lo.js",
-            "logicalPath": "page12/portrait.lo.js",
-            "type": "layout",
-            "section": "page12",
-            "size": 303
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page13/bindings.json",
-            "targetFilename": "page13__bindings.json",
-            "logicalPath": "page13/bindings.json",
-            "type": "binding",
-            "section": "page13",
-            "size": 312
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page13/images/landscape-bg.jpg",
-            "targetFilename": "page13__images__landscape-bg.jpg",
-            "logicalPath": "page13/images/landscape-bg.jpg",
-            "type": "image",
-            "section": "page13",
-            "size": 155233
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page13/images/portrait-bg.jpg",
-            "targetFilename": "page13__images__portrait-bg.jpg",
-            "logicalPath": "page13/images/portrait-bg.jpg",
-            "type": "image",
-            "section": "page13",
-            "size": 175163
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page13/landscape.lo.js",
-            "targetFilename": "page13__landscape.lo.js",
-            "logicalPath": "page13/landscape.lo.js",
-            "type": "layout",
-            "section": "page13",
-            "size": 306
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page13/portrait.lo.js",
-            "targetFilename": "page13__portrait.lo.js",
-            "logicalPath": "page13/portrait.lo.js",
-            "type": "layout",
-            "section": "page13",
-            "size": 303
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page14/bindings.json",
-            "targetFilename": "page14__bindings.json",
-            "logicalPath": "page14/bindings.json",
-            "type": "binding",
-            "section": "page14",
-            "size": 312
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page14/images/landscape-bg.jpg",
-            "targetFilename": "page14__images__landscape-bg.jpg",
-            "logicalPath": "page14/images/landscape-bg.jpg",
-            "type": "image",
-            "section": "page14",
-            "size": 271467
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page14/images/portrait-bg.jpg",
-            "targetFilename": "page14__images__portrait-bg.jpg",
-            "logicalPath": "page14/images/portrait-bg.jpg",
-            "type": "image",
-            "section": "page14",
-            "size": 273877
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page14/landscape.lo.js",
-            "targetFilename": "page14__landscape.lo.js",
-            "logicalPath": "page14/landscape.lo.js",
-            "type": "layout",
-            "section": "page14",
-            "size": 306
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page14/portrait.lo.js",
-            "targetFilename": "page14__portrait.lo.js",
-            "logicalPath": "page14/portrait.lo.js",
-            "type": "layout",
-            "section": "page14",
-            "size": 303
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page15/bindings.json",
-            "targetFilename": "page15__bindings.json",
-            "logicalPath": "page15/bindings.json",
-            "type": "binding",
-            "section": "page15",
-            "size": 312
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page15/images/landscape-bg.jpg",
-            "targetFilename": "page15__images__landscape-bg.jpg",
-            "logicalPath": "page15/images/landscape-bg.jpg",
-            "type": "image",
-            "section": "page15",
-            "size": 411274
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page15/images/portrait-bg.jpg",
-            "targetFilename": "page15__images__portrait-bg.jpg",
-            "logicalPath": "page15/images/portrait-bg.jpg",
-            "type": "image",
-            "section": "page15",
-            "size": 373167
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page15/landscape.lo.js",
-            "targetFilename": "page15__landscape.lo.js",
-            "logicalPath": "page15/landscape.lo.js",
-            "type": "layout",
-            "section": "page15",
-            "size": 306
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page15/portrait.lo.js",
-            "targetFilename": "page15__portrait.lo.js",
-            "logicalPath": "page15/portrait.lo.js",
-            "type": "layout",
-            "section": "page15",
-            "size": 303
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page16/bindings.json",
-            "targetFilename": "page16__bindings.json",
-            "logicalPath": "page16/bindings.json",
-            "type": "binding",
-            "section": "page16",
-            "size": 312
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page16/images/landscape-bg.jpg",
-            "targetFilename": "page16__images__landscape-bg.jpg",
-            "logicalPath": "page16/images/landscape-bg.jpg",
-            "type": "image",
-            "section": "page16",
-            "size": 173904
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page16/images/portrait-bg.jpg",
-            "targetFilename": "page16__images__portrait-bg.jpg",
-            "logicalPath": "page16/images/portrait-bg.jpg",
-            "type": "image",
-            "section": "page16",
-            "size": 197783
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page16/landscape.lo.js",
-            "targetFilename": "page16__landscape.lo.js",
-            "logicalPath": "page16/landscape.lo.js",
-            "type": "layout",
-            "section": "page16",
-            "size": 306
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page16/portrait.lo.js",
-            "targetFilename": "page16__portrait.lo.js",
-            "logicalPath": "page16/portrait.lo.js",
-            "type": "layout",
-            "section": "page16",
-            "size": 303
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page17/bindings.json",
-            "targetFilename": "page17__bindings.json",
-            "logicalPath": "page17/bindings.json",
-            "type": "binding",
-            "section": "page17",
-            "size": 312
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page17/images/landscape-bg.jpg",
-            "targetFilename": "page17__images__landscape-bg.jpg",
-            "logicalPath": "page17/images/landscape-bg.jpg",
-            "type": "image",
-            "section": "page17",
-            "size": 212927
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page17/images/portrait-bg.jpg",
-            "targetFilename": "page17__images__portrait-bg.jpg",
-            "logicalPath": "page17/images/portrait-bg.jpg",
-            "type": "image",
-            "section": "page17",
-            "size": 223770
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page17/landscape.lo.js",
-            "targetFilename": "page17__landscape.lo.js",
-            "logicalPath": "page17/landscape.lo.js",
-            "type": "layout",
-            "section": "page17",
-            "size": 306
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page17/portrait.lo.js",
-            "targetFilename": "page17__portrait.lo.js",
-            "logicalPath": "page17/portrait.lo.js",
-            "type": "layout",
-            "section": "page17",
-            "size": 303
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page18/bindings.json",
-            "targetFilename": "page18__bindings.json",
-            "logicalPath": "page18/bindings.json",
-            "type": "binding",
-            "section": "page18",
-            "size": 635
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page18/images/landscape-bg.jpg",
-            "targetFilename": "page18__images__landscape-bg.jpg",
-            "logicalPath": "page18/images/landscape-bg.jpg",
-            "type": "image",
-            "section": "page18",
-            "size": 120636
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page18/images/portrait-bg.jpg",
-            "targetFilename": "page18__images__portrait-bg.jpg",
-            "logicalPath": "page18/images/portrait-bg.jpg",
-            "type": "image",
-            "section": "page18",
-            "size": 143324
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page18/landscape.lo.js",
-            "targetFilename": "page18__landscape.lo.js",
-            "logicalPath": "page18/landscape.lo.js",
-            "type": "layout",
-            "section": "page18",
-            "size": 745
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page18/portrait.lo.js",
-            "targetFilename": "page18__portrait.lo.js",
-            "logicalPath": "page18/portrait.lo.js",
-            "type": "layout",
-            "section": "page18",
-            "size": 742
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page19/bindings.json",
-            "targetFilename": "page19__bindings.json",
-            "logicalPath": "page19/bindings.json",
-            "type": "binding",
-            "section": "page19",
-            "size": 455
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page19/images/landscape-bg.jpg",
-            "targetFilename": "page19__images__landscape-bg.jpg",
-            "logicalPath": "page19/images/landscape-bg.jpg",
-            "type": "image",
-            "section": "page19",
-            "size": 180920
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page19/images/portrait-bg.jpg",
-            "targetFilename": "page19__images__portrait-bg.jpg",
-            "logicalPath": "page19/images/portrait-bg.jpg",
-            "type": "image",
-            "section": "page19",
-            "size": 199265
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page19/landscape.lo.js",
-            "targetFilename": "page19__landscape.lo.js",
-            "logicalPath": "page19/landscape.lo.js",
-            "type": "layout",
-            "section": "page19",
-            "size": 452
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page19/portrait.lo.js",
-            "targetFilename": "page19__portrait.lo.js",
-            "logicalPath": "page19/portrait.lo.js",
-            "type": "layout",
-            "section": "page19",
-            "size": 449
-        },
-        {
             "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page2/bindings.json",
             "targetFilename": "page2__bindings.json",
             "logicalPath": "page2/bindings.json",
             "type": "binding",
             "section": "page2",
-            "size": 759
+            "size": 717
         },
         {
             "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page2/images/landscape-bg.jpg",
@@ -816,7 +416,7 @@
             "logicalPath": "page2/landscape.lo.js",
             "type": "layout",
             "section": "page2",
-            "size": 2299
+            "size": 2355
         },
         {
             "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page2/portrait.lo.js",
@@ -824,407 +424,7 @@
             "logicalPath": "page2/portrait.lo.js",
             "type": "layout",
             "section": "page2",
-            "size": 2297
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page20/bindings.json",
-            "targetFilename": "page20__bindings.json",
-            "logicalPath": "page20/bindings.json",
-            "type": "binding",
-            "section": "page20",
-            "size": 455
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page20/images/landscape-bg.jpg",
-            "targetFilename": "page20__images__landscape-bg.jpg",
-            "logicalPath": "page20/images/landscape-bg.jpg",
-            "type": "image",
-            "section": "page20",
-            "size": 153949
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page20/images/portrait-bg.jpg",
-            "targetFilename": "page20__images__portrait-bg.jpg",
-            "logicalPath": "page20/images/portrait-bg.jpg",
-            "type": "image",
-            "section": "page20",
-            "size": 149681
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page20/landscape.lo.js",
-            "targetFilename": "page20__landscape.lo.js",
-            "logicalPath": "page20/landscape.lo.js",
-            "type": "layout",
-            "section": "page20",
-            "size": 452
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page20/portrait.lo.js",
-            "targetFilename": "page20__portrait.lo.js",
-            "logicalPath": "page20/portrait.lo.js",
-            "type": "layout",
-            "section": "page20",
-            "size": 449
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page21/bindings.json",
-            "targetFilename": "page21__bindings.json",
-            "logicalPath": "page21/bindings.json",
-            "type": "binding",
-            "section": "page21",
-            "size": 450
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page21/images/landscape-bg.jpg",
-            "targetFilename": "page21__images__landscape-bg.jpg",
-            "logicalPath": "page21/images/landscape-bg.jpg",
-            "type": "image",
-            "section": "page21",
-            "size": 135208
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page21/images/portrait-bg.jpg",
-            "targetFilename": "page21__images__portrait-bg.jpg",
-            "logicalPath": "page21/images/portrait-bg.jpg",
-            "type": "image",
-            "section": "page21",
-            "size": 204136
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page21/landscape.lo.js",
-            "targetFilename": "page21__landscape.lo.js",
-            "logicalPath": "page21/landscape.lo.js",
-            "type": "layout",
-            "section": "page21",
-            "size": 452
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page21/portrait.lo.js",
-            "targetFilename": "page21__portrait.lo.js",
-            "logicalPath": "page21/portrait.lo.js",
-            "type": "layout",
-            "section": "page21",
-            "size": 449
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page22/bindings.json",
-            "targetFilename": "page22__bindings.json",
-            "logicalPath": "page22/bindings.json",
-            "type": "binding",
-            "section": "page22",
-            "size": 450
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page22/images/landscape-bg.jpg",
-            "targetFilename": "page22__images__landscape-bg.jpg",
-            "logicalPath": "page22/images/landscape-bg.jpg",
-            "type": "image",
-            "section": "page22",
-            "size": 171658
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page22/images/portrait-bg.jpg",
-            "targetFilename": "page22__images__portrait-bg.jpg",
-            "logicalPath": "page22/images/portrait-bg.jpg",
-            "type": "image",
-            "section": "page22",
-            "size": 97981
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page22/landscape.lo.js",
-            "targetFilename": "page22__landscape.lo.js",
-            "logicalPath": "page22/landscape.lo.js",
-            "type": "layout",
-            "section": "page22",
-            "size": 452
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page22/portrait.lo.js",
-            "targetFilename": "page22__portrait.lo.js",
-            "logicalPath": "page22/portrait.lo.js",
-            "type": "layout",
-            "section": "page22",
-            "size": 449
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page23/bindings.json",
-            "targetFilename": "page23__bindings.json",
-            "logicalPath": "page23/bindings.json",
-            "type": "binding",
-            "section": "page23",
-            "size": 464
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page23/images/landscape-bg.jpg",
-            "targetFilename": "page23__images__landscape-bg.jpg",
-            "logicalPath": "page23/images/landscape-bg.jpg",
-            "type": "image",
-            "section": "page23",
-            "size": 186380
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page23/images/portrait-bg.jpg",
-            "targetFilename": "page23__images__portrait-bg.jpg",
-            "logicalPath": "page23/images/portrait-bg.jpg",
-            "type": "image",
-            "section": "page23",
-            "size": 176381
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page23/landscape.lo.js",
-            "targetFilename": "page23__landscape.lo.js",
-            "logicalPath": "page23/landscape.lo.js",
-            "type": "layout",
-            "section": "page23",
-            "size": 452
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page23/portrait.lo.js",
-            "targetFilename": "page23__portrait.lo.js",
-            "logicalPath": "page23/portrait.lo.js",
-            "type": "layout",
-            "section": "page23",
-            "size": 449
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page24/bindings.json",
-            "targetFilename": "page24__bindings.json",
-            "logicalPath": "page24/bindings.json",
-            "type": "binding",
-            "section": "page24",
-            "size": 464
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page24/images/landscape-bg.jpg",
-            "targetFilename": "page24__images__landscape-bg.jpg",
-            "logicalPath": "page24/images/landscape-bg.jpg",
-            "type": "image",
-            "section": "page24",
-            "size": 158940
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page24/images/portrait-bg.jpg",
-            "targetFilename": "page24__images__portrait-bg.jpg",
-            "logicalPath": "page24/images/portrait-bg.jpg",
-            "type": "image",
-            "section": "page24",
-            "size": 157827
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page24/landscape.lo.js",
-            "targetFilename": "page24__landscape.lo.js",
-            "logicalPath": "page24/landscape.lo.js",
-            "type": "layout",
-            "section": "page24",
-            "size": 452
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page24/portrait.lo.js",
-            "targetFilename": "page24__portrait.lo.js",
-            "logicalPath": "page24/portrait.lo.js",
-            "type": "layout",
-            "section": "page24",
-            "size": 449
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page25/bindings.json",
-            "targetFilename": "page25__bindings.json",
-            "logicalPath": "page25/bindings.json",
-            "type": "binding",
-            "section": "page25",
-            "size": 463
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page25/images/landscape-bg.jpg",
-            "targetFilename": "page25__images__landscape-bg.jpg",
-            "logicalPath": "page25/images/landscape-bg.jpg",
-            "type": "image",
-            "section": "page25",
-            "size": 160780
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page25/images/portrait-bg.jpg",
-            "targetFilename": "page25__images__portrait-bg.jpg",
-            "logicalPath": "page25/images/portrait-bg.jpg",
-            "type": "image",
-            "section": "page25",
-            "size": 211321
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page25/landscape.lo.js",
-            "targetFilename": "page25__landscape.lo.js",
-            "logicalPath": "page25/landscape.lo.js",
-            "type": "layout",
-            "section": "page25",
-            "size": 452
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page25/portrait.lo.js",
-            "targetFilename": "page25__portrait.lo.js",
-            "logicalPath": "page25/portrait.lo.js",
-            "type": "layout",
-            "section": "page25",
-            "size": 449
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page26/bindings.json",
-            "targetFilename": "page26__bindings.json",
-            "logicalPath": "page26/bindings.json",
-            "type": "binding",
-            "section": "page26",
-            "size": 463
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page26/images/landscape-bg.jpg",
-            "targetFilename": "page26__images__landscape-bg.jpg",
-            "logicalPath": "page26/images/landscape-bg.jpg",
-            "type": "image",
-            "section": "page26",
-            "size": 170468
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page26/images/portrait-bg.jpg",
-            "targetFilename": "page26__images__portrait-bg.jpg",
-            "logicalPath": "page26/images/portrait-bg.jpg",
-            "type": "image",
-            "section": "page26",
-            "size": 87401
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page26/landscape.lo.js",
-            "targetFilename": "page26__landscape.lo.js",
-            "logicalPath": "page26/landscape.lo.js",
-            "type": "layout",
-            "section": "page26",
-            "size": 452
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page26/portrait.lo.js",
-            "targetFilename": "page26__portrait.lo.js",
-            "logicalPath": "page26/portrait.lo.js",
-            "type": "layout",
-            "section": "page26",
-            "size": 449
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page27/bindings.json",
-            "targetFilename": "page27__bindings.json",
-            "logicalPath": "page27/bindings.json",
-            "type": "binding",
-            "section": "page27",
-            "size": 887
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page27/images/landscape-bg.jpg",
-            "targetFilename": "page27__images__landscape-bg.jpg",
-            "logicalPath": "page27/images/landscape-bg.jpg",
-            "type": "image",
-            "section": "page27",
-            "size": 270257
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page27/images/portrait-bg.jpg",
-            "targetFilename": "page27__images__portrait-bg.jpg",
-            "logicalPath": "page27/images/portrait-bg.jpg",
-            "type": "image",
-            "section": "page27",
-            "size": 289579
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page27/landscape.lo.js",
-            "targetFilename": "page27__landscape.lo.js",
-            "logicalPath": "page27/landscape.lo.js",
-            "type": "layout",
-            "section": "page27",
-            "size": 1032
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page27/portrait.lo.js",
-            "targetFilename": "page27__portrait.lo.js",
-            "logicalPath": "page27/portrait.lo.js",
-            "type": "layout",
-            "section": "page27",
-            "size": 1029
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page28/bindings.json",
-            "targetFilename": "page28__bindings.json",
-            "logicalPath": "page28/bindings.json",
-            "type": "binding",
-            "section": "page28",
-            "size": 2845
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page28/images/landscape-bg.jpg",
-            "targetFilename": "page28__images__landscape-bg.jpg",
-            "logicalPath": "page28/images/landscape-bg.jpg",
-            "type": "image",
-            "section": "page28",
-            "size": 109493
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page28/images/portrait-bg.jpg",
-            "targetFilename": "page28__images__portrait-bg.jpg",
-            "logicalPath": "page28/images/portrait-bg.jpg",
-            "type": "image",
-            "section": "page28",
-            "size": 120543
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page28/landscape.lo.js",
-            "targetFilename": "page28__landscape.lo.js",
-            "logicalPath": "page28/landscape.lo.js",
-            "type": "layout",
-            "section": "page28",
-            "size": 2599
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page28/portrait.lo.js",
-            "targetFilename": "page28__portrait.lo.js",
-            "logicalPath": "page28/portrait.lo.js",
-            "type": "layout",
-            "section": "page28",
-            "size": 2740
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page29/bindings.json",
-            "targetFilename": "page29__bindings.json",
-            "logicalPath": "page29/bindings.json",
-            "type": "binding",
-            "section": "page29",
-            "size": 2944
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page29/images/landscape-bg.jpg",
-            "targetFilename": "page29__images__landscape-bg.jpg",
-            "logicalPath": "page29/images/landscape-bg.jpg",
-            "type": "image",
-            "section": "page29",
-            "size": 113022
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page29/images/portrait-bg.jpg",
-            "targetFilename": "page29__images__portrait-bg.jpg",
-            "logicalPath": "page29/images/portrait-bg.jpg",
-            "type": "image",
-            "section": "page29",
-            "size": 119353
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page29/landscape.lo.js",
-            "targetFilename": "page29__landscape.lo.js",
-            "logicalPath": "page29/landscape.lo.js",
-            "type": "layout",
-            "section": "page29",
-            "size": 2599
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page29/portrait.lo.js",
-            "targetFilename": "page29__portrait.lo.js",
-            "logicalPath": "page29/portrait.lo.js",
-            "type": "layout",
-            "section": "page29",
-            "size": 2740
+            "size": 2353
         },
         {
             "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page3/bindings.json",
@@ -1232,7 +432,7 @@
             "logicalPath": "page3/bindings.json",
             "type": "binding",
             "section": "page3",
-            "size": 433
+            "size": 414
         },
         {
             "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page3/images/landscape-bg.jpg",
@@ -1256,7 +456,7 @@
             "logicalPath": "page3/landscape.lo.js",
             "type": "layout",
             "section": "page3",
-            "size": 1140
+            "size": 1182
         },
         {
             "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page3/portrait.lo.js",
@@ -1264,87 +464,7 @@
             "logicalPath": "page3/portrait.lo.js",
             "type": "layout",
             "section": "page3",
-            "size": 1146
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page30/bindings.json",
-            "targetFilename": "page30__bindings.json",
-            "logicalPath": "page30/bindings.json",
-            "type": "binding",
-            "section": "page30",
-            "size": 2170
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page30/images/landscape-bg.jpg",
-            "targetFilename": "page30__images__landscape-bg.jpg",
-            "logicalPath": "page30/images/landscape-bg.jpg",
-            "type": "image",
-            "section": "page30",
-            "size": 66179
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page30/images/portrait-bg.jpg",
-            "targetFilename": "page30__images__portrait-bg.jpg",
-            "logicalPath": "page30/images/portrait-bg.jpg",
-            "type": "image",
-            "section": "page30",
-            "size": 50870
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page30/landscape.lo.js",
-            "targetFilename": "page30__landscape.lo.js",
-            "logicalPath": "page30/landscape.lo.js",
-            "type": "layout",
-            "section": "page30",
-            "size": 2634
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page30/portrait.lo.js",
-            "targetFilename": "page30__portrait.lo.js",
-            "logicalPath": "page30/portrait.lo.js",
-            "type": "layout",
-            "section": "page30",
-            "size": 2796
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page31/bindings.json",
-            "targetFilename": "page31__bindings.json",
-            "logicalPath": "page31/bindings.json",
-            "type": "binding",
-            "section": "page31",
-            "size": 365
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page31/images/landscape-bg.jpg",
-            "targetFilename": "page31__images__landscape-bg.jpg",
-            "logicalPath": "page31/images/landscape-bg.jpg",
-            "type": "image",
-            "section": "page31",
-            "size": 184085
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page31/images/portrait-bg.jpg",
-            "targetFilename": "page31__images__portrait-bg.jpg",
-            "logicalPath": "page31/images/portrait-bg.jpg",
-            "type": "image",
-            "section": "page31",
-            "size": 173670
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page31/landscape.lo.js",
-            "targetFilename": "page31__landscape.lo.js",
-            "logicalPath": "page31/landscape.lo.js",
-            "type": "layout",
-            "section": "page31",
-            "size": 380
-        },
-        {
-            "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page31/portrait.lo.js",
-            "targetFilename": "page31__portrait.lo.js",
-            "logicalPath": "page31/portrait.lo.js",
-            "type": "layout",
-            "section": "page31",
-            "size": 377
+            "size": 1188
         },
         {
             "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page4/bindings.json",
@@ -1512,7 +632,7 @@
             "logicalPath": "page8/bindings.json",
             "type": "binding",
             "section": "page8",
-            "size": 452
+            "size": 2168
         },
         {
             "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page8/images/landscape-bg.jpg",
@@ -1520,7 +640,7 @@
             "logicalPath": "page8/images/landscape-bg.jpg",
             "type": "image",
             "section": "page8",
-            "size": 162989
+            "size": 66179
         },
         {
             "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page8/images/portrait-bg.jpg",
@@ -1528,7 +648,7 @@
             "logicalPath": "page8/images/portrait-bg.jpg",
             "type": "image",
             "section": "page8",
-            "size": 177116
+            "size": 50870
         },
         {
             "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page8/landscape.lo.js",
@@ -1536,7 +656,7 @@
             "logicalPath": "page8/landscape.lo.js",
             "type": "layout",
             "section": "page8",
-            "size": 452
+            "size": 2634
         },
         {
             "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page8/portrait.lo.js",
@@ -1544,7 +664,7 @@
             "logicalPath": "page8/portrait.lo.js",
             "type": "layout",
             "section": "page8",
-            "size": 449
+            "size": 2796
         },
         {
             "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page9/bindings.json",
@@ -1552,7 +672,7 @@
             "logicalPath": "page9/bindings.json",
             "type": "binding",
             "section": "page9",
-            "size": 1201
+            "size": 363
         },
         {
             "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page9/images/landscape-bg.jpg",
@@ -1560,7 +680,7 @@
             "logicalPath": "page9/images/landscape-bg.jpg",
             "type": "image",
             "section": "page9",
-            "size": 267652
+            "size": 184085
         },
         {
             "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page9/images/portrait-bg.jpg",
@@ -1568,7 +688,7 @@
             "logicalPath": "page9/images/portrait-bg.jpg",
             "type": "image",
             "section": "page9",
-            "size": 298458
+            "size": 173670
         },
         {
             "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page9/landscape.lo.js",
@@ -1576,7 +696,7 @@
             "logicalPath": "page9/landscape.lo.js",
             "type": "layout",
             "section": "page9",
-            "size": 1649
+            "size": 380
         },
         {
             "sourceUrl": "https://appcatalog.webosarchive.org/pivot/en/page9/portrait.lo.js",
@@ -1584,7 +704,7 @@
             "logicalPath": "page9/portrait.lo.js",
             "type": "layout",
             "section": "page9",
-            "size": 1646
+            "size": 377
         }
     ],
     "self": {

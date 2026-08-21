@@ -1,8 +1,8 @@
 {
     "publishDate": "06/01/2011 12:00:00",
-    "magazineVersion": 1,
-    "numPages": 32,
-    "packageSize": 12593036,
+    "magazineVersion": 2,
+    "numPages": 10,
+    "packageSize": 4046008,
     "results": [
         {
             "logicalPath": "common/apps/auctionmate/info.json",
@@ -437,463 +437,13 @@
             "size": 439
         },
         {
-            "logicalPath": "page10/bindings.json",
-            "checksum": "29866e2f8c9db9c1dcafeb3daa7a12ec",
-            "section": "page10",
-            "type": "binding",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page10__bindings.json",
-            "size": 463
-        },
-        {
-            "logicalPath": "page10/images/landscape-bg.jpg",
-            "checksum": "d5b7de79af584941a8ef0595c5b0c443",
-            "section": "page10",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page10__images__landscape-bg.jpg",
-            "size": 179380
-        },
-        {
-            "logicalPath": "page10/images/portrait-bg.jpg",
-            "checksum": "e80ca738f94e506869756534254f461a",
-            "section": "page10",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page10__images__portrait-bg.jpg",
-            "size": 204817
-        },
-        {
-            "logicalPath": "page10/landscape.lo.js",
-            "checksum": "09ad4a06e37c3bf60177a82fba0ff811",
-            "section": "page10",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page10__landscape.lo.js",
-            "size": 452
-        },
-        {
-            "logicalPath": "page10/portrait.lo.js",
-            "checksum": "ec0ba33715bc3cf033238a24dda6d8cd",
-            "section": "page10",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page10__portrait.lo.js",
-            "size": 449
-        },
-        {
-            "logicalPath": "page11/bindings.json",
-            "checksum": "61feb5028681763bac890b36674bc9d9",
-            "section": "page11",
-            "type": "binding",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page11__bindings.json",
-            "size": 312
-        },
-        {
-            "logicalPath": "page11/images/landscape-bg.jpg",
-            "checksum": "e48ef09808de06dc734600fa06825e26",
-            "section": "page11",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page11__images__landscape-bg.jpg",
-            "size": 186930
-        },
-        {
-            "logicalPath": "page11/images/portrait-bg.jpg",
-            "checksum": "35ba4ded6f8aa24976774296787fdb69",
-            "section": "page11",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page11__images__portrait-bg.jpg",
-            "size": 197293
-        },
-        {
-            "logicalPath": "page11/landscape.lo.js",
-            "checksum": "87ad44cd46f9373a4c322c89d20539a4",
-            "section": "page11",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page11__landscape.lo.js",
-            "size": 306
-        },
-        {
-            "logicalPath": "page11/portrait.lo.js",
-            "checksum": "69c6bbea9853c4cf137782c28cf38019",
-            "section": "page11",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page11__portrait.lo.js",
-            "size": 303
-        },
-        {
-            "logicalPath": "page12/bindings.json",
-            "checksum": "9a0279f1da3b640b337905d44cb313bd",
-            "section": "page12",
-            "type": "binding",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page12__bindings.json",
-            "size": 312
-        },
-        {
-            "logicalPath": "page12/images/landscape-bg.jpg",
-            "checksum": "cdd247103eba2a3c32ec558e9406aa95",
-            "section": "page12",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page12__images__landscape-bg.jpg",
-            "size": 224772
-        },
-        {
-            "logicalPath": "page12/images/portrait-bg.jpg",
-            "checksum": "4ce10be8182e41913c2f0db4f1d852bc",
-            "section": "page12",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page12__images__portrait-bg.jpg",
-            "size": 244615
-        },
-        {
-            "logicalPath": "page12/landscape.lo.js",
-            "checksum": "87ad44cd46f9373a4c322c89d20539a4",
-            "section": "page12",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page12__landscape.lo.js",
-            "size": 306
-        },
-        {
-            "logicalPath": "page12/portrait.lo.js",
-            "checksum": "69c6bbea9853c4cf137782c28cf38019",
-            "section": "page12",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page12__portrait.lo.js",
-            "size": 303
-        },
-        {
-            "logicalPath": "page13/bindings.json",
-            "checksum": "959e6b9233b0aac38cae359c46f63ef5",
-            "section": "page13",
-            "type": "binding",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page13__bindings.json",
-            "size": 312
-        },
-        {
-            "logicalPath": "page13/images/landscape-bg.jpg",
-            "checksum": "761141983c4d56c6f25203a959c7811d",
-            "section": "page13",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page13__images__landscape-bg.jpg",
-            "size": 155233
-        },
-        {
-            "logicalPath": "page13/images/portrait-bg.jpg",
-            "checksum": "2fdf28ae97264669fc9bb64c1180dd71",
-            "section": "page13",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page13__images__portrait-bg.jpg",
-            "size": 175163
-        },
-        {
-            "logicalPath": "page13/landscape.lo.js",
-            "checksum": "87ad44cd46f9373a4c322c89d20539a4",
-            "section": "page13",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page13__landscape.lo.js",
-            "size": 306
-        },
-        {
-            "logicalPath": "page13/portrait.lo.js",
-            "checksum": "69c6bbea9853c4cf137782c28cf38019",
-            "section": "page13",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page13__portrait.lo.js",
-            "size": 303
-        },
-        {
-            "logicalPath": "page14/bindings.json",
-            "checksum": "e2a663532b71417777fec184be96cb21",
-            "section": "page14",
-            "type": "binding",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page14__bindings.json",
-            "size": 312
-        },
-        {
-            "logicalPath": "page14/images/landscape-bg.jpg",
-            "checksum": "cd854a48bf016caaa16a91d7fb5ae19f",
-            "section": "page14",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page14__images__landscape-bg.jpg",
-            "size": 271467
-        },
-        {
-            "logicalPath": "page14/images/portrait-bg.jpg",
-            "checksum": "56474389363eb9d48a5a09edbebdd6d8",
-            "section": "page14",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page14__images__portrait-bg.jpg",
-            "size": 273877
-        },
-        {
-            "logicalPath": "page14/landscape.lo.js",
-            "checksum": "87ad44cd46f9373a4c322c89d20539a4",
-            "section": "page14",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page14__landscape.lo.js",
-            "size": 306
-        },
-        {
-            "logicalPath": "page14/portrait.lo.js",
-            "checksum": "69c6bbea9853c4cf137782c28cf38019",
-            "section": "page14",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page14__portrait.lo.js",
-            "size": 303
-        },
-        {
-            "logicalPath": "page15/bindings.json",
-            "checksum": "a4f58b25ec46f012a1ab3d1d94891e14",
-            "section": "page15",
-            "type": "binding",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page15__bindings.json",
-            "size": 312
-        },
-        {
-            "logicalPath": "page15/images/landscape-bg.jpg",
-            "checksum": "3775f889c4763c9fc8e1b24d44d017f5",
-            "section": "page15",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page15__images__landscape-bg.jpg",
-            "size": 411274
-        },
-        {
-            "logicalPath": "page15/images/portrait-bg.jpg",
-            "checksum": "2fcfaec0fe368ec09ff0b0ac9cef26a6",
-            "section": "page15",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page15__images__portrait-bg.jpg",
-            "size": 373167
-        },
-        {
-            "logicalPath": "page15/landscape.lo.js",
-            "checksum": "87ad44cd46f9373a4c322c89d20539a4",
-            "section": "page15",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page15__landscape.lo.js",
-            "size": 306
-        },
-        {
-            "logicalPath": "page15/portrait.lo.js",
-            "checksum": "69c6bbea9853c4cf137782c28cf38019",
-            "section": "page15",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page15__portrait.lo.js",
-            "size": 303
-        },
-        {
-            "logicalPath": "page16/bindings.json",
-            "checksum": "717dccd3dc30f973e575e3f77d694c31",
-            "section": "page16",
-            "type": "binding",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page16__bindings.json",
-            "size": 312
-        },
-        {
-            "logicalPath": "page16/images/landscape-bg.jpg",
-            "checksum": "c2ea473ffe8c47d59c936171c690fcdd",
-            "section": "page16",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page16__images__landscape-bg.jpg",
-            "size": 173904
-        },
-        {
-            "logicalPath": "page16/images/portrait-bg.jpg",
-            "checksum": "0e59e4d338c39245f4d30e689ad66ac8",
-            "section": "page16",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page16__images__portrait-bg.jpg",
-            "size": 197783
-        },
-        {
-            "logicalPath": "page16/landscape.lo.js",
-            "checksum": "87ad44cd46f9373a4c322c89d20539a4",
-            "section": "page16",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page16__landscape.lo.js",
-            "size": 306
-        },
-        {
-            "logicalPath": "page16/portrait.lo.js",
-            "checksum": "69c6bbea9853c4cf137782c28cf38019",
-            "section": "page16",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page16__portrait.lo.js",
-            "size": 303
-        },
-        {
-            "logicalPath": "page17/bindings.json",
-            "checksum": "55ab83db6c0fcb12c88e1a0e1ebc4861",
-            "section": "page17",
-            "type": "binding",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page17__bindings.json",
-            "size": 312
-        },
-        {
-            "logicalPath": "page17/images/landscape-bg.jpg",
-            "checksum": "2741344193c662fb6527ab16d13f4cb3",
-            "section": "page17",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page17__images__landscape-bg.jpg",
-            "size": 212927
-        },
-        {
-            "logicalPath": "page17/images/portrait-bg.jpg",
-            "checksum": "70be7c9c31716842e9eea1cf8378c7c7",
-            "section": "page17",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page17__images__portrait-bg.jpg",
-            "size": 223770
-        },
-        {
-            "logicalPath": "page17/landscape.lo.js",
-            "checksum": "87ad44cd46f9373a4c322c89d20539a4",
-            "section": "page17",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page17__landscape.lo.js",
-            "size": 306
-        },
-        {
-            "logicalPath": "page17/portrait.lo.js",
-            "checksum": "69c6bbea9853c4cf137782c28cf38019",
-            "section": "page17",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page17__portrait.lo.js",
-            "size": 303
-        },
-        {
-            "logicalPath": "page18/bindings.json",
-            "checksum": "8527b7ac17d192b207c85223574acb82",
-            "section": "page18",
-            "type": "binding",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page18__bindings.json",
-            "size": 635
-        },
-        {
-            "logicalPath": "page18/images/landscape-bg.jpg",
-            "checksum": "c90e568027aa7d79238a3ccbda9126e6",
-            "section": "page18",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page18__images__landscape-bg.jpg",
-            "size": 120636
-        },
-        {
-            "logicalPath": "page18/images/portrait-bg.jpg",
-            "checksum": "8966b47a1573539f1a89c0e00459dce2",
-            "section": "page18",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page18__images__portrait-bg.jpg",
-            "size": 143324
-        },
-        {
-            "logicalPath": "page18/landscape.lo.js",
-            "checksum": "6f6fd0447b0f259b9e14fae68af1bc5b",
-            "section": "page18",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page18__landscape.lo.js",
-            "size": 745
-        },
-        {
-            "logicalPath": "page18/portrait.lo.js",
-            "checksum": "db1d5e869800c77d4a6c2bf206d30831",
-            "section": "page18",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page18__portrait.lo.js",
-            "size": 742
-        },
-        {
-            "logicalPath": "page19/bindings.json",
-            "checksum": "3de3940583854fd0eafbb796d346befe",
-            "section": "page19",
-            "type": "binding",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page19__bindings.json",
-            "size": 455
-        },
-        {
-            "logicalPath": "page19/images/landscape-bg.jpg",
-            "checksum": "6fda18165f853c03ac2548b6fcf23773",
-            "section": "page19",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page19__images__landscape-bg.jpg",
-            "size": 180920
-        },
-        {
-            "logicalPath": "page19/images/portrait-bg.jpg",
-            "checksum": "c85b0d11ed0a1cc6ca24bb44e1399a59",
-            "section": "page19",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page19__images__portrait-bg.jpg",
-            "size": 199265
-        },
-        {
-            "logicalPath": "page19/landscape.lo.js",
-            "checksum": "93c71841da420c940edd1855fb4cd789",
-            "section": "page19",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page19__landscape.lo.js",
-            "size": 452
-        },
-        {
-            "logicalPath": "page19/portrait.lo.js",
-            "checksum": "603244c5b5c889f3b231363b8855f9c5",
-            "section": "page19",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page19__portrait.lo.js",
-            "size": 449
-        },
-        {
             "logicalPath": "page2/bindings.json",
-            "checksum": "e256807e01c4973f2d9af876f00eec2a",
+            "checksum": "10efa0b6cd8ecfe81e0f24cdd38a8da6",
             "section": "page2",
             "type": "binding",
             "edition": 1,
             "physicalPath": "/media/internal/.pivot/en/page2__bindings.json",
-            "size": 759
+            "size": 717
         },
         {
             "logicalPath": "page2/images/landscape-bg.jpg",
@@ -915,480 +465,30 @@
         },
         {
             "logicalPath": "page2/landscape.lo.js",
-            "checksum": "ea1bc3a36932313f6fd548dc7c341b99",
+            "checksum": "ca72a54e2d6b0b7875ced79237d36654",
             "section": "page2",
             "type": "layout",
             "edition": 1,
             "physicalPath": "/media/internal/.pivot/en/page2__landscape.lo.js",
-            "size": 2299
+            "size": 2355
         },
         {
             "logicalPath": "page2/portrait.lo.js",
-            "checksum": "d2ef97bf8ed9fbf6c38493335365801d",
+            "checksum": "96ed661e0e77992abfa2e7aae620bf60",
             "section": "page2",
             "type": "layout",
             "edition": 1,
             "physicalPath": "/media/internal/.pivot/en/page2__portrait.lo.js",
-            "size": 2297
-        },
-        {
-            "logicalPath": "page20/bindings.json",
-            "checksum": "c4b2c6f52c05ef1246f153dca79d9527",
-            "section": "page20",
-            "type": "binding",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page20__bindings.json",
-            "size": 455
-        },
-        {
-            "logicalPath": "page20/images/landscape-bg.jpg",
-            "checksum": "4e6cbf7f29409c07f162139a98ff1cf2",
-            "section": "page20",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page20__images__landscape-bg.jpg",
-            "size": 153949
-        },
-        {
-            "logicalPath": "page20/images/portrait-bg.jpg",
-            "checksum": "a5fe9a598e52e15439a998829fadc337",
-            "section": "page20",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page20__images__portrait-bg.jpg",
-            "size": 149681
-        },
-        {
-            "logicalPath": "page20/landscape.lo.js",
-            "checksum": "63eea98eb3400cdc069e4012f04de637",
-            "section": "page20",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page20__landscape.lo.js",
-            "size": 452
-        },
-        {
-            "logicalPath": "page20/portrait.lo.js",
-            "checksum": "a2caea6706ae01d28466c0a65d2fa61d",
-            "section": "page20",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page20__portrait.lo.js",
-            "size": 449
-        },
-        {
-            "logicalPath": "page21/bindings.json",
-            "checksum": "307bf8119208274dbc307acaff2b88e4",
-            "section": "page21",
-            "type": "binding",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page21__bindings.json",
-            "size": 450
-        },
-        {
-            "logicalPath": "page21/images/landscape-bg.jpg",
-            "checksum": "8fbfd590a5f117d119eb58f214b385b6",
-            "section": "page21",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page21__images__landscape-bg.jpg",
-            "size": 135208
-        },
-        {
-            "logicalPath": "page21/images/portrait-bg.jpg",
-            "checksum": "d0217415b20ee6261b65d1d37eadbd8d",
-            "section": "page21",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page21__images__portrait-bg.jpg",
-            "size": 204136
-        },
-        {
-            "logicalPath": "page21/landscape.lo.js",
-            "checksum": "a20610656a3a6b26051938198b1ce438",
-            "section": "page21",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page21__landscape.lo.js",
-            "size": 452
-        },
-        {
-            "logicalPath": "page21/portrait.lo.js",
-            "checksum": "9612cc45191f7c286c0c1d1a15499c84",
-            "section": "page21",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page21__portrait.lo.js",
-            "size": 449
-        },
-        {
-            "logicalPath": "page22/bindings.json",
-            "checksum": "360f2006ae62be94e2778057db894d2f",
-            "section": "page22",
-            "type": "binding",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page22__bindings.json",
-            "size": 450
-        },
-        {
-            "logicalPath": "page22/images/landscape-bg.jpg",
-            "checksum": "d851400e33bc7d436d7ad9e6542f365c",
-            "section": "page22",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page22__images__landscape-bg.jpg",
-            "size": 171658
-        },
-        {
-            "logicalPath": "page22/images/portrait-bg.jpg",
-            "checksum": "278d048ce2681f92ac5be7cf66178f5f",
-            "section": "page22",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page22__images__portrait-bg.jpg",
-            "size": 97981
-        },
-        {
-            "logicalPath": "page22/landscape.lo.js",
-            "checksum": "ebc094ac56632faf8c7e14f0776dbb95",
-            "section": "page22",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page22__landscape.lo.js",
-            "size": 452
-        },
-        {
-            "logicalPath": "page22/portrait.lo.js",
-            "checksum": "f1d285fd9dec49bad38ebcaf182b2e13",
-            "section": "page22",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page22__portrait.lo.js",
-            "size": 449
-        },
-        {
-            "logicalPath": "page23/bindings.json",
-            "checksum": "83a88b840d63988f0813828465528c9e",
-            "section": "page23",
-            "type": "binding",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page23__bindings.json",
-            "size": 464
-        },
-        {
-            "logicalPath": "page23/images/landscape-bg.jpg",
-            "checksum": "27cb17b0e8fdd3f697a1aff765945d6f",
-            "section": "page23",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page23__images__landscape-bg.jpg",
-            "size": 186380
-        },
-        {
-            "logicalPath": "page23/images/portrait-bg.jpg",
-            "checksum": "0a458c92716c6f8d26dfe30bff2cdc30",
-            "section": "page23",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page23__images__portrait-bg.jpg",
-            "size": 176381
-        },
-        {
-            "logicalPath": "page23/landscape.lo.js",
-            "checksum": "1c3a1619b62048e0ee9a8fa6cd473120",
-            "section": "page23",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page23__landscape.lo.js",
-            "size": 452
-        },
-        {
-            "logicalPath": "page23/portrait.lo.js",
-            "checksum": "38e27caba573f72eda14086f1370fb8f",
-            "section": "page23",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page23__portrait.lo.js",
-            "size": 449
-        },
-        {
-            "logicalPath": "page24/bindings.json",
-            "checksum": "06d288299612d5c5ca5e6ac84a0ed374",
-            "section": "page24",
-            "type": "binding",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page24__bindings.json",
-            "size": 464
-        },
-        {
-            "logicalPath": "page24/images/landscape-bg.jpg",
-            "checksum": "ba920066f7207cf26654c5146871a365",
-            "section": "page24",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page24__images__landscape-bg.jpg",
-            "size": 158940
-        },
-        {
-            "logicalPath": "page24/images/portrait-bg.jpg",
-            "checksum": "319200b4199d8e3e88fc2e3c124f8a2d",
-            "section": "page24",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page24__images__portrait-bg.jpg",
-            "size": 157827
-        },
-        {
-            "logicalPath": "page24/landscape.lo.js",
-            "checksum": "d3acc831382b28fedde935518000cbf5",
-            "section": "page24",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page24__landscape.lo.js",
-            "size": 452
-        },
-        {
-            "logicalPath": "page24/portrait.lo.js",
-            "checksum": "777aa18d07b1cf7410f055d9492784e3",
-            "section": "page24",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page24__portrait.lo.js",
-            "size": 449
-        },
-        {
-            "logicalPath": "page25/bindings.json",
-            "checksum": "01fb692f8787028cbd15ec701543da41",
-            "section": "page25",
-            "type": "binding",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page25__bindings.json",
-            "size": 463
-        },
-        {
-            "logicalPath": "page25/images/landscape-bg.jpg",
-            "checksum": "08f361bc90f1f5ecb76b4987dac3f5fc",
-            "section": "page25",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page25__images__landscape-bg.jpg",
-            "size": 160780
-        },
-        {
-            "logicalPath": "page25/images/portrait-bg.jpg",
-            "checksum": "75f77d0141fa4cc2528d3534e88826dc",
-            "section": "page25",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page25__images__portrait-bg.jpg",
-            "size": 211321
-        },
-        {
-            "logicalPath": "page25/landscape.lo.js",
-            "checksum": "5e531204ce2bdf3da6801217b2d79def",
-            "section": "page25",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page25__landscape.lo.js",
-            "size": 452
-        },
-        {
-            "logicalPath": "page25/portrait.lo.js",
-            "checksum": "01b5d9f077a07f9612c0b0acba8e5d54",
-            "section": "page25",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page25__portrait.lo.js",
-            "size": 449
-        },
-        {
-            "logicalPath": "page26/bindings.json",
-            "checksum": "8b6b07783e9da2e0b29b1e361c1d351b",
-            "section": "page26",
-            "type": "binding",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page26__bindings.json",
-            "size": 463
-        },
-        {
-            "logicalPath": "page26/images/landscape-bg.jpg",
-            "checksum": "c31cdca1cc705044b48f9de839581ea7",
-            "section": "page26",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page26__images__landscape-bg.jpg",
-            "size": 170468
-        },
-        {
-            "logicalPath": "page26/images/portrait-bg.jpg",
-            "checksum": "b360a1543022c1cd8a705caaa72279fb",
-            "section": "page26",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page26__images__portrait-bg.jpg",
-            "size": 87401
-        },
-        {
-            "logicalPath": "page26/landscape.lo.js",
-            "checksum": "ea39d0397ffe8b1ed0fea3ea8ee86725",
-            "section": "page26",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page26__landscape.lo.js",
-            "size": 452
-        },
-        {
-            "logicalPath": "page26/portrait.lo.js",
-            "checksum": "145fcc38a09bfab412a836c95959ba34",
-            "section": "page26",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page26__portrait.lo.js",
-            "size": 449
-        },
-        {
-            "logicalPath": "page27/bindings.json",
-            "checksum": "51c0b69337b05e698ae94350f96abd85",
-            "section": "page27",
-            "type": "binding",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page27__bindings.json",
-            "size": 887
-        },
-        {
-            "logicalPath": "page27/images/landscape-bg.jpg",
-            "checksum": "3a6505f3525cb16a29982cf368536ac4",
-            "section": "page27",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page27__images__landscape-bg.jpg",
-            "size": 270257
-        },
-        {
-            "logicalPath": "page27/images/portrait-bg.jpg",
-            "checksum": "b6f38bb5d0e45f63c81a7c32e754ed9a",
-            "section": "page27",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page27__images__portrait-bg.jpg",
-            "size": 289579
-        },
-        {
-            "logicalPath": "page27/landscape.lo.js",
-            "checksum": "9f03010d713ca8abb1c7d4a87a4bfb24",
-            "section": "page27",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page27__landscape.lo.js",
-            "size": 1032
-        },
-        {
-            "logicalPath": "page27/portrait.lo.js",
-            "checksum": "715496c37873c362b9e57afc44a572bd",
-            "section": "page27",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page27__portrait.lo.js",
-            "size": 1029
-        },
-        {
-            "logicalPath": "page28/bindings.json",
-            "checksum": "90d2bc452f18be3e8394ae251100147a",
-            "section": "page28",
-            "type": "binding",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page28__bindings.json",
-            "size": 2845
-        },
-        {
-            "logicalPath": "page28/images/landscape-bg.jpg",
-            "checksum": "fe94d7079e45e8d6814a63e4b7b8a323",
-            "section": "page28",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page28__images__landscape-bg.jpg",
-            "size": 109493
-        },
-        {
-            "logicalPath": "page28/images/portrait-bg.jpg",
-            "checksum": "f4efe07f25775d7821c68b1902aa9df1",
-            "section": "page28",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page28__images__portrait-bg.jpg",
-            "size": 120543
-        },
-        {
-            "logicalPath": "page28/landscape.lo.js",
-            "checksum": "e29ea62aded6ec15ba7dba0f1d029347",
-            "section": "page28",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page28__landscape.lo.js",
-            "size": 2599
-        },
-        {
-            "logicalPath": "page28/portrait.lo.js",
-            "checksum": "301c99b41311e7fa37549d4c14924bc3",
-            "section": "page28",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page28__portrait.lo.js",
-            "size": 2740
-        },
-        {
-            "logicalPath": "page29/bindings.json",
-            "checksum": "27aba3f85007c08a66706561c42ab4e1",
-            "section": "page29",
-            "type": "binding",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page29__bindings.json",
-            "size": 2944
-        },
-        {
-            "logicalPath": "page29/images/landscape-bg.jpg",
-            "checksum": "a941da00d6795a5b18d2de19332a4823",
-            "section": "page29",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page29__images__landscape-bg.jpg",
-            "size": 113022
-        },
-        {
-            "logicalPath": "page29/images/portrait-bg.jpg",
-            "checksum": "c09c4b09bdd3e0c972855b44ee817355",
-            "section": "page29",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page29__images__portrait-bg.jpg",
-            "size": 119353
-        },
-        {
-            "logicalPath": "page29/landscape.lo.js",
-            "checksum": "e29ea62aded6ec15ba7dba0f1d029347",
-            "section": "page29",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page29__landscape.lo.js",
-            "size": 2599
-        },
-        {
-            "logicalPath": "page29/portrait.lo.js",
-            "checksum": "301c99b41311e7fa37549d4c14924bc3",
-            "section": "page29",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page29__portrait.lo.js",
-            "size": 2740
+            "size": 2353
         },
         {
             "logicalPath": "page3/bindings.json",
-            "checksum": "4ae08ace51735ab0fe19672174086a2d",
+            "checksum": "7b9ff42227289a1c8c7df1d05377bad1",
             "section": "page3",
             "type": "binding",
             "edition": 1,
             "physicalPath": "/media/internal/.pivot/en/page3__bindings.json",
-            "size": 433
+            "size": 414
         },
         {
             "logicalPath": "page3/images/landscape-bg.jpg",
@@ -1410,111 +510,21 @@
         },
         {
             "logicalPath": "page3/landscape.lo.js",
-            "checksum": "f9386ccf01193ce7c8efd47f582a7487",
+            "checksum": "555b8f5117dcfafc9715b67377e9f11e",
             "section": "page3",
             "type": "layout",
             "edition": 1,
             "physicalPath": "/media/internal/.pivot/en/page3__landscape.lo.js",
-            "size": 1140
+            "size": 1182
         },
         {
             "logicalPath": "page3/portrait.lo.js",
-            "checksum": "8c82dfe5bb2cdf92a3dbefd66b765ef8",
+            "checksum": "038695904f94aeb49055b9f0d2c2784d",
             "section": "page3",
             "type": "layout",
             "edition": 1,
             "physicalPath": "/media/internal/.pivot/en/page3__portrait.lo.js",
-            "size": 1146
-        },
-        {
-            "logicalPath": "page30/bindings.json",
-            "checksum": "17eb7dbe9f906ca6c3688a1a26c0d3d5",
-            "section": "page30",
-            "type": "binding",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page30__bindings.json",
-            "size": 2170
-        },
-        {
-            "logicalPath": "page30/images/landscape-bg.jpg",
-            "checksum": "f3b762477bdbd679f3ab09ebc357e7cf",
-            "section": "page30",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page30__images__landscape-bg.jpg",
-            "size": 66179
-        },
-        {
-            "logicalPath": "page30/images/portrait-bg.jpg",
-            "checksum": "f06119c48ae5b8fad9812238f33c7858",
-            "section": "page30",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page30__images__portrait-bg.jpg",
-            "size": 50870
-        },
-        {
-            "logicalPath": "page30/landscape.lo.js",
-            "checksum": "a75843bc799dce0449f32b73ac15255f",
-            "section": "page30",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page30__landscape.lo.js",
-            "size": 2634
-        },
-        {
-            "logicalPath": "page30/portrait.lo.js",
-            "checksum": "cad8b1f68108c877a75286bab566934b",
-            "section": "page30",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page30__portrait.lo.js",
-            "size": 2796
-        },
-        {
-            "logicalPath": "page31/bindings.json",
-            "checksum": "d9edc92ac488b0c0acbbc20789439141",
-            "section": "page31",
-            "type": "binding",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page31__bindings.json",
-            "size": 365
-        },
-        {
-            "logicalPath": "page31/images/landscape-bg.jpg",
-            "checksum": "08a8873f866f3536ad99a85db39b75bc",
-            "section": "page31",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page31__images__landscape-bg.jpg",
-            "size": 184085
-        },
-        {
-            "logicalPath": "page31/images/portrait-bg.jpg",
-            "checksum": "4f58917e8f2393f2bbc3114c59ceb34c",
-            "section": "page31",
-            "type": "image",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page31__images__portrait-bg.jpg",
-            "size": 173670
-        },
-        {
-            "logicalPath": "page31/landscape.lo.js",
-            "checksum": "f3dce807a5a64583817b08b5539ab0ba",
-            "section": "page31",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page31__landscape.lo.js",
-            "size": 380
-        },
-        {
-            "logicalPath": "page31/portrait.lo.js",
-            "checksum": "76b569bb0cfa5242fa7e2b99f61049ec",
-            "section": "page31",
-            "type": "layout",
-            "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/page31__portrait.lo.js",
-            "size": 377
+            "size": 1188
         },
         {
             "logicalPath": "page4/bindings.json",
@@ -1698,93 +708,93 @@
         },
         {
             "logicalPath": "page8/bindings.json",
-            "checksum": "6be0742f8190d7c16fe232b783474e34",
+            "checksum": "49de221460b854aaf89da8d2c354258d",
             "section": "page8",
             "type": "binding",
             "edition": 1,
             "physicalPath": "/media/internal/.pivot/en/page8__bindings.json",
-            "size": 452
+            "size": 2168
         },
         {
             "logicalPath": "page8/images/landscape-bg.jpg",
-            "checksum": "0bcfb54ae7423fe8bcbfb4ab827849b8",
+            "checksum": "f3b762477bdbd679f3ab09ebc357e7cf",
             "section": "page8",
             "type": "image",
             "edition": 1,
             "physicalPath": "/media/internal/.pivot/en/page8__images__landscape-bg.jpg",
-            "size": 162989
+            "size": 66179
         },
         {
             "logicalPath": "page8/images/portrait-bg.jpg",
-            "checksum": "62fa1e7d4c7386f9b4192d534ce2291b",
+            "checksum": "f06119c48ae5b8fad9812238f33c7858",
             "section": "page8",
             "type": "image",
             "edition": 1,
             "physicalPath": "/media/internal/.pivot/en/page8__images__portrait-bg.jpg",
-            "size": 177116
+            "size": 50870
         },
         {
             "logicalPath": "page8/landscape.lo.js",
-            "checksum": "403cf31a31b4494b6aaf18b1d05b3338",
+            "checksum": "a75843bc799dce0449f32b73ac15255f",
             "section": "page8",
             "type": "layout",
             "edition": 1,
             "physicalPath": "/media/internal/.pivot/en/page8__landscape.lo.js",
-            "size": 452
+            "size": 2634
         },
         {
             "logicalPath": "page8/portrait.lo.js",
-            "checksum": "ff3fefdc3f0f41783329e9dc76b3dee3",
+            "checksum": "cad8b1f68108c877a75286bab566934b",
             "section": "page8",
             "type": "layout",
             "edition": 1,
             "physicalPath": "/media/internal/.pivot/en/page8__portrait.lo.js",
-            "size": 449
+            "size": 2796
         },
         {
             "logicalPath": "page9/bindings.json",
-            "checksum": "847f496a62493aaa3aded5bdfc84df62",
+            "checksum": "20982bac8ad1fb220dc789d23544cf1b",
             "section": "page9",
             "type": "binding",
             "edition": 1,
             "physicalPath": "/media/internal/.pivot/en/page9__bindings.json",
-            "size": 1201
+            "size": 363
         },
         {
             "logicalPath": "page9/images/landscape-bg.jpg",
-            "checksum": "e28085e8e225969a7323a0259acef4a3",
+            "checksum": "08a8873f866f3536ad99a85db39b75bc",
             "section": "page9",
             "type": "image",
             "edition": 1,
             "physicalPath": "/media/internal/.pivot/en/page9__images__landscape-bg.jpg",
-            "size": 267652
+            "size": 184085
         },
         {
             "logicalPath": "page9/images/portrait-bg.jpg",
-            "checksum": "ca5ab2b9bed9758596770ac905d787cd",
+            "checksum": "4f58917e8f2393f2bbc3114c59ceb34c",
             "section": "page9",
             "type": "image",
             "edition": 1,
             "physicalPath": "/media/internal/.pivot/en/page9__images__portrait-bg.jpg",
-            "size": 298458
+            "size": 173670
         },
         {
             "logicalPath": "page9/landscape.lo.js",
-            "checksum": "49e4a060ad84468250b9bbb458ec965d",
+            "checksum": "f3dce807a5a64583817b08b5539ab0ba",
             "section": "page9",
             "type": "layout",
             "edition": 1,
             "physicalPath": "/media/internal/.pivot/en/page9__landscape.lo.js",
-            "size": 1649
+            "size": 380
         },
         {
             "logicalPath": "page9/portrait.lo.js",
-            "checksum": "91d25acc0d02eb128a87fa38210e6bab",
+            "checksum": "76b569bb0cfa5242fa7e2b99f61049ec",
             "section": "page9",
             "type": "layout",
             "edition": 1,
             "physicalPath": "/media/internal/.pivot/en/page9__portrait.lo.js",
-            "size": 1646
+            "size": 377
         }
     ]
 }

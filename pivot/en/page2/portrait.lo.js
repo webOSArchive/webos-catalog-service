@@ -13,16 +13,16 @@
         {content: "", className: "toc-sphere4", target: "{$targetSphere4}", onclick: "goToTargetAction"},
         {content: "", className: "toc-sphere5", target: "{$targetSphere5}", onclick: "goToTargetAction"},
         {content: "", className: "toc-sphere6", target: "{$targetSphere6}", onclick: "goToTargetAction"},
-        {content: "", className: "toc-sphere7", target: "{$targetSphere7}", onclick: "goToTargetAction"},
+        {content: "", className: "toc-sphere7 hidden", target: "{$targetSphere7}", onclick: "goToTargetAction"},
         {content: "", className: "toc-sphere8 hidden", target: "{$targetSphere8}", onclick: "goToTargetAction"},
 
-        {content: "", className: "toc-hub", target: "{$targetHub}", onclick: "goToTargetAction"},
-        {content: "", className: "toc-hub1", target: "{$targetHub}", onclick: "goToTargetAction"},
-        {content: "", className: "toc-orient", target: "{$targetOrient1}", onclick: "goToTargetAction"},
-        {content: "", className: "toc-orient1", target: "{$targetOrient1}", onclick: "goToTargetAction"},
-        {content: "", className: "toc-orient2", target: "{$targetOrient2}", onclick: "goToTargetAction"},
-        {content: "", className: "toc-orient3", target: "{$targetOrient3}", onclick: "goToTargetAction"},
-        {content: "", className: "toc-orient4", target: "{$targetOrient4}", onclick: "goToTargetAction"},
+        {content: "", className: "toc-hub hidden", target: "{$targetHub}", onclick: "goToTargetAction"},
+        {content: "", className: "toc-hub1 hidden", target: "{$targetHub}", onclick: "goToTargetAction"},
+        {content: "", className: "toc-orient hidden", target: "{$targetOrient1}", onclick: "goToTargetAction"},
+        {content: "", className: "toc-orient1 hidden", target: "{$targetOrient1}", onclick: "goToTargetAction"},
+        {content: "", className: "toc-orient2 hidden", target: "{$targetOrient2}", onclick: "goToTargetAction"},
+        {content: "", className: "toc-orient3 hidden", target: "{$targetOrient3}", onclick: "goToTargetAction"},
+        {content: "", className: "toc-orient4 hidden", target: "{$targetOrient4}", onclick: "goToTargetAction"},
 
         {content: "", className: "toc-toc2", target: "{$targetTOC2}", onclick: "goToTargetAction"}
 	]}
