@@ -1,8 +1,8 @@
 {
     "publishDate": "08/21/2026 12:00:00",
-    "magazineVersion": 11,
+    "magazineVersion": 12,
     "numPages": 2,
-    "packageSize": 1925,
+    "packageSize": 1959,
     "results": [
         {
             "logicalPath": "page0/bindings.json",
@@ -10,26 +10,26 @@
             "section": "page0",
             "type": "binding",
             "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/v11/page0__bindings.json",
+            "physicalPath": "/media/internal/.pivot/en/v12/page0__bindings.json",
             "size": 3
         },
         {
             "logicalPath": "page0/landscape.lo.js",
-            "checksum": "966078759441b40c73029d67e16d4a85",
+            "checksum": "0eae08b593071648c168e92dfd821e33",
             "section": "page0",
             "type": "layout",
             "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/v11/page0__landscape.lo.js",
-            "size": 463
+            "physicalPath": "/media/internal/.pivot/en/v12/page0__landscape.lo.js",
+            "size": 480
         },
         {
             "logicalPath": "page0/portrait.lo.js",
-            "checksum": "1a196ebb505f7c8357e51f9fe5651ff7",
+            "checksum": "802a6e11c2446732b44a83dd502ca79b",
             "section": "page0",
             "type": "layout",
             "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/v11/page0__portrait.lo.js",
-            "size": 461
+            "physicalPath": "/media/internal/.pivot/en/v12/page0__portrait.lo.js",
+            "size": 478
         },
         {
             "logicalPath": "page1/bindings.json",
@@ -37,25 +37,25 @@
             "section": "page1",
             "type": "binding",
             "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/v11/page1__bindings.json",
+            "physicalPath": "/media/internal/.pivot/en/v12/page1__bindings.json",
             "size": 3
         },
         {
             "logicalPath": "page1/landscape.lo.js",
-            "checksum": "224fece5b70e8fe87fd36858357b788a",
+            "checksum": "a346b93ce2ed00a809823c0acc84f2e4",
             "section": "page1",
             "type": "layout",
             "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/v11/page1__landscape.lo.js",
+            "physicalPath": "/media/internal/.pivot/en/v12/page1__landscape.lo.js",
             "size": 498
         },
         {
             "logicalPath": "page1/portrait.lo.js",
-            "checksum": "fe90128b76d8a14bc4204a208a93f485",
+            "checksum": "180ecd0e4a8e94db75536fa93fcf6736",
             "section": "page1",
             "type": "layout",
             "edition": 1,
-            "physicalPath": "/media/internal/.pivot/en/v11/page1__portrait.lo.js",
+            "physicalPath": "/media/internal/.pivot/en/v12/page1__portrait.lo.js",
             "size": 497
         }
     ]
