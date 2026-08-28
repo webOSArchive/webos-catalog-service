@@ -479,6 +479,11 @@ function mm_dev_on($app, $key) {
 			<div class="mm-desc"><?php echo $app_detail["versionNote"]; ?></div>
 		<?php } ?>
 
+		<?php if (strpos($app_detail["publicApplicationId"] ?? "", "com.palm") === 0) { ?>
+			<div class="mm-section-title">Application Permissions</div>
+			<div class="mm-desc">This app will have system-level privileges on device.</div>
+		<?php } ?>
+
 		<?php if (!empty($app_detail["images"])) { ?>
 		<div class="mm-section-title">Screenshots</div>
 		<div class="mm-shots">
