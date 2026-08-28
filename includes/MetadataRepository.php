@@ -80,6 +80,24 @@ class MetadataRepository {
     }
 
     /**
+     * Look up an app's numeric ID by its developer-facing Application ID
+     * (app_metadata.public_application_id, e.g. "org.webosarchive.secondscreen").
+     * Distinct from the numeric Museum ID (apps.id) shown alongside it in the UI.
+     *
+     * @param string $publicApplicationId
+     * @return int|null Museum ID (apps.id), or null if no app has this Application ID
+     */
+    public function getAppIdByPublicApplicationId($publicApplicationId) {
+        $stmt = $this->db->prepare("
+            SELECT app_id FROM app_metadata WHERE LOWER(public_application_id) = LOWER(?)
+        ");
+        $stmt->execute([$publicApplicationId]);
+        $result = $stmt->fetch();
+
+        return $result ? (int)$result['app_id'] : null;
+    }
+
+    /**
      * Get images for an app
      *
      * @param int $appId App ID

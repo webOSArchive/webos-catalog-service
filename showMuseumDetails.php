@@ -250,7 +250,34 @@ $found_app = null;
 $found_id = null;
 $appRepo = new AppRepository();
 
-if (isset($_GET["app"])) {
+// Normalize field names to match expected format (numeric ID / Application ID
+// lookups go through AppRepository::getById(), which returns raw column names).
+$normalize_found_app = function ($app) {
+	$app['appIconBig'] = $app['app_icon_big'] ?? '';
+	$app['Pre'] = $app['pre'] ?? false;
+	$app['Pixi'] = $app['pixi'] ?? false;
+	$app['Pre2'] = $app['pre2'] ?? false;
+	$app['Pre3'] = $app['pre3'] ?? false;
+	$app['Veer'] = $app['veer'] ?? false;
+	$app['TouchPad'] = $app['touchpad'] ?? false;
+	$app['LuneOS'] = $app['luneos'] ?? false;
+	return $app;
+};
+
+if (isset($_GET["appid"])) {
+	// Exact match on the developer-facing Application ID (app_metadata.public_application_id),
+	// distinct from the numeric Museum ID used by ?app=.
+	$search_str = urldecode($_GET["appid"]);
+	$metaRepo = new MetadataRepository();
+	$matched_id = $metaRepo->getAppIdByPublicApplicationId($search_str);
+	if ($matched_id !== null) {
+		$found_app = $appRepo->getById($matched_id);
+		if ($found_app) {
+			$found_app = $normalize_found_app($found_app);
+			$found_id = $found_app['id'];
+		}
+	}
+} else if (isset($_GET["app"])) {
 	$search_str = $_GET["app"];
 	$search_str = urldecode($search_str);
 
@@ -258,15 +285,7 @@ if (isset($_GET["app"])) {
 	if (is_numeric($search_str)) {
 		$found_app = $appRepo->getById((int)$search_str);
 		if ($found_app) {
-			// Normalize field names to match expected format
-			$found_app['appIconBig'] = $found_app['app_icon_big'] ?? '';
-			$found_app['Pre'] = $found_app['pre'] ?? false;
-			$found_app['Pixi'] = $found_app['pixi'] ?? false;
-			$found_app['Pre2'] = $found_app['pre2'] ?? false;
-			$found_app['Pre3'] = $found_app['pre3'] ?? false;
-			$found_app['Veer'] = $found_app['veer'] ?? false;
-			$found_app['TouchPad'] = $found_app['touchpad'] ?? false;
-			$found_app['LuneOS'] = $found_app['luneos'] ?? false;
+			$found_app = $normalize_found_app($found_app);
 			$found_id = $found_app['id'];
 		}
 	} else {
