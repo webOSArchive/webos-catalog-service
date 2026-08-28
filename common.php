@@ -39,11 +39,12 @@ function render_social($link, $basePath) {
  * Load app catalog from database
  *
  * @param array $statuses - Array of statuses to load (default: ['active'])
+ * @param bool $webOnly - Exclude web_suppressed apps (web callers only; API callers must leave this false)
  * @return array - Array of apps
  */
-function load_catalogs($statuses = ['active']) {
+function load_catalogs($statuses = ['active'], $webOnly = false) {
 	$repo = new AppRepository();
-	return $repo->loadCatalog(array_unique($statuses));
+	return $repo->loadCatalog(array_unique($statuses), 'recent', $webOnly);
 }
 
 /**
@@ -52,11 +53,12 @@ function load_catalogs($statuses = ['active']) {
  * @param array $catalog - Ignored (kept for backward compatibility)
  * @param string $search_str - Search term
  * @param bool $adult - Whether to include adult content
+ * @param bool $webOnly - Exclude web_suppressed apps (web callers only; API callers must leave this false)
  * @return array - Matching apps
  */
-function search_apps($catalog, $search_str, $adult = false) {
+function search_apps($catalog, $search_str, $adult = false, $webOnly = false) {
 	$repo = new AppRepository();
-	return $repo->searchApps($search_str, $adult);
+	return $repo->searchApps($search_str, $adult, ['active'], $webOnly);
 }
 
 /**
@@ -65,11 +67,12 @@ function search_apps($catalog, $search_str, $adult = false) {
  * @param array $catalog - Ignored (kept for backward compatibility)
  * @param string $search_str - Author search term
  * @param bool $adult - Whether to include adult content
+ * @param bool $webOnly - Exclude web_suppressed apps (web callers only; API callers must leave this false)
  * @return array - Matching apps
  */
-function search_apps_by_author($catalog, $search_str, $adult = false) {
+function search_apps_by_author($catalog, $search_str, $adult = false, $webOnly = false) {
 	$repo = new AppRepository();
-	return $repo->searchByAuthor($search_str, $adult);
+	return $repo->searchByAuthor($search_str, $adult, ['active'], 'alpha', $webOnly);
 }
 
 /**
@@ -80,11 +83,12 @@ function search_apps_by_author($catalog, $search_str, $adult = false) {
  * @param bool $adult - Whether to include adult content
  * @param int $limit - Maximum number of results (0 for no limit)
  * @param string $sort - Sort order: 'recent' (default), 'alpha', or 'recommended'
+ * @param bool $webOnly - Exclude web_suppressed apps (web callers only; API callers must leave this false)
  * @return array - Filtered apps
  */
-function filter_apps_by_category($catalog, $category, $adult = false, $limit = 0, $sort = 'recent') {
+function filter_apps_by_category($catalog, $category, $adult = false, $limit = 0, $sort = 'recent', $webOnly = false) {
 	$repo = new AppRepository();
-	return $repo->filterByCategory($category, $adult, $limit, ['active'], $sort);
+	return $repo->filterByCategory($category, $adult, $limit, ['active'], $sort, $webOnly);
 }
 
 /**

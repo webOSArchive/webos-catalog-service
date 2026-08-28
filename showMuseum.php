@@ -114,7 +114,7 @@ if (isset($_GET['category']))
 	// Fetch the full, sorted category set. Sorting is done in SQL
 	// (ORDER BY), so slicing into pages below preserves the chosen
 	// sort order (recent / alpha / recommended).
-	$results = filter_apps_by_category($fullcatalog, $category, $_adult, 0, $_sort);
+	$results = filter_apps_by_category($fullcatalog, $category, $_adult, 0, $_sort, true);
 
 	// Paginate categories with more than PAGE_SIZE apps
 	$PAGE_SIZE = 150;
@@ -140,7 +140,7 @@ elseif (isset($_GET['search']))
 	$search_str = strtolower($search);
 	$_adult = strpos($adult, 'true') !== false;
 
-	$results = search_apps($fullcatalog, $search_str, $_adult);
+	$results = search_apps($fullcatalog, $search_str, $_adult, true);
 	$app_response = array('data' => $results);
 }
 

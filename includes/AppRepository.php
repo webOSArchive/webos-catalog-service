@@ -47,14 +47,31 @@ class AppRepository {
     }
 
     /**
+     * SQL WHERE fragment that hides apps flagged web_suppressed. Only applied
+     * when a caller explicitly asks for web-facing results ($webOnly = true);
+     * the JSON API (WebService/*) always passes false (the default) so
+     * webOS/LuneOS clients keep seeing these apps.
+     *
+     * Requires app_metadata to be joined with the given alias.
+     *
+     * @param string $alias Table alias used for app_metadata in the query
+     * @return string SQL fragment (no leading AND)
+     */
+    private function notWebSuppressedClause($alias = 'm') {
+        return "($alias.web_suppressed IS NULL OR $alias.web_suppressed = FALSE)";
+    }
+
+    /**
      * Load apps from database - replaces load_catalogs()
      *
      * @param array $statuses Which statuses to include ['active', 'missing', 'archived']
      * @param string $sort Sort order: 'recent' (default), 'alpha', or 'recommended'
+     * @param bool $webOnly Exclude web_suppressed apps (web callers only; API always passes false)
      * @return array Apps in format matching original JSON structure
      */
-    public function loadCatalog($statuses = ['active'], $sort = 'recent') {
+    public function loadCatalog($statuses = ['active'], $sort = 'recent', $webOnly = false) {
         $placeholders = str_repeat('?,', count($statuses) - 1) . '?';
+        $webFilter = $webOnly ? " AND {$this->notWebSuppressedClause()}" : "";
 
         // Determine sort order
         if ($sort === 'recommended') {
@@ -96,6 +113,7 @@ class AppRepository {
             LEFT JOIN app_metadata m ON a.id = m.app_id
             WHERE a.status IN ($placeholders)
               AND {$this->notFutureDatedClause()}
+              $webFilter
             ORDER BY $orderBy
         ";
 
@@ -129,9 +147,10 @@ class AppRepository {
      * @param string $searchStr Search term
      * @param bool $adult Whether to include adult content
      * @param array $statuses Which statuses to search
+     * @param bool $webOnly Exclude web_suppressed apps (web callers only; API always passes false)
      * @return array Matching apps
      */
-    public function searchApps($searchStr, $adult = false, $statuses = ['active']) {
+    public function searchApps($searchStr, $adult = false, $statuses = ['active'], $webOnly = false) {
         $searchStr = $this->sanitizeSearch($searchStr);
         if (empty($searchStr)) {
             return [];
@@ -197,6 +216,10 @@ class AppRepository {
         $sql .= " AND " . $this->notFutureDatedClause();
         $params[] = $this->publishCutoff();
 
+        if ($webOnly) {
+            $sql .= " AND " . $this->notWebSuppressedClause();
+        }
+
         if (!$adult) {
             $sql .= " AND a.adult = FALSE";
         }
@@ -232,15 +255,18 @@ class AppRepository {
      * @param string $authorStr Author name to search
      * @param bool $adult Whether to include adult content
      * @param array $statuses Which statuses to search
+     * @param string $sort Sort order: 'alpha' (default) or 'recent'
+     * @param bool $webOnly Exclude web_suppressed apps (web callers only; API always passes false)
      * @return array Matching apps
      */
-    public function searchByAuthor($authorStr, $adult = false, $statuses = ['active'], $sort = 'alpha') {
+    public function searchByAuthor($authorStr, $adult = false, $statuses = ['active'], $sort = 'alpha', $webOnly = false) {
         $authorStr = $this->sanitizeSearch($authorStr);
         if (empty($authorStr)) {
             return [];
         }
 
         $statusPlaceholders = str_repeat('?,', count($statuses) - 1) . '?';
+        $webFilter = $webOnly ? " AND {$this->notWebSuppressedClause()}" : "";
 
         $sql = "
             SELECT
@@ -272,6 +298,7 @@ class AppRepository {
                   OR LOWER(REPLACE(a.author, ' ', '')) LIKE LOWER(?)
               )
               AND {$this->notFutureDatedClause()}
+              $webFilter
         ";
 
         $params = array_merge($statuses, [
@@ -307,9 +334,10 @@ class AppRepository {
      * @param int $limit Max results (0 for unlimited)
      * @param array $statuses Which statuses to include
      * @param string $sort Sort order: 'recent' (default), 'alpha', or 'recommended'
+     * @param bool $webOnly Exclude web_suppressed apps (web callers only; API always passes false)
      * @return array Filtered apps
      */
-    public function filterByCategory($category, $adult = false, $limit = 0, $statuses = ['active'], $sort = 'recent') {
+    public function filterByCategory($category, $adult = false, $limit = 0, $statuses = ['active'], $sort = 'recent', $webOnly = false) {
         $statusPlaceholders = str_repeat('?,', count($statuses) - 1) . '?';
 
         $sql = "
@@ -357,6 +385,10 @@ class AppRepository {
         // Hide apps scheduled for the future (server clock)
         $sql .= " AND " . $this->notFutureDatedClause();
         $params[] = $this->publishCutoff();
+
+        if ($webOnly) {
+            $sql .= " AND " . $this->notWebSuppressedClause();
+        }
 
         // Determine sort order
         if ($sort === 'recommended') {
@@ -995,9 +1027,11 @@ class AppRepository {
      *
      * @param int $appId App ID
      * @param int $limit Maximum number of related apps
+     * @param bool $webOnly Exclude web_suppressed apps (web callers only; API always passes false)
      * @return array Related apps with basic info
      */
-    public function getRelatedApps($appId, $limit = 10) {
+    public function getRelatedApps($appId, $limit = 10, $webOnly = false) {
+        $webFilter = $webOnly ? " AND {$this->notWebSuppressedClause()}" : "";
         $sql = "
             SELECT a.id, a.title, a.author,
                    a.app_icon as appIcon, a.app_icon_big as appIconBig
@@ -1006,7 +1040,9 @@ class AppRepository {
                 (ar.app_id = ? AND a.id = ar.related_app_id) OR
                 (ar.related_app_id = ? AND a.id = ar.app_id)
             )
+            LEFT JOIN app_metadata m ON a.id = m.app_id
             WHERE a.status = 'active'
+              $webFilter
             ORDER BY a.title
             LIMIT ?
         ";

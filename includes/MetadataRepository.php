@@ -61,6 +61,7 @@ class MetadataRepository {
             'installSize' => $metadata['install_size'] ? (int)$metadata['install_size'] : null,
             'isEncrypted' => (bool)$metadata['is_encrypted'],
             'adultRating' => (bool)$metadata['adult_rating'],
+            'webSuppressed' => (bool)$metadata['web_suppressed'],
             'islocationbased' => (bool)$metadata['is_location_based'],
             'lastModifiedTime' => $metadata['last_modified_time'],
             'mediaLink' => $metadata['media_link'],
@@ -95,6 +96,22 @@ class MetadataRepository {
         $result = $stmt->fetch();
 
         return $result ? (int)$result['app_id'] : null;
+    }
+
+    /**
+     * Cheap check of the web_suppressed flag, without loading full metadata
+     * (images, description, etc). Used to gate web-only visibility before
+     * deciding whether to render an app's detail page.
+     *
+     * @param int $appId
+     * @return bool
+     */
+    public function isWebSuppressed($appId) {
+        $stmt = $this->db->prepare("SELECT web_suppressed FROM app_metadata WHERE app_id = ?");
+        $stmt->execute([$appId]);
+        $result = $stmt->fetch();
+
+        return $result ? (bool)$result['web_suppressed'] : false;
     }
 
     /**
@@ -177,14 +194,14 @@ class MetadataRepository {
                 app_id, public_application_id, description, version, version_note,
                 home_url, support_url, cust_support_email, cust_support_phone,
                 copyright, license_url, locale, app_size, install_size,
-                is_encrypted, adult_rating, is_location_based, last_modified_time,
+                is_encrypted, adult_rating, web_suppressed, is_location_based, last_modified_time,
                 media_link, media_icon, price, currency, free, is_advertized,
                 filename, original_filename, star_rating, attributes
             ) VALUES (
                 ?, ?, ?, ?, ?,
                 ?, ?, ?, ?,
                 ?, ?, ?, ?, ?,
-                ?, ?, ?, ?,
+                ?, ?, ?, ?, ?,
                 ?, ?, ?, ?, ?, ?,
                 ?, ?, ?, ?
             )
@@ -204,6 +221,7 @@ class MetadataRepository {
                 install_size = VALUES(install_size),
                 is_encrypted = VALUES(is_encrypted),
                 adult_rating = VALUES(adult_rating),
+                web_suppressed = VALUES(web_suppressed),
                 is_location_based = VALUES(is_location_based),
                 last_modified_time = VALUES(last_modified_time),
                 media_link = VALUES(media_link),
@@ -241,6 +259,7 @@ class MetadataRepository {
             $data['installSize'] ?? null,
             (int)($data['isEncrypted'] ?? false),
             (int)($data['adultRating'] ?? false),
+            (int)($data['webSuppressed'] ?? false),
             (int)($data['islocationbased'] ?? false),
             $lastModified,
             $data['mediaLink'] ?? null,

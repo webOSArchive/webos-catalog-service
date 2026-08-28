@@ -19,7 +19,7 @@ $fullcatalog = load_catalogs();
 $search_str = urldecode(strtolower($query));
 $search_str = preg_replace("/[^a-zA-Z0-9 ]+/", "", $search_str);
 
-$results = search_apps($fullcatalog, $search_str, false);
+$results = search_apps($fullcatalog, $search_str, false, true);
 $app_response = create_app_response($results);
 
 //send them to result if it's the only or an exact-title match, else the search page

@@ -66,6 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'starRating' => $_POST['starRating'] ? (int)$_POST['starRating'] : null,
         'isEncrypted' => isset($_POST['isEncrypted']),
         'adultRating' => isset($_POST['adultRating']),
+        'webSuppressed' => isset($_POST['webSuppressed']),
         'islocationbased' => isset($_POST['islocationbased']),
         'isAdvertized' => isset($_POST['isAdvertized']),
         'mediaLink' => trim($_POST['mediaLink'] ?? ''),
@@ -359,6 +360,10 @@ include 'includes/header.php';
                 <label>
                     <input type="checkbox" name="adultRating" <?php echo ($metadata['adult_rating'] ?? false) ? 'checked' : ''; ?>>
                     Adult Rating
+                </label>
+                <label>
+                    <input type="checkbox" name="webSuppressed" <?php echo ($metadata['web_suppressed'] ?? false) ? 'checked' : ''; ?>>
+                    Web Suppressed
                 </label>
                 <label>
                     <input type="checkbox" name="islocationbased" <?php echo ($metadata['is_location_based'] ?? false) ? 'checked' : ''; ?>>

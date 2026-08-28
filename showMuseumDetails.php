@@ -249,6 +249,7 @@ $encode_secret = $config['download_secret'] ?? 'webos_archive_default_secret';
 $found_app = null;
 $found_id = null;
 $appRepo = new AppRepository();
+$metaRepo = new MetadataRepository();
 
 // Normalize field names to match expected format (numeric ID / Application ID
 // lookups go through AppRepository::getById(), which returns raw column names).
@@ -266,9 +267,9 @@ $normalize_found_app = function ($app) {
 
 if (isset($_GET["appid"])) {
 	// Exact match on the developer-facing Application ID (app_metadata.public_application_id),
-	// distinct from the numeric Museum ID used by ?app=.
+	// distinct from the numeric Museum ID used by ?app=. Deliberately bypasses the
+	// web_suppressed check below - this is the one way a suppressed app stays reachable.
 	$search_str = urldecode($_GET["appid"]);
-	$metaRepo = new MetadataRepository();
 	$matched_id = $metaRepo->getAppIdByPublicApplicationId($search_str);
 	if ($matched_id !== null) {
 		$found_app = $appRepo->getById($matched_id);
@@ -287,12 +288,18 @@ if (isset($_GET["appid"])) {
 		if ($found_app) {
 			$found_app = $normalize_found_app($found_app);
 			$found_id = $found_app['id'];
+			// Suppressed apps aren't navigable by Museum ID on the web (API/device
+			// clients never go through this file, so they're unaffected).
+			if ($metaRepo->isWebSuppressed($found_id)) {
+				$found_app = null;
+				$found_id = null;
+			}
 		}
 	} else {
 		// Text search - sanitize and search
 		$search_str = strtolower($search_str);
 		$search_str = preg_replace("/[^a-zA-Z0-9 ]+/", "", $search_str);
-		$results = $appRepo->searchApps($search_str, true); // Include adult content
+		$results = $appRepo->searchApps($search_str, true, ['active'], true); // Include adult content, exclude web_suppressed
 		if (count($results) > 0) {
 			$found_app = $results[0];
 			$found_id = $found_app["id"];
@@ -331,7 +338,6 @@ else
     $PROTOCOL = "http://";
 
 // Get app detail data from database first, fallback to metadata host
-$metaRepo = new MetadataRepository();
 $app_detail = $metaRepo->getMetadata((int)$found_id);
 
 // Note: External metadata host fallback removed - all metadata should be in database
@@ -527,7 +533,9 @@ function mm_dev_on($app, $key) {
 		<div class="mm-rows">
 			<div class="mm-row"><span class="mm-label">Museum ID</span><span class="mm-value"><?php echo htmlspecialchars($found_app["id"]) ?></span></div>
 			<div class="mm-row"><span class="mm-label">Application ID</span><span class="mm-value"><?php echo htmlspecialchars($app_detail["publicApplicationId"] ?? "") ?></span></div>
+			<?php if (empty($app_detail["webSuppressed"])) { ?>
 			<div class="mm-row"><span class="mm-label">Share Link</span><span class="mm-value"><a href="<?php echo htmlspecialchars($share_url, ENT_QUOTES) ?>"><?php echo htmlspecialchars($share_url) ?></a></span></div>
+			<?php } ?>
 			<div class="mm-row"><span class="mm-label">Author</span><span class="mm-value"><a href="<?php echo htmlspecialchars($author_url, ENT_QUOTES) ?>"><?php echo htmlspecialchars($found_app["author"]) ?></a></span></div>
 			<div class="mm-row"><span class="mm-label">Version</span><span class="mm-value"><?php echo htmlspecialchars($app_detail["version"] ?? "") ?></span></div>
 			<div class="mm-row"><span class="mm-label">Home Page</span><span class="mm-value"><a href="<?php echo htmlspecialchars($app_detail["homeURL"] ?? "", ENT_QUOTES) ?>" target="_blank"><?php echo htmlspecialchars($app_detail["homeURL"] ?? "") ?></a></span></div>
@@ -540,7 +548,7 @@ function mm_dev_on($app, $key) {
 		<?php
 		// Get and display related apps
 		$appRepo = new AppRepository();
-		$relatedApps = $appRepo->getRelatedApps($found_id, 6);
+		$relatedApps = $appRepo->getRelatedApps($found_id, 6, true);
 		if (!empty($relatedApps)):
 		?>
 		<div class="mm-section-title">Related Apps</div>
