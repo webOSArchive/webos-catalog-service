@@ -887,10 +887,12 @@ class AppRepository {
                 a.recommendation_order,
                 a.updated_at,
                 a.owner_account_id,
-                acct.username AS owner_username
+                acct.username AS owner_username,
+                m.public_application_id AS publicApplicationId
             FROM apps a
             LEFT JOIN categories c ON a.category_id = c.id
             LEFT JOIN accounts acct ON acct.id = a.owner_account_id
+            LEFT JOIN app_metadata m ON a.id = m.app_id
             WHERE 1=1
         ";
 

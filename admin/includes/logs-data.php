@@ -12,12 +12,12 @@ function admin_get_logs_data($logType, $dateFrom, $dateTo, $appId, $page, $perPa
 
     if ($logType === 'downloads') {
         $table   = 'download_logs';
-        $columns = 'dl.id, dl.app_id, dl.source, dl.ip_address, dl.created_at, a.title as app_title';
+        $columns = 'dl.id, dl.app_id, dl.source, dl.ip_address, dl.created_at, a.title as app_title, m.public_application_id';
     } else {
         $table   = 'update_check_logs';
-        $columns = 'dl.id, dl.app_id, dl.device_data, dl.client_info, dl.ip_address, dl.created_at, a.title as app_title';
+        $columns = 'dl.id, dl.app_id, dl.device_data, dl.client_info, dl.ip_address, dl.created_at, a.title as app_title, m.public_application_id';
     }
-    $join  = 'LEFT JOIN apps a ON dl.app_id = a.id';
+    $join  = 'LEFT JOIN apps a ON dl.app_id = a.id LEFT JOIN app_metadata m ON a.id = m.app_id';
     $alias = 'dl';
 
     $where  = ["$alias.created_at >= ?", "$alias.created_at < DATE_ADD(?, INTERVAL 1 DAY)"];
@@ -46,9 +46,10 @@ function admin_get_logs_data($logType, $dateFrom, $dateTo, $appId, $page, $perPa
     $updateChecksInPeriod = (int)$stmt->fetchColumn();
 
     $stmt = $db->prepare("
-        SELECT dl.app_id, a.title, COUNT(*) as download_count
+        SELECT dl.app_id, a.title, m.public_application_id, COUNT(*) as download_count
         FROM download_logs dl
         LEFT JOIN apps a ON dl.app_id = a.id
+        LEFT JOIN app_metadata m ON a.id = m.app_id
         WHERE dl.created_at >= ? AND dl.created_at < DATE_ADD(?, INTERVAL 1 DAY)
         GROUP BY dl.app_id
         ORDER BY download_count DESC

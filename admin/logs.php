@@ -115,7 +115,7 @@ include 'includes/header.php';
                                 <?php echo htmlspecialchars($log['app_title'] ?? "ID: {$log['app_id']}"); ?>
                             </a>
                             <?php else: ?>
-                            <a href="../showMuseumDetails.php?app=<?php echo $log['app_id']; ?>" target="_blank" rel="noopener">
+                            <a href="<?php echo htmlspecialchars('../showMuseumDetails.php?appid=' . urlencode($log['public_application_id'] ?? '')); ?>" target="_blank" rel="noopener">
                                 <?php echo htmlspecialchars($log['app_title'] ?? "ID: {$log['app_id']}"); ?>
                             </a>
                             <?php endif; ?>
@@ -166,7 +166,7 @@ include 'includes/header.php';
                                 <?php echo htmlspecialchars($row['title'] ?? "ID: {$row['app_id']}"); ?>
                             </a>
                             <?php else: ?>
-                            <a href="../showMuseumDetails.php?app=<?php echo $row['app_id']; ?>" target="_blank" rel="noopener">
+                            <a href="<?php echo htmlspecialchars('../showMuseumDetails.php?appid=' . urlencode($row['public_application_id'] ?? '')); ?>" target="_blank" rel="noopener">
                                 <?php echo htmlspecialchars($row['title'] ?? "ID: {$row['app_id']}"); ?>
                             </a>
                             <?php endif; ?>

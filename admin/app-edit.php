@@ -5,11 +5,13 @@
 require_once __DIR__ . '/includes/security.php';
 require_once __DIR__ . '/../includes/Database.php';
 require_once __DIR__ . '/../includes/AppRepository.php';
+require_once __DIR__ . '/../includes/MetadataRepository.php';
 require_once __DIR__ . '/../includes/AccountRepository.php';
 require_once __DIR__ . '/../includes/ImageStorage.php';
 
 $db = Database::getInstance()->getConnection();
 $repo = new AppRepository();
+$metaRepo = new MetadataRepository();
 $accounts = (new AccountRepository())->listAccounts();
 $imgConfig = require __DIR__ . '/../WebService/config.php';
 
@@ -191,14 +193,18 @@ if (isset($_GET['saved'])) {
     $success = true;
 }
 
+// Application ID for the "View App" quick-action link, which must use
+// ?appid= (not the numeric ?app=) so it still resolves for a Web Suppressed app.
+$applicationId = $id ? ($metaRepo->getForAdmin($id)['public_application_id'] ?? '') : '';
+
 // Shared quick-actions row, rendered above and below the form so they're
 // reachable without scrolling either way.
-function admin_app_quick_actions($id, $isNew) {
+function admin_app_quick_actions($id, $isNew, $applicationId) {
     if (!$isNew) {
         ?>
         <a href="app-images.php?id=<?php echo (int)$id; ?>" class="btn">Manage Images</a>
         <a href="metadata-edit.php?id=<?php echo (int)$id; ?>" class="btn">Edit Metadata</a>
-        <a href="../showMuseumDetails.php?app=<?php echo (int)$id; ?>" class="btn" target="_blank" rel="noopener">View App</a>
+        <a href="<?php echo htmlspecialchars('../showMuseumDetails.php?appid=' . urlencode($applicationId), ENT_QUOTES); ?>" class="btn" target="_blank" rel="noopener">View App</a>
         <?php
     }
     ?>
@@ -212,7 +218,7 @@ include 'includes/header.php';
 <div class="page-header">
     <h1><?php echo $pageTitle; ?><?php echo $id ? " (ID: $id)" : ''; ?></h1>
     <div>
-        <?php admin_app_quick_actions($id, $isNew); ?>
+        <?php admin_app_quick_actions($id, $isNew, $applicationId); ?>
     </div>
 </div>
 
@@ -447,7 +453,7 @@ include 'includes/header.php';
 
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary"><?php echo $isNew ? 'Create App' : 'Save Changes'; ?></button>
-                <?php admin_app_quick_actions($id, $isNew); ?>
+                <?php admin_app_quick_actions($id, $isNew, $applicationId); ?>
             </div>
         </form>
     </div>
