@@ -54,7 +54,7 @@ if (strpos($outputObj["filename"], "://") === false) {
 
   <link id="favicon" rel="icon" type="image/png" sizes="64x64" href="<?php echo $icon;?>">
   <link rel="alternate" type="application/rss+xml" title="webOS App Museum - What's New" href="feed.php">
-  <link href="<?php echo $PROTOCOL . "://www.webosarchive.org/app-template/"?>web.css" rel="stylesheet" type="text/css" >
+  <link href="http://127.0.0.1:8765/app-template/web.css" rel="stylesheet" type="text/css" >
   <style>
     a { text-decoration: none; }
     a:hover { text-decoration: underline; }
