@@ -63,16 +63,28 @@ if (strpos($outputObj["filename"], "://") === false) {
         #hero { padding-top: 0px !important; }
     }
     small { font-size: 15px; }
+    /* Vertically center the page content on tall screens. A 100%-height
+       table (rather than flexbox or vh units) so 2011-era webOS WebKit
+       gets the same result; the table simply grows past the viewport on
+       small screens, so nothing is clipped and no extra scrollbar appears. */
+    html, body { height: 100%; }
+    #page { width: 100%; height: 100%; border: 0; border-collapse: collapse; }
+    #page td { border: 0; padding: 0; }
+    #page-menu { height: 1px; }
+    #page-body { vertical-align: middle; }
+    #row { margin-left: auto; margin-right: auto; }
   </style>
 </head>
 <body>
+  <table id="page" width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr><td id="page-menu">
 <?php
 
 $docRoot = "./";
 echo file_get_contents("https://www.webosarchive.org/menu.php?docRoot=" . $docRoot . "&protocol=" . $PROTOCOL);
 ?>
-
-  <table width="100%" border=0 style="width:100%;border:0px"><tr><td align="center" style="width:100%;height:100%;border:0px">
+  </td></tr>
+  <tr><td id="page-body" align="center" valign="middle">
   <div id="row">
     <div id="content" align="left">
       <h1><img src="<?php echo $icon;?>" width="60" height="60" alt=""/><?php echo $title; ?></h1>
