@@ -2,6 +2,7 @@
 <html>
 <head>
 <link rel="shortcut icon" href="favicon.ico">
+<link rel="alternate" type="application/rss+xml" title="webOS App Museum - What's New" href="feed.php">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script>
 function showHelp() {

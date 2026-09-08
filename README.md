@@ -156,6 +156,7 @@ Roadmap and status for the accounts system (done + planned phases) live in
 - `showMuseumDetails.php` - App detail page with lightbox screenshots
 - `author/index.php` - Author profile pages
 - `downloadProxy.php` - HTTPS proxy for HTTP package downloads
+- `feed.php` - RSS feed of what's new (new and updated apps, by last-modified time; `?count=` up to 100)
 
 ## Historical Context
 

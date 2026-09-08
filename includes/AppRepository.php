@@ -462,6 +462,67 @@ class AppRepository {
     }
 
     /**
+     * Recent catalog activity for the public RSS feed (feed.php): the same
+     * "recent" ordering as the web UI (app_metadata.last_modified_time desc),
+     * limited, with the version fields the feed needs. Newly added apps and
+     * updated apps both surface here because both get a fresh
+     * last_modified_time.
+     *
+     * Apps without a last_modified_time are skipped (nothing to date them by).
+     * Future-dated (scheduled) apps are excluded until they publish, as in
+     * every other client-facing query.
+     *
+     * @param int $limit Max rows
+     * @param bool $adult Include adult apps
+     * @param bool $webOnly Exclude web_suppressed apps
+     * @return array
+     */
+    public function getRecentChanges($limit = 50, $adult = false, $webOnly = true) {
+        $limit = max(1, (int)$limit);
+        $adultFilter = $adult ? "" : " AND a.adult = 0";
+        $webFilter = $webOnly ? " AND {$this->notWebSuppressedClause()}" : "";
+
+        $sql = "
+            SELECT
+                a.id,
+                a.title,
+                a.author,
+                a.summary,
+                a.app_icon AS appIcon,
+                a.vendor_id AS vendorId,
+                c.name AS category,
+                a.adult AS Adult,
+                a.post_shutdown AS postShutdown,
+                m.public_application_id AS publicApplicationId,
+                m.version,
+                m.version_note AS versionNote,
+                m.last_modified_time AS lastModifiedTime
+            FROM apps a
+            LEFT JOIN categories c ON a.category_id = c.id
+            JOIN app_metadata m ON a.id = m.app_id
+            WHERE a.status = 'active'
+              AND m.last_modified_time IS NOT NULL
+              AND {$this->notFutureDatedClause()}
+              $adultFilter
+              $webFilter
+            ORDER BY m.last_modified_time DESC, a.title
+            LIMIT $limit
+        ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$this->publishCutoff()]);
+
+        $results = [];
+        while ($row = $stmt->fetch()) {
+            $row['id'] = (int)$row['id'];
+            $row['Adult'] = (bool)$row['Adult'];
+            $row['postShutdown'] = (bool)$row['postShutdown'];
+            $results[] = $row;
+        }
+        return $results;
+    }
+
+    /**
      * Get single app by ID
      *
      * @param int $id App ID

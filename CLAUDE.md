@@ -106,6 +106,7 @@ CRUD interface for managing catalog data. Security is app-level: login (`admin/l
 - `app/index.php` - `/app/<title>` search redirect
 - `author/index.php` - `/author/<name>` profile page
 - `downloadProxy.php` - HTTPS proxy for HTTP package downloads
+- `feed.php` - RSS 2.0 "What's New" feed: apps in `recent` order (`app_metadata.last_modified_time`), so new and updated apps both appear; `?count=` (max 100), `?adult=1`. Backed by `AppRepository::getRecentChanges()`
 
 ### Rate Limiting
 
