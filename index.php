@@ -87,7 +87,7 @@ echo file_get_contents("https://www.webosarchive.org/menu.php?docRoot=" . $docRo
   <tr><td id="page-body" align="center" valign="middle">
   <div id="row">
     <div id="content" align="left">
-      <p style="font-size:36px;font-weight:600;"><img src="<?php echo $icon;?>" width="60" height="60" alt="" style="vertical-align:top;height:60px;width:60px;"/> <?php echo $title; ?></p>
+      <p style="font-size:30px;font-weight:600;"><img src="<?php echo $icon;?>" width="60" height="60" alt="" style="vertical-align:top;height:60px;width:60px;"/> <?php echo $title; ?></p>
       <p><?php echo $description; ?></p>
       <p>The recovered catalog is stored on the <a href="https://archive.org/details/@webos_archive">Internet Archive</a>, and can be browsed a number of ways... </p>
       <div style="font-size:0.98em">
