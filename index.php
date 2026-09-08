@@ -82,7 +82,6 @@ echo file_get_contents("https://www.webosarchive.org/menu.php?docRoot=" . $docRo
 
         <a class="download-link" href="showMuseum.php">
            <img src="assets/browser-icon.png" style="vertical-align:middle" alt="Browse Online" title="Browse Online" width="48" height="48"/> Browse Online </a>
-           | <a class="download-link" href="https://weboslives.eu/feeds/">Alternate Site</a>
            | <a class="download-link" href="https://archive.org/details/webosappcatalog"> Full Archive</a>
            | <a class="download-link" href="feed.php" title="RSS feed of new apps and updates">What's New (RSS)</a>
         <br><br>
