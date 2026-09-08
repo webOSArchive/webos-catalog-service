@@ -95,7 +95,7 @@ echo file_get_contents("https://www.webosarchive.org/menu.php?docRoot=" . $docRo
         <a class="download-link" href="showMuseum.php">
            <img src="assets/browser-icon.png" style="vertical-align:middle" alt="Browse Online" title="Browse Online" width="48" height="48"/> Browse Online </a>
            | <a class="download-link" href="https://archive.org/details/webosappcatalog"> Full Archive</a>
-           | <a class="download-link" href="feed.php" title="RSS feed of new apps and updates"><img src="assets/rss.png" style="vertical-align:middle;height:16px;width:16px;">RSS Feed</a>
+           | <a class="download-link" href="feed.php" title="RSS feed of new apps and updates"><img src="assets/rss.png" style="vertical-align:middle;height:16px;width:16px;"> RSS Feed</a>
         <br><br>
         <div style="font-weight:bold; margin-bottom:8px;">Install on Device | <a href="http://docs.webosarchive.org/#step-5">Help</a><br></div>
         <a class="download-link" href="AppPackages/com.palm.app.enyo-findapps_6.0.2900_all.ipk"><img src="assets/hp-appcatalog.png" style="vertical-align:middle;height:48px;width:48px;" alt="HP App Catalog for TouchPad"" title="HP App Catalog for TouchPad">Restored App Catalog (webOS 3.0.x)</a><br>
