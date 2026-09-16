@@ -80,8 +80,12 @@ class LogRepository {
      * @return bool Success
      */
     public function logDownload($appIdentifier, $source = 'app', $ipAddress = null, $userAgent = null, $deviceId = null, $accountId = null) {
-        // Try to get numeric app_id if identifier is numeric
-        $appId = is_numeric($appIdentifier) ? (int)$appIdentifier : null;
+        // Web clients send the numeric Museum ID; on-device clients send the
+        // package's Application ID (app_metadata.public_application_id, e.g.
+        // "com.palm.app.foo"). Resolve the latter so download_logs.app_id is
+        // populated either way — otherwise every device download lands in one
+        // NULL bucket that swamps the admin "Top Downloads" report.
+        $appId = $this->resolveAppId($appIdentifier);
 
         $sql = "
             INSERT INTO download_logs (app_id, app_identifier, source, ip_address, user_agent, device_id, account_id)
@@ -98,6 +102,37 @@ class LogRepository {
             $deviceId !== null ? substr((string)$deviceId, 0, 128) : null,
             $accountId !== null ? (int)$accountId : null,
         ]);
+    }
+
+    /**
+     * Map a client-supplied identifier to apps.id. Numeric strings are taken
+     * as the Museum ID; anything else is matched case-insensitively against
+     * app_metadata.public_application_id. Best-effort: returns null when the
+     * identifier is unknown so the raw string is still kept in app_identifier.
+     *
+     * @param string $appIdentifier
+     * @return int|null
+     */
+    private function resolveAppId($appIdentifier) {
+        $appIdentifier = trim((string)$appIdentifier);
+        if ($appIdentifier === '') {
+            return null;
+        }
+        if (ctype_digit($appIdentifier)) {
+            return (int)$appIdentifier;
+        }
+        try {
+            $stmt = $this->db->prepare("
+                SELECT app_id FROM app_metadata
+                 WHERE LOWER(public_application_id) = LOWER(?)
+                 LIMIT 1
+            ");
+            $stmt->execute([$appIdentifier]);
+            $row = $stmt->fetch();
+            return $row ? (int)$row['app_id'] : null;
+        } catch (Exception $e) {
+            return null;
+        }
     }
 
     /**
