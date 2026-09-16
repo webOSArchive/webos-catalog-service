@@ -77,7 +77,8 @@ class LogRepository {
      * @param string|null $userAgent User agent string
      * @param string|null $deviceId Device identifier (nduid) if the client sent one
      * @param int|null $accountId Account signed in on that device at download time
-     * @return bool Success
+     * @return bool True if a row was written; false if the identifier doesn't
+     *              name a catalog app (scanner probe, typo, unknown package)
      */
     public function logDownload($appIdentifier, $source = 'app', $ipAddress = null, $userAgent = null, $deviceId = null, $accountId = null) {
         // Web clients send the numeric Museum ID; on-device clients send the
@@ -85,7 +86,16 @@ class LogRepository {
         // "com.palm.app.foo"). Resolve the latter so download_logs.app_id is
         // populated either way — otherwise every device download lands in one
         // NULL bucket that swamps the admin "Top Downloads" report.
+        //
+        // Anything that doesn't resolve isn't a download of a catalog app —
+        // in practice it's a vulnerability scanner probing
+        // ?appid=.env.local / credentials / database.yml~ — so don't record it.
+        // Pattern-based filtering in countAppDownload.php can't keep up with
+        // scanner wordlists; requiring a real catalog match can.
         $appId = $this->resolveAppId($appIdentifier);
+        if ($appId === null) {
+            return false;
+        }
 
         $sql = "
             INSERT INTO download_logs (app_id, app_identifier, source, ip_address, user_agent, device_id, account_id)
@@ -105,10 +115,10 @@ class LogRepository {
     }
 
     /**
-     * Map a client-supplied identifier to apps.id. Numeric strings are taken
-     * as the Museum ID; anything else is matched case-insensitively against
-     * app_metadata.public_application_id. Best-effort: returns null when the
-     * identifier is unknown so the raw string is still kept in app_identifier.
+     * Map a client-supplied identifier to apps.id. Numeric strings are checked
+     * against apps.id; anything else is matched case-insensitively against
+     * app_metadata.public_application_id. Returns null when no catalog app
+     * matches (or on DB error).
      *
      * @param string $appIdentifier
      * @return int|null
@@ -118,10 +128,13 @@ class LogRepository {
         if ($appIdentifier === '') {
             return null;
         }
-        if (ctype_digit($appIdentifier)) {
-            return (int)$appIdentifier;
-        }
         try {
+            if (ctype_digit($appIdentifier)) {
+                $stmt = $this->db->prepare("SELECT id FROM apps WHERE id = ? LIMIT 1");
+                $stmt->execute([(int)$appIdentifier]);
+                $row = $stmt->fetch();
+                return $row ? (int)$row['id'] : null;
+            }
             $stmt = $this->db->prepare("
                 SELECT app_id FROM app_metadata
                  WHERE LOWER(public_application_id) = LOWER(?)

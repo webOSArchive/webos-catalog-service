@@ -45,18 +45,17 @@ function admin_get_logs_data($logType, $dateFrom, $dateTo, $appId, $page, $perPa
     $stmt->execute([$dateFrom, $dateTo]);
     $updateChecksInPeriod = (int)$stmt->fetchColumn();
 
-    // Rows with a resolved app_id group per app. Rows the logger couldn't map
-    // to an app (app_id NULL — unknown package ID, junk, etc.) group per raw
-    // identifier instead, so they don't all collapse into one anonymous
-    // "ID:" bucket at the top of the list.
+    // Only rank rows that resolved to a catalog app. Rows with app_id NULL are
+    // unknown package IDs or scanner junk (".env.local" etc.) — they'd either
+    // collapse into one anonymous "ID:" bucket or crowd out real apps, so they
+    // stay out of the ranking. They remain visible in the main log list.
     $stmt = $db->prepare("
-        SELECT dl.app_id, MIN(dl.app_identifier) AS app_identifier,
-               a.title, m.public_application_id, COUNT(*) as download_count
+        SELECT dl.app_id, a.title, m.public_application_id, COUNT(*) as download_count
         FROM download_logs dl
-        LEFT JOIN apps a ON dl.app_id = a.id
+        JOIN apps a ON dl.app_id = a.id
         LEFT JOIN app_metadata m ON a.id = m.app_id
         WHERE dl.created_at >= ? AND dl.created_at < DATE_ADD(?, INTERVAL 1 DAY)
-        GROUP BY dl.app_id, IF(dl.app_id IS NULL, dl.app_identifier, NULL)
+        GROUP BY dl.app_id, a.title, m.public_application_id
         ORDER BY download_count DESC
         LIMIT 10
     ");

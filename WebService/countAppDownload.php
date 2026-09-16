@@ -65,6 +65,24 @@ function isProbeAttempt($appid) {
         return true;
     }
 
+    // Legitimate identifiers are either a numeric Museum ID or a reverse-DNS
+    // package ID (com.palm.app.foo): alphanumerics, dots, hyphens, underscores,
+    // never starting with a dot. Dotfile probes like ".env.local" or
+    // ".env.production" (which dodge the extension list below) die here.
+    if ($appid[0] === '.' || !preg_match('/^[a-z0-9][a-z0-9._-]*$/', $appid)) {
+        return true;
+    }
+
+    // Any ".env" anywhere (".env.local", "app.env.bak", …) is a secrets probe
+    if (strpos($appid, '.env') !== false) {
+        return true;
+    }
+
+    // Everything below is a cheap pre-screen only. The real gate is in
+    // LogRepository::logDownload(), which refuses to record anything that
+    // doesn't resolve to a catalog app — scanner wordlists ("credentials",
+    // "database.yml.pgsql", …) are endless; the catalog is finite.
+
     // Block requests for files by extension. No legitimate app ID is a
     // filename, so anything ending in a known file extension is a scanner
     // probing for source/config/secret files (parameters.yml, .env, config.php,

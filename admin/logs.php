@@ -161,9 +161,7 @@ include 'includes/header.php';
                     <?php foreach ($topDownloads as $row): ?>
                     <tr>
                         <td>
-                            <?php if (empty($row['app_id'])): ?>
-                            <span title="Not matched to a catalog app"><?php echo htmlspecialchars($row['app_identifier'] ?: '(unknown)'); ?></span>
-                            <?php elseif ($canEditAll): ?>
+                            <?php if ($canEditAll): ?>
                             <a href="app-edit.php?id=<?php echo (int)$row['app_id']; ?>">
                                 <?php echo htmlspecialchars($row['title'] ?? "ID: {$row['app_id']}"); ?>
                             </a>

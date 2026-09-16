@@ -142,13 +142,9 @@ include 'includes/header.php';
                     <?php foreach ($topDownloads as $row): ?>
                     <tr>
                         <td>
-                            <?php if (empty($row['app_id'])): ?>
-                            <span title="Not matched to a catalog app"><?php echo htmlspecialchars($row['app_identifier'] ?: '(unknown)'); ?></span>
-                            <?php else: ?>
                             <a href="<?php echo htmlspecialchars('../showMuseumDetails.php?appid=' . urlencode($row['public_application_id'] ?? '')); ?>" target="_blank" rel="noopener">
                                 <?php echo htmlspecialchars($row['title'] ?? "ID: {$row['app_id']}"); ?>
                             </a>
-                            <?php endif; ?>
                         </td>
                         <td><?php echo number_format($row['download_count']); ?></td>
                     </tr>
