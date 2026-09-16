@@ -473,6 +473,28 @@ class LogRepository {
     }
 
     /**
+     * Distinct clients that made an update check in the last N days - the
+     * closest thing to an "active devices" metric. Every Museum app launch
+     * (and any community app that checks for updates via getLatestVersionInfo)
+     * logs a row keyed by client_id, so this approximates devices seen, not
+     * downloads. Web browsing and the patched HP clients' manifest checks are
+     * not logged here, so they aren't counted.
+     *
+     * @param int $days Window size in days
+     * @return int
+     */
+    public function getActiveClientCount($days) {
+        $stmt = $this->db->prepare("
+            SELECT COUNT(DISTINCT client_id)
+            FROM update_check_logs
+            WHERE client_id IS NOT NULL AND client_id <> ''
+              AND created_at > DATE_SUB(NOW(), INTERVAL ? DAY)
+        ");
+        $stmt->execute([(int)$days]);
+        return (int)$stmt->fetchColumn();
+    }
+
+    /**
      * Get total update check count
      *
      * @return int

@@ -44,6 +44,10 @@ function admin_get_dashboard_stats() {
     // Session stats
     $stats['active_sessions'] = $sessionRepo->getActiveSessionCount();
 
+    // Active devices: distinct update-check clients over 7 / 30 days
+    $stats['active_devices_7d'] = $logRepo->getActiveClientCount(7);
+    $stats['active_devices_30d'] = $logRepo->getActiveClientCount(30);
+
     // Recent apps (last 10 updated, by app_metadata.last_modified_time - the
     // catalog's "recent" sort field - not apps.updated_at, which just tracks
     // when the row itself was last written)

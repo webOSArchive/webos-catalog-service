@@ -61,6 +61,14 @@ include 'includes/header.php';
         <h3><?php echo number_format($stats['active_sessions']); ?></h3>
         <p>Active Sessions</p>
     </div>
+    <div class="stat-card">
+        <h3><?php echo number_format($stats['active_devices_7d']); ?></h3>
+        <p>Active Devices (7 days)</p>
+    </div>
+    <div class="stat-card">
+        <h3><?php echo number_format($stats['active_devices_30d']); ?></h3>
+        <p>Active Devices (30 days)</p>
+    </div>
 </div>
 
 <div class="card" style="margin-bottom:20px;">

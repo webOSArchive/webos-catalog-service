@@ -311,6 +311,7 @@ if (isset($_GET["appid"])) {
 if (!$found_app) {
 ?>
 <title>App Not Found - webOS App Museum</title>
+<meta name="robots" content="noindex">
 <link rel="stylesheet" href="museum-modern.css">
 </head>
 <body>
@@ -419,6 +420,9 @@ function mm_dev_on($app, $key) {
 }
 ?>
 <title><?php echo htmlspecialchars($found_app["title"]); ?> - webOS App Museum</title>
+<?php if (!empty($app_detail["webSuppressed"])) { ?>
+<meta name="robots" content="noindex">
+<?php } ?>
 <link rel="stylesheet" href="museum-modern.css">
 <script src="downloadHelper.php"></script>
 </head>
