@@ -110,7 +110,7 @@ echo file_get_contents("https://www.webosarchive.org/menu.php?docRoot=" . $docRo
 
         <a class="download-link" href="showMuseum.php">
            <img src="assets/browser-icon.png" style="vertical-align:middle" alt="Browse Online" title="Browse Online" width="48" height="48"/> Browse Online </a>
-           | <a class="download-link" href="http://archive.org/details/webosappcatalog"> Complete Archive</a>
+           | <a class="download-link" href="http://archive.org/details/webosappcatalog"> Full Archive</a>
            | <a class="download-link" href="feed.php" title="RSS feed of new apps and updates"><img src="assets/rss.png" style="vertical-align:middle;height:16px;width:16px;"> RSS Feed</a>
         <br><br>
         <div style="font-weight:bold; margin-bottom:8px;">Install on a Device:
@@ -120,11 +120,11 @@ echo file_get_contents("https://www.webosarchive.org/menu.php?docRoot=" . $docRo
           <option value="luneos">Other LuneOS Device</option>
         </select>
         </div>
-        <p style="font-size:smaller" id="explain-enyo">HP TouchPad, TouchPad 4G or TouchPad Go running webOS 3.0.x.<br>Note: <a href="http://www.webosarchive.org/pivot/2026/09/08/webos-3.1.0-community-edition-is-here/">webOS 3.1.0</a> has everything pre-installed.</p>
+        <p style="font-size:smaller" id="explain-enyo">HP TouchPad, TouchPad 4G or TouchPad Go on webOS 3.0.x.<br>Note: <a href="http://www.webosarchive.org/pivot/2026/09/08/webos-3.1.0-community-edition-is-here/">webOS 3.1.0</a> has everything pre-installed.</p>
         <p style="font-size:smaller; display:none;" id="explain-mojo">Palm Pre, Pre Plus, Pre2, Pixi; HP Veer or Pre3.</p>
         <p style="font-size:smaller; display:none;" id="explain-luneos">Modern devices running <a href="http://www.webosarchive.org/pivot/author/webosports/">LuneOS</a> or the <a href="https://sdk.webosarchive.org">Enyo library</a> in WebKit.</p>
 
-        <span id="show-preware"><a class="download-link" href="http://docs.webosarchive.org/#step-5"><img src="assets/preware-icon.png" style="vertical-align:middle;height:48px;width:48px;" alt="Preware" title="Preware"> 1) Install Preware | Requires WOSQI and Java</a><br/></span>
+        <span id="show-preware"><a class="download-link" href="http://docs.webosarchive.org/#step-5"><img src="assets/preware-icon.png" style="vertical-align:middle;height:48px;width:48px;" alt="Preware" title="Preware"> 1) Install Preware | Requires WOSQI + Java</a><br/></span>
         <span id="show-enyo" style="display:block"><a class="download-link" href="AppPackages/com.palm.app.enyo-findapps_6.0.2900_all.ipk"><img src="assets/hp-appcatalog.png" style="vertical-align:middle;height:48px;width:48px;" alt="HP App Catalog for TouchPad" title="HP App Catalog for TouchPad"> 2) Restored App Catalog (Enyo)</a><br></span>
         <span id="show-mojo" style="display:none"><a class="download-link" href="AppPackages/com.palm.app.findapps_3.0.23300_all.ipk"><img src="assets/palm-appcatalog.png" style="vertical-align:middle;height:48px;width:48px;" alt="HP App Catalog" title="HP App Catalog for Phones"> 2) Restored App Catalog (Mojo)</a><br></span>
         <span id="show-luneos" style="display:none"><a class="download-link" href="<?php echo $use_uri?>"><img src="assets/icon.png" style="vertical-align:middle" alt="App Museum for LuneOS" title="App Museum for LuneOS" width="48" height="48"/> App Museum (WebKit/LuneOS)</a></span>
