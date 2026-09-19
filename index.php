@@ -120,7 +120,7 @@ echo file_get_contents("https://www.webosarchive.org/menu.php?docRoot=" . $docRo
           <option value="luneos">Other LuneOS Device</option>
         </select>
         </div>
-        <p style="font-size:smaller" id="explain-enyo">HP TouchPad, TouchPad 4G or TouchPad Go on webOS 3.0.x.<br>Note: <a href="http://www.webosarchive.org/pivot/2026/09/08/webos-3.1.0-community-edition-is-here/">webOS 3.1.0</a> has everything pre-installed.</p>
+        <p style="font-size:smaller" id="explain-enyo">HP TouchPad, TouchPad 4G or TouchPad Go running webOS 3.0.x. Note: <a href="http://www.webosarchive.org/pivot/2026/09/08/webos-3.1.0-community-edition-is-here/">webOS 3.1.0</a> has everything pre-installed.</p>
         <p style="font-size:smaller; display:none;" id="explain-mojo">Palm Pre, Pre Plus, Pre2, Pixi; HP Veer or Pre3.</p>
         <p style="font-size:smaller; display:none;" id="explain-luneos">Modern devices running <a href="http://www.webosarchive.org/pivot/author/webosports/">LuneOS</a> or the <a href="https://sdk.webosarchive.org">Enyo library</a> in WebKit.</p>
 
