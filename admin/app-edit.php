@@ -118,9 +118,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'Author is required';
     }
 
-    // For new apps, require an ID
+    // For new apps, require an ID. Owner-only accounts (developers) don't get
+    // to choose: they're always assigned the next sequential Museum ID, so
+    // they can't squat on a historical ID or leave gaps. Managers may pick.
     if ($isNew) {
-        $newId = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+        $newId = $ownOnly ? (int)$suggestedId : (isset($_POST['id']) ? (int)$_POST['id'] : 0);
         if ($newId <= 0) {
             $errors[] = 'A valid App ID is required for new apps';
         } else {
@@ -247,7 +249,13 @@ include 'includes/header.php';
 <div class="card">
     <div class="card-body">
         <form method="post" class="admin-form">
-            <?php if ($isNew): ?>
+            <?php if ($isNew && $ownOnly): ?>
+            <div class="form-group">
+                <label>App ID (Museum ID)</label>
+                <input type="number" name="id" value="<?php echo (int)$suggestedId; ?>" readonly>
+                <small>Assigned automatically. Your app's package ID (e.g. com.example.myapp) is set separately under Edit Metadata after the app is created.</small>
+            </div>
+            <?php elseif ($isNew): ?>
             <div class="form-group">
                 <label>App ID *</label>
                 <input type="number" name="id" value="<?php echo htmlspecialchars($_POST['id'] ?? $suggestedId ?? ''); ?>" required min="1">

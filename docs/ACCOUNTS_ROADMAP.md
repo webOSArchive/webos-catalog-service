@@ -63,8 +63,10 @@ Goal: accounts with `apps.submit` can submit apps; admins moderate them.
 steps yet):**
 
 - **Direct submission:** `apps.submit` accounts use the regular `app-edit.php`
-  "Add New App" flow. New apps by owner-only accounts are forced to
-  `owner_account_id` = the submitter and start uncurated
+  "Add New App" flow. New apps by owner-only accounts are always assigned the
+  next sequential Museum ID (the numeric ID field is read-only for them and the
+  posted value is ignored server-side), forced to
+  `owner_account_id` = the submitter, and start uncurated
   (`recommendation_order` 0, no featured flags); curation fieldsets are hidden
   for them. The developer picks status/content flags. `app-edit.php` then nudges
   them to set the Package ID under Edit Metadata (one-time, see Phase 1) so the IPK
