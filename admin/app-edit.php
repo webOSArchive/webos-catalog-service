@@ -226,6 +226,13 @@ include 'includes/header.php';
 <div class="alert alert-success">App saved successfully!</div>
 <?php endif; ?>
 
+<?php if (!$isNew && $ownOnly && $applicationId === ''): ?>
+<div class="alert alert-warning">
+    <strong>Next step:</strong> this app has no Package ID yet, so IPK uploads for it will be refused.
+    Set it once under <a href="metadata-edit.php?id=<?php echo (int)$id; ?>">Edit Metadata</a> (the <code>id</code> from your appinfo.json, e.g. com.example.myapp), then upload your package in the IPK Manager.
+</div>
+<?php endif; ?>
+
 <?php if (!empty($errors)): ?>
 <div class="alert alert-error">
     <strong>Please fix the following errors:</strong>
@@ -307,7 +314,9 @@ include 'includes/header.php';
                         <option value="<?php echo htmlspecialchars($currentVendor); ?>" selected><?php echo htmlspecialchars($currentVendor); ?> (not in Vendors list)</option>
                         <?php endif; ?>
                     </select>
+                    <?php if (admin_has_capability('authors.manage')): ?>
                     <a href="vendors.php" class="btn btn-sm" target="_blank" rel="noopener">Manage Vendors</a>
+                    <?php endif; ?>
                 </div>
                 <small>Links to vendor metadata (optional)</small>
             </div>

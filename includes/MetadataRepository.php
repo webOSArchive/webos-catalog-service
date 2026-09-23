@@ -99,6 +99,32 @@ class MetadataRepository {
     }
 
     /**
+     * Is $publicApplicationId free for $appId to take as its Application ID?
+     *
+     * Used when an owner-only account (developer) sets the ID on an app they
+     * created. ipk-manager.php authorizes their uploads by matching the upload
+     * filename against this ID ("<id>_<version>_<arch>.ipk" or "<id>.ipk"), so
+     * the ID must not collide with any other app's - exact match (case-
+     * insensitive) or as an underscore prefix (an app with ID "com.foo" could
+     * otherwise overwrite the package of an app with ID "com.foo_bar").
+     *
+     * @param string $publicApplicationId
+     * @param int    $appId  The app that wants the ID (its own row is ignored)
+     * @return bool
+     */
+    public function isApplicationIdAvailable($publicApplicationId, $appId) {
+        $escaped = addcslashes($publicApplicationId, '%_\\');
+        $stmt = $this->db->prepare("
+            SELECT COUNT(*) FROM app_metadata
+            WHERE app_id <> ?
+              AND (LOWER(public_application_id) = LOWER(?)
+                   OR LOWER(public_application_id) LIKE LOWER(?))
+        ");
+        $stmt->execute([(int)$appId, $publicApplicationId, $escaped . '\\_%']);
+        return (int)$stmt->fetchColumn() === 0;
+    }
+
+    /**
      * Cheap check of the web_suppressed flag, without loading full metadata
      * (images, description, etc). Used to gate web-only visibility before
      * deciding whether to render an app's detail page.

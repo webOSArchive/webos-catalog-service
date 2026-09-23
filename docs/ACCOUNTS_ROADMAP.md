@@ -43,8 +43,12 @@ browse. Accounts are admin-provisioned.
   reach the Dashboard, Logs and IPK manager, and an Apps view scoped to **only their
   own** apps (owner filter on the list; ownership check on edit; curation/status fields
   forced on save; owner selector hidden). IPK **uploads** are further scoped: the file
-  name must start with the `public_application_id` of one of their owned apps. They do
-  not see Categories, Authors or Accounts.
+  name must start with the `public_application_id` of one of their owned apps. Because
+  of that, owners may set an app's `public_application_id` in `metadata-edit.php` only
+  **once, while it is empty** (i.e. on an app they just created), and only to an ID no
+  other app uses (`MetadataRepository::isApplicationIdAvailable`: case-insensitive
+  exact match or `<id>_` prefix collision); afterwards it is read-only for them and only
+  `apps.edit` accounts can change it. They do not see Categories, Authors or Accounts.
 - **App images:** icons + screenshots are uploaded via `admin/app-images.php` to the
   filesystem (`config['image_path']`, per-app `<appId>/` folders auto-created on app
   create) using `includes/ImageStorage.php` — never stored in the DB. Managers
@@ -62,7 +66,9 @@ steps yet):**
   "Add New App" flow. New apps by owner-only accounts are forced to
   `owner_account_id` = the submitter and start uncurated
   (`recommendation_order` 0, no featured flags); curation fieldsets are hidden
-  for them. The developer picks status/content flags.
+  for them. The developer picks status/content flags. `app-edit.php` then nudges
+  them to set the Package ID under Edit Metadata (one-time, see Phase 1) so the IPK
+  manager will accept their package.
 - **App claims:** `admin/app-claim.php` ("Claim Existing App" on the Apps page,
   `apps.own`) lets a developer claim an **unowned** app by ID with a required
   explanation — e.g. to restore an app that was originally theirs. Claims are

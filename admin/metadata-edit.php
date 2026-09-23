@@ -75,10 +75,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!$canEditAll) {
         // ipk-manager.php authorizes owner-scoped uploads by matching the
-        // upload filename against this app's publicApplicationId. Letting an
-        // owner-only account set it themselves would let them point it at
-        // another app's real IPK filename and overwrite that app's package.
-        $data['publicApplicationId'] = $metadata['public_application_id'] ?? '';
+        // upload filename against this app's publicApplicationId, so an
+        // owner-only account must not be able to point it at another app's
+        // package. They may set it exactly once (while it's still empty - a new
+        // app they created), and only to an ID no other app uses; after that
+        // it's locked and only full managers can change it.
+        $currentId = $metadata['public_application_id'] ?? '';
+        if ($currentId !== '') {
+            $data['publicApplicationId'] = $currentId;
+        } elseif ($data['publicApplicationId'] !== '') {
+            $newId = $data['publicApplicationId'];
+            if (!preg_match('/^[A-Za-z0-9][A-Za-z0-9.\-]{2,127}$/', $newId) || strpos($newId, '.') === false) {
+                $errors[] = 'Package ID must be reverse-domain style (e.g. com.example.myapp): letters, digits, dots and hyphens only.';
+            } elseif (!$metaRepo->isApplicationIdAvailable($newId, $id)) {
+                $errors[] = 'Package ID "' . $newId . '" is already used by another app. If it is really yours, ask an admin to reassign it.';
+            }
+        }
     }
 
     // Process screenshots
@@ -91,21 +103,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $imageData[$order] = [
                     'screenshot' => $screenshot,
                     'thumbnail' => $thumbnail ?: $screenshot, // Default thumbnail to screenshot if not provided
-                    'orientation' => $_POST['orientation'][$order] ?? 'P',
-                    'device' => $_POST['device'][$order] ?? 'P'
+                    'orientation' => $_POST['orientation'][$order] ?? 'L',
+                    'device' => $_POST['device'][$order] ?? 'T'
                 ];
             }
         }
     }
 
-    try {
-        $metaRepo->upsert($id, $data);
-        $metaRepo->updateImages($id, $imageData);
-        $success = true;
-        $metadata = $metaRepo->getForAdmin($id);
-        $images = $metaRepo->getImages($id);
-    } catch (Exception $e) {
-        $errors[] = 'Database error: ' . $e->getMessage();
+    if (empty($errors)) {
+        try {
+            $metaRepo->upsert($id, $data);
+            $metaRepo->updateImages($id, $imageData);
+            $success = true;
+            $metadata = $metaRepo->getForAdmin($id);
+            $images = $metaRepo->getImages($id);
+        } catch (Exception $e) {
+            $errors[] = 'Database error: ' . $e->getMessage();
+        }
     }
 }
 
@@ -150,11 +164,19 @@ include 'includes/header.php';
 <div class="card">
     <div class="card-body">
         <form method="post" class="admin-form">
+            <?php
+            // Owner-only accounts may set the Package ID once (while empty); see the POST handler.
+            $storedAppId   = $metadata['public_application_id'] ?? '';
+            $canSetAppId   = $canEditAll || $storedAppId === '';
+            $appIdValue    = $storedAppId !== '' ? $storedAppId : ($_POST['publicApplicationId'] ?? '');
+            ?>
             <div class="form-group">
                 <label>Package ID (publicApplicationId)</label>
-                <input type="text" name="publicApplicationId" value="<?php echo htmlspecialchars($metadata['public_application_id'] ?? ''); ?>"<?php echo $canEditAll ? '' : ' readonly'; ?>>
+                <input type="text" name="publicApplicationId" value="<?php echo htmlspecialchars($appIdValue); ?>"<?php echo $canSetAppId ? '' : ' readonly'; ?>>
                 <?php if ($canEditAll): ?>
                 <small>e.g., com.example.myapp</small>
+                <?php elseif ($canSetAppId): ?>
+                <small>The app's ID from its appinfo.json (e.g. com.example.myapp). <strong>You can set this once</strong>: IPK uploads are matched against it, so after saving only a full manager can change it.</small>
                 <?php else: ?>
                 <small>IPK uploads are matched against this ID, so only full managers can change it.</small>
                 <?php endif; ?>
@@ -306,6 +328,9 @@ include 'includes/header.php';
                     $rowCount = max(3, count($imageList) + 1);
                     for ($i = 1; $i <= $rowCount; $i++):
                         $img = $imageList[$i - 1] ?? null;
+                        // Empty rows default to Landscape / Tablet; stored images keep their values.
+                        $rowOrientation = $img ? ($img['orientation'] ?? 'P') : 'L';
+                        $rowDevice      = $img ? ($img['device'] ?? 'P') : 'T';
                     ?>
                     <div class="screenshot-row" style="display:grid;grid-template-columns:2fr 2fr 80px 80px;gap:10px;margin-bottom:10px;align-items:end;">
                         <div class="form-group" style="margin:0;">
@@ -319,15 +344,15 @@ include 'includes/header.php';
                         <div class="form-group" style="margin:0;">
                             <?php if ($i === 1): ?><label>Orient.</label><?php endif; ?>
                             <select name="orientation[<?php echo $i; ?>]">
-                                <option value="P" <?php echo ($img['orientation'] ?? 'P') === 'P' ? 'selected' : ''; ?>>Portrait</option>
-                                <option value="L" <?php echo ($img['orientation'] ?? '') === 'L' ? 'selected' : ''; ?>>Landscape</option>
+                                <option value="P" <?php echo $rowOrientation === 'P' ? 'selected' : ''; ?>>Portrait</option>
+                                <option value="L" <?php echo $rowOrientation === 'L' ? 'selected' : ''; ?>>Landscape</option>
                             </select>
                         </div>
                         <div class="form-group" style="margin:0;">
                             <?php if ($i === 1): ?><label>Device</label><?php endif; ?>
                             <select name="device[<?php echo $i; ?>]">
-                                <option value="P" <?php echo ($img['device'] ?? 'P') === 'P' ? 'selected' : ''; ?>>Phone</option>
-                                <option value="T" <?php echo ($img['device'] ?? '') === 'T' ? 'selected' : ''; ?>>Tablet</option>
+                                <option value="P" <?php echo $rowDevice === 'P' ? 'selected' : ''; ?>>Phone</option>
+                                <option value="T" <?php echo $rowDevice === 'T' ? 'selected' : ''; ?>>Tablet</option>
                             </select>
                         </div>
                     </div>
@@ -344,8 +369,8 @@ include 'includes/header.php';
                     row.style = 'display:grid;grid-template-columns:2fr 2fr 80px 80px;gap:10px;margin-bottom:10px;align-items:end;';
                     row.innerHTML = '<div class="form-group" style="margin:0;"><input type="text" name="screenshot[' + screenshotCount + ']" placeholder="path/to/screenshot.png"></div>' +
                         '<div class="form-group" style="margin:0;"><input type="text" name="thumbnail[' + screenshotCount + ']" placeholder="path/to/thumb.png (optional)"></div>' +
-                        '<div class="form-group" style="margin:0;"><select name="orientation[' + screenshotCount + ']"><option value="P">Portrait</option><option value="L">Landscape</option></select></div>' +
-                        '<div class="form-group" style="margin:0;"><select name="device[' + screenshotCount + ']"><option value="P">Phone</option><option value="T">Tablet</option></select></div>';
+                        '<div class="form-group" style="margin:0;"><select name="orientation[' + screenshotCount + ']"><option value="P">Portrait</option><option value="L" selected>Landscape</option></select></div>' +
+                        '<div class="form-group" style="margin:0;"><select name="device[' + screenshotCount + ']"><option value="P">Phone</option><option value="T" selected>Tablet</option></select></div>';
                     container.appendChild(row);
                 }
                 </script>

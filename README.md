@@ -134,7 +134,7 @@ php scripts/create-account.php alice curator       # a curator
 | `superadmin` | Everything, including managing other accounts |
 | `admin` | Full catalog management (no account management) |
 | `curator` | Edit apps / categories / authors, moderate reviews |
-| `developer` | Submit and manage their own apps; gets full Logs (has `logs.view`) but the read-only Dashboard (no `apps.edit`) |
+| `developer` | Submit and manage their own apps (create app → set its Package ID once under Edit Metadata → upload the IPK); gets full Logs (has `logs.view`) but the read-only Dashboard (no `apps.edit`) |
 | `viewer` | Read-only: Dashboard stats and Logs (IP-redacted) only, nothing else |
 
 **Signing in:** every role above includes `admin.access`, so any of them can

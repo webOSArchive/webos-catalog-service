@@ -74,9 +74,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $storage->isConfigured()) {
                     $baseName = $storage->nextScreenshotName(array_map(function ($x) { return $x['screenshot']; }, $images));
                     $rel      = $storage->saveUpload($id, $file['tmp_name'], $baseName);
                     $nextOrder = empty($images) ? 1 : (max(array_map('intval', array_keys($images))) + 1);
-                    $images[$nextOrder] = ['screenshot' => $rel, 'thumbnail' => $rel, 'orientation' => 'P', 'device' => 'P'];
+                    // New screenshots default to Landscape / Tablet (the common
+                    // combo); adjust on the Metadata page if needed.
+                    $images[$nextOrder] = ['screenshot' => $rel, 'thumbnail' => $rel, 'orientation' => 'L', 'device' => 'T'];
                     $metaRepo->updateImages($id, $images);
-                    $success = 'Screenshot added. (Set its orientation on the Metadata page if it should be landscape.)';
+                    $success = 'Screenshot added as Landscape / Tablet. (Change its orientation or device on the Metadata page if needed.)';
                 } catch (Throwable $e) {
                     $errors[] = $e->getMessage();
                 }
