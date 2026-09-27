@@ -1,7 +1,7 @@
 {
   "publicApplicationId": "com.palm.app.enyo",
   "description": "HP App Catalog for Mojo",
-  "version": "3.0.23300",
+  "version": "3.0.23302",
   "versionNote": "Initial restoration",
   "homeURL": "http://www.webosarchive.org",
   "supportURL": "http://appcatalog.webosarchive.org",
