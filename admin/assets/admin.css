@@ -460,6 +460,41 @@ fieldset label input[type="checkbox"] {
     margin-right: 6px;
 }
 
+/* "Features" fieldset on metadata-edit.php */
+fieldset.features .feature-row {
+    margin-bottom: 14px;
+}
+
+fieldset.features .subhead {
+    display: block;
+    font-weight: 500;
+    color: #2c3e50;
+    margin-bottom: 8px;
+}
+
+fieldset.features .help {
+    display: block;
+    margin: 0 0 10px;
+    color: #7f8c8d;
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+fieldset.features .help code {
+    font-size: 0.85em;
+}
+
+fieldset.features .feature-other {
+    display: block;
+    width: 100%;
+    max-width: 480px;
+    padding: 8px 12px;
+    margin: 4px 0 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.95rem;
+}
+
 .form-actions {
     display: flex;
     gap: 10px;

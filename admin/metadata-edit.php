@@ -407,31 +407,36 @@ include 'includes/header.php';
                 </label>
             </fieldset>
 
-            <fieldset>
+            <fieldset class="features">
                 <legend>Features ("Find More…" searches)</legend>
-                <small>Exhibition, Just Type and Accounts open App Catalog on a search filtered by these. Take them from the package: <code>appinfo.json</code> for the first two, the account templates under <code>usr/palm/accounts/</code> (each <code>capabilityProviders[].capability</code>) for connectors.</small>
                 <?php
                 $currentConnectors = MetadataRepository::normalizeConnectors($metadata['connectors'] ?? '');
                 $otherConnectors   = array_diff($currentConnectors, MetadataRepository::CONNECTOR_CAPABILITIES);
                 ?>
-                <label>
-                    <input type="checkbox" name="dockMode" <?php echo ($metadata['dock_mode'] ?? false) ? 'checked' : ''; ?>>
-                    Exhibition (dock mode) &mdash; <code>"dockMode": true</code> in appinfo.json
-                </label>
-                <label>
-                    <input type="checkbox" name="universalSearch" <?php echo ($metadata['universal_search'] ?? false) ? 'checked' : ''; ?>>
-                    Just Type (universal search) &mdash; <code>"universalSearch"</code> in appinfo.json
-                </label>
-                <div class="form-group">
-                    <label>Synergy connectors (account capabilities)</label>
+                <p class="help">Exhibition, Just Type and Accounts open App Catalog on a search filtered by these flags.</p>
+
+                <div class="feature-row">
+                    <label>
+                        <input type="checkbox" name="dockMode" <?php echo ($metadata['dock_mode'] ?? false) ? 'checked' : ''; ?>>
+                        Exhibition (dock mode)
+                    </label>
+                    <label>
+                        <input type="checkbox" name="universalSearch" <?php echo ($metadata['universal_search'] ?? false) ? 'checked' : ''; ?>>
+                        Just Type (universal search)
+                    </label>
+                    <p class="help">From the package's appinfo.json: <code>"dockMode": true</code> and <code>"universalSearch"</code>.</p>
+                </div>
+
+                <div class="feature-row">
+                    <span class="subhead">Synergy connectors</span>
                     <?php foreach (MetadataRepository::CONNECTOR_CAPABILITIES as $cap): ?>
-                    <label style="display:inline-block;margin:0 14px 6px 0;">
+                    <label>
                         <input type="checkbox" name="connectors[]" value="<?php echo $cap; ?>" <?php echo in_array($cap, $currentConnectors, true) ? 'checked' : ''; ?>>
                         <?php echo $cap; ?>
                     </label>
                     <?php endforeach; ?>
-                    <input type="text" name="connectorsOther" value="<?php echo htmlspecialchars(implode(',', $otherConnectors)); ?>" placeholder="Other capabilities, comma-separated">
-                    <small>Mail templates say <code>MAIL</code>; it is stored as <code>EMAIL</code>, which is what the catalog app expects.</small>
+                    <input type="text" class="feature-other" name="connectorsOther" value="<?php echo htmlspecialchars(implode(',', $otherConnectors)); ?>" placeholder="Other capabilities, comma-separated">
+                    <p class="help">Account capabilities from the package's <code>usr/palm/accounts/*.json</code> (<code>capabilityProviders[].capability</code>). Mail templates say <code>MAIL</code>; it is stored as <code>EMAIL</code>, which the catalog app expects.</p>
                 </div>
             </fieldset>
 
