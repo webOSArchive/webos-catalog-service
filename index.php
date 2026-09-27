@@ -122,7 +122,7 @@ echo file_get_contents("https://www.webosarchive.org/menu.php?docRoot=" . $docRo
         </div>
         <p style="font-size:smaller" id="explain-enyo">HP TouchPad, TouchPad 4G or TouchPad Go running webOS 3.0.x. Note: <a href="http://www.webosarchive.org/pivot/2026/09/08/webos-3.1.0-community-edition-is-here/">webOS 3.1.0</a> has everything pre-installed.</p>
         <p style="font-size:smaller; display:none;" id="explain-mojo">Palm Pre, Pre Plus, Pre2, Pixi; HP Veer or Pre3.</p>
-        <p style="font-size:smaller; display:none;" id="explain-luneos">Modern devices running <a href="http://www.webosarchive.org/pivot/author/webosports/">LuneOS</a> or the <a href="https://sdk.webosarchive.org">Enyo library</a> in WebKit (dev/test only.)</p>
+        <p style="font-size:smaller; display:none;" id="explain-luneos">Modern devices running <a href="http://www.webosarchive.org/pivot/author/webosports/">LuneOS</a> or the <a href="https://sdk.webosarchive.org">Enyo library</a> in WebKit (for dev/test purposes only.)</p>
 
         <span id="show-preware"><a class="download-link" href="http://docs.webosarchive.org/#step-5"><img src="assets/preware-icon.png" style="vertical-align:middle;height:48px;width:48px;" alt="Preware" title="Preware"> 1) Install Preware | Requires WOSQI + Java</a><br/></span>
         <span id="show-enyo" style="display:block"><a class="download-link" href="http://stacks.webosarchive.org/feeds/modernize/ipkgs/com.palm.app.enyo-findapps_6.2.2929_all.ipk"><img src="assets/hp-appcatalog.png" style="vertical-align:middle;height:48px;width:48px;" alt="HP App Catalog for TouchPad" title="HP App Catalog for TouchPad"> 2) Restored App Catalog (Enyo)</a><br></span>
