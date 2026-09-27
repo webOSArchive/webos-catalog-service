@@ -10,8 +10,89 @@ require_once __DIR__ . '/Database.php';
 class MetadataRepository {
     private $db;
 
+    /**
+     * Synergy connector capability names, as they appear in an app's account
+     * templates (usr/palm/accounts/<template>.json -> capabilityProviders[].capability).
+     * Stored in app_metadata.connectors as a comma-separated upper-case list and
+     * matched by getMuseumMaster.php?provides=connector/<CAPABILITY> (the Accounts
+     * app's "Find More…" search). The list drives the admin checkboxes; other
+     * names are still accepted and kept.
+     */
+    const CONNECTOR_CAPABILITIES = [
+        'CONTACTS', 'CALENDAR', 'EMAIL', 'MESSAGING', 'TASKS', 'MEMOS',
+        'PHOTO.UPLOAD', 'DOCUMENTS', 'PHONE', 'REMOTECONTACTS', 'LOCAL.FILESTORAGE'
+    ];
+
     public function __construct() {
         $this->db = Database::getInstance()->getConnection();
+    }
+
+    /**
+     * Normalise a list of connector capabilities to sorted, unique, upper-case names.
+     *
+     * Accepts an array or a comma-separated string. Strips a "connector/" prefix
+     * (the form the catalog client sends), drops the literal "null" HP's export
+     * left behind, and maps MAIL -> EMAIL (account templates say MAIL, the
+     * catalog client's "Works with" badges and HP's data say EMAIL).
+     *
+     * @param array|string|null $value
+     * @return string[]
+     */
+    public static function normalizeConnectors($value) {
+        if (is_string($value)) {
+            $value = explode(',', $value);
+        }
+        if (!is_array($value)) {
+            return [];
+        }
+        $out = [];
+        foreach ($value as $v) {
+            $v = strtoupper(trim((string)$v));
+            if (stripos($v, 'CONNECTOR/') === 0) {
+                $v = substr($v, strlen('CONNECTOR/'));
+            }
+            if ($v === 'MAIL') {
+                $v = 'EMAIL';
+            }
+            if ($v === '' || $v === 'NULL' || !preg_match('/^[A-Z0-9._-]+$/', $v)) {
+                continue;
+            }
+            $out[$v] = true;
+        }
+        $out = array_keys($out);
+        sort($out);
+        return $out;
+    }
+
+    /**
+     * Build the `attributes` object for API responses.
+     *
+     * The stored JSON blob (imported from HP's catalog, [] or NULL for newer
+     * apps) is kept for its extra keys, but attributes.provides.{dockMode,
+     * universalSearch, connectors} always come from the dedicated columns so
+     * the details view and the "Find More…" searches agree.
+     *
+     * @param array $row app_metadata row
+     * @return array
+     */
+    private function buildAttributes($row) {
+        $attrs = !empty($row['attributes']) ? json_decode($row['attributes'], true) : null;
+        if (!is_array($attrs) || isset($attrs[0])) {
+            // NULL, invalid, [] or a JSON list: start from an empty object
+            $attrs = [];
+        }
+        $provides = (isset($attrs['provides']) && is_array($attrs['provides'])) ? $attrs['provides'] : [];
+        $services = (isset($provides['services']) && is_array($provides['services'])) ? array_values($provides['services']) : [];
+
+        $attrs['provides'] = [
+            'noApp'                   => (bool)($provides['noApp'] ?? false),
+            'dockMode'                => (bool)($row['dock_mode'] ?? false),
+            'universalSearch'         => (bool)($row['universal_search'] ?? false),
+            'connectors'              => self::normalizeConnectors($row['connectors'] ?? ''),
+            'services'                => $services,
+            'optimizedUserExperience' => (bool)($provides['optimizedUserExperience'] ?? false)
+        ];
+        return $attrs;
     }
 
     /**
@@ -66,7 +147,7 @@ class MetadataRepository {
             'lastModifiedTime' => $metadata['last_modified_time'],
             'mediaLink' => $metadata['media_link'],
             'mediaIcon' => $metadata['media_icon'],
-            'attributes' => $metadata['attributes'] ? json_decode($metadata['attributes'], true) : [],
+            'attributes' => $this->buildAttributes($metadata),
             'price' => (float)$metadata['price'],
             'currency' => $metadata['currency'] ?? 'USD',
             'isAdvertized' => (bool)$metadata['is_advertized'],
@@ -215,19 +296,26 @@ class MetadataRepository {
      * @return bool Success
      */
     public function upsert($appId, $data) {
+        // `attributes` (HP's imported JSON blob) is only replaced when the caller
+        // supplies one; admin/metadata-edit.php never does, and before this
+        // COALESCE every curator save wiped it. The feature flags the API
+        // derives from it now live in their own columns (dock_mode,
+        // universal_search, connectors) - see buildAttributes().
         $sql = "
             INSERT INTO app_metadata (
                 app_id, public_application_id, description, version, version_note,
                 home_url, support_url, cust_support_email, cust_support_phone,
                 copyright, license_url, locale, app_size, install_size,
-                is_encrypted, adult_rating, web_suppressed, is_location_based, last_modified_time,
+                is_encrypted, adult_rating, web_suppressed, is_location_based,
+                dock_mode, universal_search, connectors, last_modified_time,
                 media_link, media_icon, price, currency, free, is_advertized,
                 filename, original_filename, star_rating, attributes
             ) VALUES (
                 ?, ?, ?, ?, ?,
                 ?, ?, ?, ?,
                 ?, ?, ?, ?, ?,
-                ?, ?, ?, ?, ?,
+                ?, ?, ?, ?,
+                ?, ?, ?, ?,
                 ?, ?, ?, ?, ?, ?,
                 ?, ?, ?, ?
             )
@@ -249,6 +337,9 @@ class MetadataRepository {
                 adult_rating = VALUES(adult_rating),
                 web_suppressed = VALUES(web_suppressed),
                 is_location_based = VALUES(is_location_based),
+                dock_mode = VALUES(dock_mode),
+                universal_search = VALUES(universal_search),
+                connectors = VALUES(connectors),
                 last_modified_time = VALUES(last_modified_time),
                 media_link = VALUES(media_link),
                 media_icon = VALUES(media_icon),
@@ -259,7 +350,7 @@ class MetadataRepository {
                 filename = VALUES(filename),
                 original_filename = VALUES(original_filename),
                 star_rating = VALUES(star_rating),
-                attributes = VALUES(attributes)
+                attributes = COALESCE(VALUES(attributes), attributes)
         ";
 
         $lastModified = null;
@@ -287,6 +378,9 @@ class MetadataRepository {
             (int)($data['adultRating'] ?? false),
             (int)($data['webSuppressed'] ?? false),
             (int)($data['islocationbased'] ?? false),
+            (int)($data['dockMode'] ?? false),
+            (int)($data['universalSearch'] ?? false),
+            implode(',', self::normalizeConnectors($data['connectors'] ?? [])),
             $lastModified,
             $data['mediaLink'] ?? null,
             $data['mediaIcon'] ?? null,

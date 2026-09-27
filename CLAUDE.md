@@ -66,7 +66,7 @@ App data is stored in MySQL. Key tables:
 | Endpoint | Rate Limit | Purpose |
 |----------|------------|---------|
 | `getSearchResults.php` | 60/hour | App/author search |
-| `getMuseumMaster.php` | 120/hour | Catalog listing |
+| `getMuseumMaster.php` | 120/hour | Catalog listing. `provides=` filters by app feature for the App Catalog "Find More…" searches (Exhibition → `dockMode`, Just Type → `universalSearch`, Accounts → `connector/<CAPABILITY>`, e.g. `connector/CONTACTS`); comma-separated, an app matches any of them. Backed by `app_metadata.dock_mode` / `universal_search` / `connectors` (migration 0010), curated in `metadata-edit.php` under "Features"; `getMuseumDetails.php` composes `attributes.provides.{dockMode,universalSearch,connectors}` from the same columns, so the imported `attributes` JSON blob is no longer authoritative for those |
 | `getMuseumDetails.php` | 200/hour | App details with related apps |
 | `countAppDownload.php` | — | Logs a download to `download_logs` (no body returned). Accepts a numeric Museum ID (web) or a package Application ID (device clients); anything that doesn't resolve to a catalog app is dropped, which is what keeps scanner probes (`?appid=.env.local`) out of the logs |
 | `getLatestVersionInfo.php` | — | Update check; museum app reads `0.json`, other apps read `getMuseumDetails.php` |
@@ -94,7 +94,7 @@ CRUD interface for managing catalog data. Security is app-level: login (`admin/l
 | `app-edit.php` | Create/edit apps (includes recommendation_order) |
 | `logs.php` | Download/update-check logs incl. IP address; requires `logs.view`, otherwise redirects to `logs-basic.php` |
 | `logs-basic.php` | Same log data minus the IP column, for accounts without `logs.view` (e.g. `viewer`) |
-| `metadata-edit.php` | Edit extended metadata, screenshots, and lastModifiedTime |
+| `metadata-edit.php` | Edit extended metadata, screenshots, lastModifiedTime, and the "Features" flags (dock mode, universal search, Synergy connector capabilities) behind the catalog's "Find More…" searches |
 | `account.php` | Self-service for the signed-in account: change username/password, download or delete this account's app storage data (see StorageRepository) |
 | `accounts.php` | Superadmin account management: create accounts, assign/remove roles (`accounts.manage`), enable/disable, reset passwords, delete (once disabled) |
 | `vendors.php` | Manage vendors (`authors.manage`); underlying table is still `authors` |

@@ -25,6 +25,12 @@
  *   useAppId     - Use appIds list mode
  *   appIds       - Comma-separated app IDs or "random"
  *   sort         - Sort order: 'recent' (default), 'alpha', or 'recommended'
+ *   provides     - Feature filter for the App Catalog "Find More…" searches.
+ *                  Comma-separated list of: dockMode (Exhibition), universalSearch
+ *                  (Just Type), connector/<CAPABILITY> (Accounts, e.g.
+ *                  connector/CONTACTS; case-insensitive, MAIL == EMAIL).
+ *                  An app matches when it provides ANY of the listed values.
+ *                  noApp and unknown tokens match nothing.
  *
  * Response format (must be maintained for backward compatibility):
  * {
@@ -105,6 +111,27 @@ $_adult       = isset($_REQUEST['adult']) ? filter_var($_REQUEST['adult'], FILTE
 $_onlyLuneOS  = isset($_REQUEST['onlyLuneOS']) ? $_REQUEST['onlyLuneOS'] : false;
 $_museumVersion = isset($_REQUEST['museumVersion']) ? $_REQUEST['museumVersion'] : "0.0.0";
 $_sort        = isset($_REQUEST['sort']) && in_array($_REQUEST['sort'], ['alpha', 'recommended', 'recent']) ? $_REQUEST['sort'] : 'recent';
+$_provides    = isset($_REQUEST['provides']) ? (string)$_REQUEST['provides'] : '';
+
+// Feature filter ("Find More…" from Exhibition, Just Type and Accounts). The
+// catalog client sends e.g. provides=dockMode or provides=connector/CONTACTS.
+$_providesFilter  = false;
+$_wantDockMode    = false;
+$_wantUniversal   = false;
+$_wantConnectors  = [];
+foreach (explode(',', $_provides) as $token) {
+	$token = trim($token);
+	if ($token === '') { continue; }
+	$_providesFilter = true;
+	if (strcasecmp($token, 'dockMode') === 0) {
+		$_wantDockMode = true;
+	} elseif (strcasecmp($token, 'universalSearch') === 0) {
+		$_wantUniversal = true;
+	} elseif (stripos($token, 'connector/') === 0) {
+		$_wantConnectors = array_merge($_wantConnectors, MetadataRepository::normalizeConnectors([$token]));
+	}
+	// noApp / anything else: no app matches it
+}
 
 // Convert string booleans
 if (gettype($_useAppId) === "string") { $_useAppId = strtolower($_useAppId) === "true"; }
@@ -187,6 +214,13 @@ foreach ($masterdata as $key => $app) {
 	$authorFound = empty($_query) || stripos($app['author'], $_query) !== false;
 	$summaryFound = empty($_query) || stripos($app['summary'] ?? '', $_query) !== false;
 
+	// Feature filter (any of the requested values)
+	$providesFound = !$_providesFilter
+		|| ($_wantDockMode && !empty($app['dockMode']))
+		|| ($_wantUniversal && !empty($app['universalSearch']))
+		|| (!empty($_wantConnectors) && !empty($app['connectors'])
+			&& count(array_intersect($_wantConnectors, $app['connectors'])) > 0);
+
 	// Vendor filter
 	$vendorId = !is_null($_vendorId) && !empty($_vendorId);
 
@@ -195,13 +229,13 @@ foreach ($masterdata as $key => $app) {
 			array_push($indices, $key);
 		}
 	} else {
-		if ($validDevice && $category && ($titleFound || $authorFound || $summaryFound)) {
+		if ($validDevice && $category && $providesFound && ($titleFound || $authorFound || $summaryFound)) {
 			array_push($indices, $key);
 		}
 	}
 
 	// Count apps for appCount (excluding category filter for accurate counts)
-	if ($validDevice && ($titleFound || $authorFound || $summaryFound)) {
+	if ($validDevice && $providesFound && ($titleFound || $authorFound || $summaryFound)) {
 		$appCount["All"]++;
 		if (isset($appCount[$app['category']])) {
 			$appCount[$app['category']]++;

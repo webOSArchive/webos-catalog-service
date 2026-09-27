@@ -107,7 +107,10 @@ class AppRepository {
                 a.in_curators_choice AS inCuratorsChoice,
                 a.status,
                 m.star_rating AS starRating,
-                a.review_count AS reviewCount
+                a.review_count AS reviewCount,
+                m.dock_mode AS dockMode,
+                m.universal_search AS universalSearch,
+                m.connectors AS connectors
             FROM apps a
             LEFT JOIN categories c ON a.category_id = c.id
             LEFT JOIN app_metadata m ON a.id = m.app_id
@@ -134,6 +137,11 @@ class AppRepository {
             $row['Adult'] = (bool)$row['Adult'];
             $row['inRevisionistHistory'] = (bool)$row['inRevisionistHistory'];
             $row['inCuratorsChoice'] = (bool)$row['inCuratorsChoice'];
+            // Feature flags for the "Find More…" searches (getMuseumMaster.php?provides=).
+            // connectors is stored normalised (see MetadataRepository::normalizeConnectors).
+            $row['dockMode'] = (bool)$row['dockMode'];
+            $row['universalSearch'] = (bool)$row['universalSearch'];
+            $row['connectors'] = ($row['connectors'] ?? '') === '' ? [] : explode(',', $row['connectors']);
             $row['id'] = (int)$row['id'];
             $results[] = $row;
         }

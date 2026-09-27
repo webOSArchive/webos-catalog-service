@@ -90,7 +90,7 @@ The `post_shutdown` flag identifies community-created apps after platform EOL.
 | Endpoint | Purpose |
 |----------|---------|
 | `getSearchResults.php` | App/author search |
-| `getMuseumMaster.php` | Catalog listing with filtering |
+| `getMuseumMaster.php` | Catalog listing with filtering. `provides=` filters by app feature for the App Catalog "Find More…" searches: `dockMode` (Exhibition), `universalSearch` (Just Type), `connector/<CAPABILITY>` (Accounts, e.g. `connector/CONTACTS`); comma-separated, any-of |
 | `getMuseumDetails.php` | App details with related apps |
 
 ### Admin UI (/admin)
