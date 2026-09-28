@@ -2,7 +2,7 @@
   "publicApplicationId": "com.palm.app.enyo",
   "description": "HP App Catalog for Mojo",
   "version": "3.1.23302",
-  "versionNote": "Initial restoration",
+  "versionNote": "Parity with tablet version.",
   "homeURL": "http://www.webosarchive.org",
   "supportURL": "http://appcatalog.webosarchive.org",
   "custsupportemail": "webosarchive@gmail.com",
