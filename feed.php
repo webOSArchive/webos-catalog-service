@@ -105,7 +105,7 @@ function feed_icon_url($appIcon, $imgPath) {
  */
 function feed_render_rss($items, $ch) {
 	$out = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-	$out .= '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">' . "\n";
+	$out .= '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">' . "\n";
 	$out .= "<channel>\n";
 	$out .= "\t<title>" . feed_xml($ch['title']) . "</title>\n";
 	$out .= "\t<link>" . feed_xml($ch['link']) . "</link>\n";
@@ -133,7 +133,9 @@ function feed_render_rss($items, $ch) {
 
 		// Description body (HTML)
 		$html = '';
-		$icon = feed_icon_url($app['appIcon'], $ch['imgPath']);
+		// Prefer the large icon: readers (Inoreader etc.) upscale whatever
+		// image they pick as the item thumbnail, and the small one looks rough
+		$icon = feed_icon_url(!empty($app['appIconBig']) ? $app['appIconBig'] : $app['appIcon'], $ch['imgPath']);
 		if ($icon) {
 			$html .= '<p><img src="' . feed_h($icon) . '" alt="" width="64" height="64" /></p>';
 		}
@@ -163,6 +165,9 @@ function feed_render_rss($items, $ch) {
 			$out .= "\t\t<category>" . feed_xml($app['category']) . "</category>\n";
 		}
 		$out .= "\t\t<description>" . feed_cdata($html) . "</description>\n";
+		if ($icon) {
+			$out .= "\t\t<media:thumbnail url=\"" . feed_xml($icon) . "\" />\n";
+		}
 		$out .= "\t</item>\n";
 	}
 

@@ -497,6 +497,7 @@ class AppRepository {
                 a.author,
                 a.summary,
                 a.app_icon AS appIcon,
+                a.app_icon_big AS appIconBig,
                 a.vendor_id AS vendorId,
                 c.name AS category,
                 a.adult AS Adult,

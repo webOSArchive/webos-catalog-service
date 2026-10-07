@@ -39,7 +39,7 @@ if (strpos($outputObj["filename"], "://") === false) {
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
   <meta name="description" content="<?php echo $description; ?>">
-  <meta name="keywords" content="webos, firefoxos, pwa, rss">
+  <meta name="keywords" content="webos, firefoxos, pwa">
   <meta name="author" content="webOS Archive">
   <meta property="og:title" content="<?php echo $title; ?>">
   <meta property="og:description" content="<?php echo $description; ?>">
@@ -53,7 +53,7 @@ if (strpos($outputObj["filename"], "://") === false) {
   <title><?php echo $title . $subtitle; ?></title>
 
   <link id="favicon" rel="icon" type="image/png" sizes="64x64" href="<?php echo $icon;?>">
-  <link rel="alternate" type="application/rss+xml" title="webOS App Museum - What's New" href="feed.php">
+  <link rel="alternate" type="application/rss+xml" title="webOS Archive News" href="http://www.webosarchive.org/feed.php">
   <link href="<?php echo $PROTOCOL . "://www.webosarchive.org/app-template/"?>web.css" rel="stylesheet" type="text/css" >
   <style>
     a { text-decoration: none; }
@@ -111,7 +111,7 @@ echo file_get_contents("https://www.webosarchive.org/menu.php?docRoot=" . $docRo
         <a class="download-link" href="showMuseum.php">
            <img src="assets/browser-icon.png" style="vertical-align:middle" alt="Browse Online" title="Browse Online" width="48" height="48"/> Browse Online </a>
            | <a class="download-link" href="http://archive.org/details/webosappcatalog"> Full Archive</a>
-           | <a class="download-link" href="feed.php" title="RSS feed of new apps and updates"><img src="assets/rss.png" style="vertical-align:middle;height:16px;width:16px;"> RSS Feed</a>
+           | <a class="download-link" href="http://www.webosarchive.org/feed.php" title="RSS feed of new apps and updates"><img src="assets/rss.png" style="vertical-align:middle;height:16px;width:16px;"> RSS Feed</a>
         <br><br>
         <div style="font-weight:bold; margin-bottom:8px;">Install on a Device:
         <select id="selectOS" onchange="setOS(document.getElementById('selectOS').value);">
