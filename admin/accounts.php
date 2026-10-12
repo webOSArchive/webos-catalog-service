@@ -31,6 +31,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
             if ($username === '') {
                 $errors[] = 'Username is required.';
+            } elseif ($err = AccountRepository::usernameError($username)) {
+                $errors[] = ($err === 'USERNAME_RESERVED')
+                    ? 'That username is reserved.'
+                    : 'Usernames must be 3-32 characters: letters, numbers, ".", "_" or "-", starting with a letter.';
             }
             if (strlen($password) < 8) {
                 $errors[] = 'Password must be at least 8 characters.';

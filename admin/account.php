@@ -1,7 +1,8 @@
 <?php
 /**
  * My Account — self-service password change for the signed-in user.
- * Any logged-in account may change its own password (no special capability).
+ * Any logged-in account may change its own password (no special capability),
+ * and see or replace its webOS Chat pass phrase.
  */
 require_once __DIR__ . '/includes/security.php';
 require_once __DIR__ . '/../includes/StorageRepository.php';
@@ -13,9 +14,11 @@ $me      = current_account();
 $errors  = [];
 $usernameErrors = [];
 $storageErrors = [];
+$chatErrors = [];
 $success = '';
 $usernameSuccess = '';
 $storageSuccess = '';
+$chatSuccess = '';
 
 // Self-service data export (app storage is opaque, client-scrambled blobs -
 // see StorageRepository's docblock - so this hands back exactly what's
@@ -46,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'chang
         } elseif ($err = AccountRepository::usernameError($newUsername)) {
             $usernameErrors[] = ($err === 'USERNAME_RESERVED')
                 ? 'That username is reserved.'
-                : 'Usernames must be 3-32 characters: letters, numbers, ".", "_" or "-", starting with a letter or number.';
+                : 'Usernames must be 3-32 characters: letters, numbers, ".", "_" or "-", starting with a letter.';
         } elseif ($repo->usernameTaken($newUsername, $me['id'])) {
             $usernameErrors[] = 'That username is already taken.';
         } else {
@@ -63,6 +66,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'chang
 if (isset($_GET['username_changed'])) {
     $usernameSuccess = 'Your username has been changed.';
 }
+
+// webOS Chat: the username is the screen name, so an account whose username
+// fails the rules (a device account still named after its email) has to pick
+// one first; usernameError() is the same check the OSCAR server relies on.
+$chatReady = AccountRepository::usernameError($me['username']) === null;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'new_chat_key') {
+    if (!csrf_validate()) {
+        $chatErrors[] = 'Your session expired. Please try again.';
+    } elseif (!$chatReady) {
+        $chatErrors[] = 'Choose a username first.';
+    } else {
+        $repo->newChatKey($me['id']);
+        header('Location: account.php?chat_key_changed=1');
+        exit;
+    }
+}
+
+if (isset($_GET['chat_key_changed'])) {
+    $chatSuccess = 'You have a new pass phrase. Devices signed in with the old one need the new one.';
+}
+
+$chatKey = $chatReady ? $repo->chatKey($me['id']) : null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'change_password') {
     if (!csrf_validate()) {
@@ -134,10 +160,46 @@ include 'includes/header.php';
             <div class="form-group">
                 <label>Username</label>
                 <input type="text" name="username" value="<?php echo htmlspecialchars($me['username']); ?>" required minlength="3" maxlength="32">
-                <small>3-32 letters or numbers. NOTE: this will not take effect on-device until you open the Accounts app, then edit and save your account.</small>
+                <small>3-32 letters, numbers, ".", "_" or "-", starting with a letter. It is also your webOS Chat screen name. NOTE: this will not take effect on-device until you open the Accounts app, then edit and save your account.</small>
             </div>
             <button type="submit" class="btn btn-primary">Change Username</button>
         </form>
+    </div>
+</div>
+
+<div class="card" style="max-width:480px;">
+    <div class="card-header"><h2>webOS Chat</h2></div>
+    <div class="card-body">
+        <?php if ($chatSuccess): ?>
+        <div class="alert alert-success"><?php echo htmlspecialchars($chatSuccess); ?></div>
+        <?php endif; ?>
+        <?php if (!empty($chatErrors)): ?>
+        <div class="alert alert-error">
+            <?php foreach ($chatErrors as $e): ?><?php echo htmlspecialchars($e); ?><br><?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+        <?php if (!$chatReady): ?>
+        <p style="font-size:13px;margin-top:0;">To use webOS Chat, choose a username above. Your username is your chat screen name, so it can't be your email address.</p>
+        <?php else: ?>
+        <p style="font-size:13px;margin-top:0;"><strong>webOS CE and Lunacy:</strong> nothing to set up. Your device signs in to chat with your webOS Account.</p>
+        <p style="font-size:13px;"><strong>Older webOS devices:</strong> in Accounts, add an AOL account with your screen name and pass phrase.</p>
+        <div class="form-group">
+            <label>Screen name</label>
+            <div style="font-size:16px;"><code><?php echo htmlspecialchars($me['username']); ?></code></div>
+        </div>
+        <?php if ($chatKey !== null): ?>
+        <div class="form-group">
+            <label>Pass phrase</label>
+            <div style="font-size:16px;"><code><?php echo htmlspecialchars($chatKey); ?></code></div>
+            <small>Spaces are optional, and capital letters at the start of words are fine. It's only for chat and is never your account password, so it's safe to keep on an old device.</small>
+        </div>
+        <?php endif; ?>
+        <form method="post"<?php echo $chatKey !== null ? " onsubmit=\"return confirm('Make a new pass phrase? Devices signed in with the old one will need the new one.');\"" : ''; ?>>
+            <?php echo csrf_field(); ?>
+            <input type="hidden" name="action" value="new_chat_key">
+            <button type="submit" class="btn btn-primary"><?php echo $chatKey !== null ? 'New Pass Phrase' : 'Create Pass Phrase'; ?></button>
+        </form>
+        <?php endif; ?>
     </div>
 </div>
 

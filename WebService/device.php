@@ -42,6 +42,9 @@
  *   ?m=authenticateWeb   {login, password, device_id} -> {token, expires_at, account}
  *   ?m=refreshToken      {token} -> {token, expires_at}   (old token is invalidated)
  *   ?m=deauthenticate    {token} -> {deauthenticated}     (sign-out; idempotent)
+ *   ?m=getChatCredentials -> {screenName, chatKey, server, port}  webOS Chat
+ *                            sign-in for CE / Lunacy (409 username_required
+ *                            while the username is still an email)
  *   ?m=getAccountInfo    -> {username, email, display_name}  live lookup for SDK
  *                        clients (webos-common/AppStorage), bypassing the
  *                        on-device db8 profile cache. Token via "Authorization:
@@ -590,6 +593,38 @@ switch ($method) {
             'username'     => $account['username'],
             'email'        => $account['email'] ?: '',
             'display_name' => $account['display_name'] ?: '',
+        ]);
+        break;
+
+    case 'getChatCredentials':
+        // webOS Chat sign-in for up-to-date devices (webOS CE, Lunacy): the
+        // device trades its account token for the AIM screen name and pass
+        // phrase, and sets up its AIM account without the person typing
+        // either. The first call makes the pass phrase; later calls return the
+        // same one, so every device on the account shares it. Stock devices
+        // get theirs from My Account instead. Same bearer-token convention as
+        // getAccountInfo.
+        $token   = device_bearer_token($body);
+        $account = $token !== null ? $repo->verifyDeviceToken($token) : null;
+        if (!$account) {
+            http_response_code(401);
+            echo json_encode(['error' => 'unauthorized', 'message' => 'Invalid or expired account token']);
+            break;
+        }
+        // The screen name is the username, so it has to be a real one: not a
+        // device account's email (which would show to every buddy), and
+        // starting with a letter (AIM reads a leading digit as ICQ).
+        if (AccountRepository::usernameError($account['username'])) {
+            http_response_code(409);
+            echo json_encode(['error' => 'username_required',
+                              'message' => 'Choose a username for your webOS Account to use webOS Chat']);
+            break;
+        }
+        echo json_encode([
+            'screenName' => $account['username'],
+            'chatKey'    => $repo->chatKey($account['id']) ?? $repo->newChatKey($account['id']),
+            'server'     => 'oscar.webosarchive.org',
+            'port'       => 5190,
         ]);
         break;
 

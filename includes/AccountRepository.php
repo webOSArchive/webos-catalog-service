@@ -141,12 +141,18 @@ class AccountRepository {
      * ambiguous with an email at sign-in (verifyLogin matches username OR
      * email). Uniqueness is case-insensitive via the column collation.
      *
+     * It must start with a letter: the username is also the account's webOS
+     * Chat screen name, and AIM clients take a name starting with a digit for
+     * an ICQ number. An account whose username fails these rules (a device
+     * account still named after its email) can't use webOS Chat until it picks
+     * one.
+     *
      * @return string|null error code, or null when acceptable.
      */
     public static function usernameError($username) {
         static $reserved = ['admin', 'administrator', 'root', 'system', 'support', 'help',
                             'moderator', 'webos', 'webosarchive', 'museum', 'palm', 'hp', 'null'];
-        if (!preg_match('/^[A-Za-z0-9][A-Za-z0-9._-]{2,31}$/', $username)) {
+        if (!preg_match('/^[A-Za-z][A-Za-z0-9._-]{2,31}$/', $username)) {
             return 'USERNAME_INVALID';
         }
         if (in_array(strtolower($username), $reserved, true)) {
@@ -184,6 +190,53 @@ class AccountRepository {
     public function deleteAccount($accountId) {
         $stmt = $this->db->prepare("DELETE FROM accounts WHERE id = ?");
         return $stmt->execute([(int)$accountId]);
+    }
+
+    // -- webOS Chat -----------------------------------------------------------
+
+    /**
+     * The account's webOS Chat pass phrase, or null if it has none yet.
+     *
+     * Stored as is, not hashed: AIM's sign-in (BUCP) only ever needs
+     * MD5(phrase), so a stored hash would sign in just as well and protect
+     * nothing, while the plain phrase can be shown again on My Account and
+     * handed to webOS CE / Lunacy by device.php's getChatCredentials. It is
+     * a chat-only secret, never the account password (stock devices sign in
+     * over plain TCP). Not in PUBLIC_COLS, so find*() never returns it.
+     */
+    public function chatKey($accountId) {
+        $stmt = $this->db->prepare("SELECT chat_key FROM accounts WHERE id = ?");
+        $stmt->execute([(int)$accountId]);
+        $key = $stmt->fetchColumn();
+        return ($key === false || $key === null || $key === '') ? null : $key;
+    }
+
+    /** Give the account a new pass phrase (replacing any old one) and return it. */
+    public function newChatKey($accountId) {
+        $key  = self::generateChatKey();
+        $stmt = $this->db->prepare("UPDATE accounts SET chat_key = ? WHERE id = ?");
+        $stmt->execute([$key, (int)$accountId]);
+        return $key;
+    }
+
+    /**
+     * Three short lowercase words, e.g. "maple river lamp": easy to type on a
+     * Pre's or Veer's keyboard, about 31 bits. Words from includes/chat-words.txt
+     * (the EFF short word list), picked with random_int().
+     */
+    public static function generateChatKey() {
+        static $words = null;
+        if ($words === null) {
+            $words = array_values(array_filter(
+                array_map('trim', file(__DIR__ . '/chat-words.txt')),
+                fn($w) => $w !== '' && $w[0] !== '#'
+            ));
+        }
+        $picked = [];
+        for ($i = 0; $i < 3; $i++) {
+            $picked[] = $words[random_int(0, count($words) - 1)];
+        }
+        return implode(' ', $picked);
     }
 
     public function updateLastLogin($accountId) {

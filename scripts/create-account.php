@@ -59,6 +59,11 @@ try {
     fail("Database connection failed: " . $e->getMessage());
 }
 
+if ($err = AccountRepository::usernameError($username)) {
+    fail($err === 'USERNAME_RESERVED'
+        ? "'$username' is a reserved username."
+        : "Usernames must be 3-32 characters: letters, numbers, '.', '_' or '-', starting with a letter.");
+}
 if ($repo->findByUsername($username)) {
     fail("An account named '$username' already exists.");
 }
