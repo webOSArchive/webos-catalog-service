@@ -140,9 +140,11 @@ php scripts/create-account.php alice curator       # a curator
 **Signing in:** every role above includes `admin.access`, so any of them can
 sign in at `/admin/login.php` (rate-limited, generic error on failure).
 Sessions are isolated from the front-end site; "Log out" is in the admin nav.
-Accounts created via `accounts.php` or `scripts/create-account.php` also get
-the `viewer` role baked in automatically, so an account is never left
-role-less (which would otherwise block login entirely).
+Every new account, whether created via `accounts.php`,
+`scripts/create-account.php` or on a device (`device.php`'s
+`createDeviceAccount`), gets the `viewer` role automatically
+(`AccountRepository::create()`), so an account is never left role-less
+(which would otherwise block login entirely).
 
 Bootstrap order on a fresh install: run the migration, create the first account
 with `scripts/create-account.php` (make it a `superadmin`), then sign in.

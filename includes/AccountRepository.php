@@ -69,7 +69,11 @@ class AccountRepository {
     // -- Create / update ------------------------------------------------------
 
     /**
-     * Create an account. Accounts are admin-provisioned only (no self-signup).
+     * Create an account: admin-provisioned (accounts.php, create-account.php)
+     * or self-signup from a device (device.php createDeviceAccount). Every
+     * account gets the baseline 'viewer' role here, so none is left role-less
+     * (which blocks admin login entirely, see login.php's admin.access check);
+     * callers add any further role themselves.
      *
      * @param array $data username (required), plus optional password (plaintext,
      *                    hashed here), email, display_name, status,
@@ -98,7 +102,9 @@ class AccountRepository {
             $data['author_vendor_id'] ?? null,
             $data['legacy_account_id'] ?? null,
         ]);
-        return (int)$this->db->lastInsertId();
+        $id = (int)$this->db->lastInsertId();
+        $this->assignRole($id, 'viewer');
+        return $id;
     }
 
     public function setPassword($accountId, $plainPassword) {

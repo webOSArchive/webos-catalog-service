@@ -101,11 +101,8 @@ try {
         fail("Account #$id created, but role '$role' could not be assigned " .
              "(did you run the 0001_accounts.sql migration?).");
     }
-    // Baseline so the account is never role-less; harmless no-op if $role is
-    // already 'viewer' or already implies it (assignRole is INSERT IGNORE).
-    if ($role !== 'viewer') {
-        $repo->assignRole($id, 'viewer');
-    }
+    // create() already added the baseline 'viewer' role; assigning 'viewer'
+    // again above is a harmless no-op (assignRole is INSERT IGNORE).
 } catch (Throwable $e) {
     fail("Could not create account: " . $e->getMessage());
 }
