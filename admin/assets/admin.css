@@ -209,16 +209,20 @@ body {
     padding: 20px;
 }
 
-/* Cards side by side, wrapping to as many columns as fit (one on a phone) */
+/* Fixed-width cards that sit side by side and wrap onto new rows as
+   space runs out (one per row on a phone). Cards keep their own width and
+   height; they don't stretch to fill the row. */
 .card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
     gap: 20px;
-    align-items: start;
     margin-bottom: 20px;
 }
 
 .card-grid > .card {
+    flex: 0 1 480px;
+    min-width: 0;
     margin-bottom: 0;
 }
 
