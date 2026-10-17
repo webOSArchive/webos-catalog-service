@@ -1,7 +1,7 @@
 {
   "publicApplicationId": "com.palm.app.enyo-findapps",
   "description": "App Catalog for Enyo",
-  "version": "6.2.2929",
+  "version": "6.2.2931",
   "versionNote": "App Catalog can now directly install most apps, and works with Preware 2.",
   "homeURL": "http://www.webosarchive.org",
   "supportURL": "http://appcatalog.webosarchive.org",
@@ -11,6 +11,6 @@
   "licenseURL": "MIT",
   "locale": "en_US",
   "lastModifiedTime": "2026-06-10T01:15:19-04:00",
-  "filename": "http://stacks.webosarchive.org/feeds/modernize/ipkgs/com.palm.app.enyo-findapps_6.2.2929_all.ipk",
+  "filename": "http://stacks.webosarchive.org/feeds/modernize/ipkgs/com.palm.app.enyo-findapps_6.2.2931_all.ipk",
   "originalFileName": "com.palm.app.enyo-findapps_6.0.2900_all.ipk"
 }
