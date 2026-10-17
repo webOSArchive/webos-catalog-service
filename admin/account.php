@@ -2,23 +2,27 @@
 /**
  * My Account — self-service password change for the signed-in user.
  * Any logged-in account may change its own password (no special capability),
- * and see or replace its webOS Chat pass phrase.
+ * see or replace its webOS Chat pass phrase, and opt in to the webOS user map.
  */
 require_once __DIR__ . '/includes/security.php';
 require_once __DIR__ . '/../includes/StorageRepository.php';
+require_once __DIR__ . '/../includes/UserMapRepository.php';
 $pageTitle = 'My Account';
 
 $repo        = new AccountRepository();
 $storageRepo = new StorageRepository();
+$mapRepo     = new UserMapRepository(include __DIR__ . '/../WebService/config.php');
 $me      = current_account();
 $errors  = [];
 $usernameErrors = [];
 $storageErrors = [];
 $chatErrors = [];
+$mapErrors = [];
 $success = '';
 $usernameSuccess = '';
 $storageSuccess = '';
 $chatSuccess = '';
+$mapSuccess = '';
 
 // Self-service data export (app storage is opaque, client-scrambled blobs -
 // see StorageRepository's docblock - so this hands back exactly what's
@@ -90,6 +94,31 @@ if (isset($_GET['chat_key_changed'])) {
 
 $chatKey = $chatReady ? $repo->chatKey($me['id']) : null;
 
+// webOS user map: the map shows the username, so (as with chat) an account
+// still named after its email has to pick a username before it can opt in.
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'user_map') {
+    $optIn     = !empty($_POST['map_opt_in']);
+    $precision = (string)($_POST['map_precision'] ?? '');
+    if (!csrf_validate()) {
+        $mapErrors[] = 'Your session expired. Please try again.';
+    } elseif ($optIn && !$chatReady) {
+        $mapErrors[] = 'Choose a username first.';
+    } elseif (!in_array($precision, UserMapRepository::PRECISIONS, true)) {
+        $mapErrors[] = 'Choose how precise your location should be.';
+    } else {
+        $mapRepo->saveSettings($me['id'], $optIn, $precision);
+        header('Location: account.php?map_saved=1');
+        exit;
+    }
+}
+
+if (isset($_GET['map_saved'])) {
+    $mapSuccess = 'Your user map settings have been saved.';
+}
+
+$mapSettings = $mapRepo->settings($me['id']);
+$mapLocation = $mapSettings['opted_in'] ? $mapRepo->locate($me['id']) : null;
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'change_password') {
     if (!csrf_validate()) {
         $errors[] = 'Your session expired. Please try again.';
@@ -143,7 +172,9 @@ include 'includes/header.php';
 
 <p style="color:#777;font-size:13px;">Signed in as <strong><?php echo htmlspecialchars($me['username']); ?></strong>.</p>
 
-<div class="card" style="max-width:480px;">
+<div class="card-grid">
+
+<div class="card">
     <div class="card-header"><h2>Change Username</h2></div>
     <div class="card-body">
         <?php if ($usernameSuccess): ?>
@@ -167,7 +198,7 @@ include 'includes/header.php';
     </div>
 </div>
 
-<div class="card" style="max-width:480px;">
+<div class="card">
     <div class="card-header"><h2>webOS Chat</h2></div>
     <div class="card-body">
         <?php if ($chatSuccess): ?>
@@ -203,7 +234,57 @@ include 'includes/header.php';
     </div>
 </div>
 
-<div class="card" style="max-width:480px;">
+<div class="card">
+    <div class="card-header"><h2>webOS User Map</h2></div>
+    <div class="card-body">
+        <?php if ($mapSuccess): ?>
+        <div class="alert alert-success"><?php echo htmlspecialchars($mapSuccess); ?></div>
+        <?php endif; ?>
+        <?php if (!empty($mapErrors)): ?>
+        <div class="alert alert-error">
+            <?php foreach ($mapErrors as $e): ?><?php echo htmlspecialchars($e); ?><br><?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+        <p style="font-size:13px;margin-top:0;">Put yourself on a community map of webOS users around the world. The map shows your username and the place below, never your exact location. Your location is estimated from your internet address when a device signed in to your webOS Account checks for app updates, and only checks made after you opt in are used.</p>
+        <?php if (!$chatReady): ?>
+        <p style="font-size:13px;">To join the map, choose a username above. The map shows your username, so it can't be your email address.</p>
+        <?php endif; ?>
+        <form method="post">
+            <?php echo csrf_field(); ?>
+            <input type="hidden" name="action" value="user_map">
+            <div class="form-group">
+                <label style="font-weight:normal;">
+                    <input type="checkbox" name="map_opt_in" value="1"<?php echo $mapSettings['opted_in'] ? ' checked' : ''; ?><?php echo $chatReady ? '' : ' disabled'; ?>>
+                    Show me on the webOS user map
+                </label>
+            </div>
+            <div class="form-group">
+                <label>Show my location as</label>
+                <?php foreach (['city' => 'Nearest large city', 'state' => 'State or province only', 'country' => 'Country only'] as $value => $text): ?>
+                <label style="font-weight:normal;display:block;">
+                    <input type="radio" name="map_precision" value="<?php echo $value; ?>"<?php echo $mapSettings['precision'] === $value ? ' checked' : ''; ?>>
+                    <?php echo $text; ?>
+                </label>
+                <?php endforeach; ?>
+            </div>
+            <?php if ($mapSettings['opted_in']): ?>
+            <p style="color:#777;font-size:13px;">
+                <?php if ($mapLocation): ?>
+                Currently shown at <strong><?php echo htmlspecialchars($mapLocation['place']); ?></strong> (as of <?php echo htmlspecialchars($mapLocation['last_seen']); ?>).
+                <?php if ($mapLocation['precision'] !== $mapSettings['precision']): ?>
+                Your <?php echo $mapSettings['precision'] === 'city' ? 'city' : 'state'; ?> couldn't be worked out, so a less precise location is used.
+                <?php endif; ?>
+                <?php else: ?>
+                Not on the map yet. You'll appear after a device signed in to your webOS Account checks for app updates.
+                <?php endif; ?>
+            </p>
+            <?php endif; ?>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+    </div>
+</div>
+
+<div class="card">
     <div class="card-header"><h2>Change Password</h2></div>
     <div class="card-body">
         <?php if ($success): ?>
@@ -235,7 +316,7 @@ include 'includes/header.php';
     </div>
 </div>
 
-<div class="card" style="max-width:480px;">
+<div class="card">
     <div class="card-header"><h2>My App Storage Data</h2></div>
     <div class="card-body">
         <p style="color:#777;font-size:13px;margin-top:0;">
@@ -272,6 +353,8 @@ include 'includes/header.php';
             </form>
         </div>
     </div>
+</div>
+
 </div>
 
 <?php include 'includes/footer.php'; ?>

@@ -60,6 +60,7 @@ App data is stored in MySQL. Key tables:
 | `LogRepository.php` | Download/update logging and reports |
 | `AccountRepository.php` | Accounts, roles, and device/web tokens (issue, verify, refresh, revoke); the username rules (`usernameError()`: 3-32 characters, starting with a letter, since the username is also the webOS Chat screen name); webOS Chat pass phrases (`chatKey()`, `newChatKey()`: three words from `chat-words.txt`, the EFF short word list, stored as is in `accounts.chat_key`, migration 0012) |
 | `StorageRepository.php` | Per-account app KV storage backing `storage.php` (revisions, quota enforcement, account-deletion cascade via `deleteAccount()`) |
+| `UserMapRepository.php` | Opt-in webOS user map (migration 0013: `accounts.map_opt_in_at` / `map_precision`, `geo_ip_cache`, `geo_place_cache`). An account's location is the IP of its devices' newest update check since opting in (`update_check_logs.client_id` = nduid = `account_tokens.device_id`, last 12 months), geolocated by the same service as `reports/getgeodata.php`, then published only as a named place: the nearest large city from `large-cities.tsv` (GeoNames 100k+, rebuilt by `scripts/build-large-cities.php`), or a state/country center from OSM Nominatim. Never the IP's own coordinates |
 
 ### API Endpoints (WebService/)
 
@@ -71,6 +72,7 @@ App data is stored in MySQL. Key tables:
 | `countAppDownload.php` | — | Logs a download to `download_logs` (no body returned). Accepts a numeric Museum ID (web) or a package Application ID (device clients); anything that doesn't resolve to a catalog app is dropped, which is what keeps scanner probes (`?appid=.env.local`) out of the logs |
 | `getLatestVersionInfo.php` | — | Update check; museum app reads `0.json`, other apps read `getMuseumDetails.php` |
 | `device.php` | 240/hour | webOS Account backend: HP-shaped device methods (`createDeviceAccount`, `authenticateFromDevice`, …), the token-authenticated profile-editor surface (`getAccountInfoAggregate`, `isUserValid`, `updateAccountInfo`, `changeEmailAddress`, `changePassword`, `assignDeviceName`, `updateUsername`) behind Settings → Accounts, plus plain-JSON web/PWA auth (`authenticateWeb` — takes an optional `device_name` so a browser session reads as `PWA-<name>` rather than a phantom device, `refreshToken`, `deauthenticate`), `getChatCredentials` (webOS Chat sign-in for webOS CE / Lunacy: `{screenName, chatKey, server, port}`, making the pass phrase on first call; 409 `username_required` while the username fails `usernameError()`, e.g. a device account still named after its email; bearer token like `getAccountInfo`) and `getAccountInfo` (live `{username, email, display_name}` for SDK clients — bearer token via `Authorization: PalmAuth token=…`, same convention as `storage.php`; bypasses the on-device db8 profile cache, see `webos-common/AppStorage`'s `useDeviceAccount`/`getAccountInfo`). Sets its own CORS headers — see README "CORS" for the required nginx exemption |
+| `getUserMap.php` | 120/hour | Opted-in users as a GeoJSON FeatureCollection (`username`, `place`, `precision`, `last_seen`) for a community user map. Requires `user_map_api_key` from config (`X-Api-Key` header or `?key=`); off (503) when that key is empty |
 | `storage.php` | 600/hour + per-account | Cloud app storage: per-account, per-app KV sync (`?m=get/getAll/list/set/setMany/delete/usage`). Auth via `Authorization: PalmAuth token=…` resolved by `AccountRepository::verifyDeviceToken()`; quotas from `storage_*` config keys; values are opaque client-scrambled blobs. Client SDK: `webos-common/AppStorage`. Sets its own CORS headers |
 
 **`download_logs.source`** identifies the client: web frontend (unset/`app`), on-device Museum app (`webos` / `luneos`), and the patched HP first-party clients (`webos-appcatalog-enyo` for TouchPad, `webos-appcatalog-mojo` for phones). Use these to separate device installs from web in most-downloaded reports.
@@ -95,7 +97,7 @@ CRUD interface for managing catalog data. Security is app-level: login (`admin/l
 | `logs.php` | Download/update-check logs incl. IP address; requires `logs.view`, otherwise redirects to `logs-basic.php` |
 | `logs-basic.php` | Same log data minus the IP column, for accounts without `logs.view` (e.g. `viewer`) |
 | `metadata-edit.php` | Edit extended metadata, screenshots, lastModifiedTime, and the "Features" flags (dock mode, universal search, Synergy connector capabilities) behind the catalog's "Find More…" searches |
-| `account.php` | Self-service for the signed-in account: change username/password, see or replace the webOS Chat pass phrase (only once the username passes `usernameError()`), download or delete this account's app storage data (see StorageRepository) |
+| `account.php` | Self-service for the signed-in account: change username/password, see or replace the webOS Chat pass phrase (only once the username passes `usernameError()`), download or delete this account's app storage data (see StorageRepository), opt in or out of the webOS user map and pick its precision (nearest large city / state / country; see UserMapRepository) |
 | `accounts.php` | Superadmin account management: create accounts, assign/remove roles (`accounts.manage`), enable/disable, reset passwords, delete (once disabled) |
 | `vendors.php` | Manage vendors (`authors.manage`); underlying table is still `authors` |
 
@@ -125,4 +127,5 @@ Devices running the community OTA have TLS 1.3 / full modern HTTPS support; new 
 - **image_host** - Icons and screenshots
 - **package_host** - IPK packages (served over HTTP for stock pre-OTA devices)
 - **storage_host** - Base URL for the app-storage + web-auth endpoints (public via `getConfig.php`)
+- **user_map_api_key** - Secret key for `getUserMap.php`; empty disables it
 - **storage_**\* - App-storage quota/throttle keys enforced by `storage.php` (see `config-example.php`; omitted keys fall back to built-in defaults)

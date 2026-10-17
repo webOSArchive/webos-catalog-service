@@ -53,6 +53,14 @@ return array(
         'storage_max_bytes_per_account' => 2097152,  // 2 MB per account total
         'storage_writes_per_hour' => 300,            // per-account write throttle
 
+        // Opt-in webOS user map (NOT exposed via API). WebService/getUserMap.php
+        // requires this key (X-Api-Key header or ?key=); leave empty to turn
+        // the endpoint off. Give it only to the map app's developer.
+        'user_map_api_key' => '',
+        // IP geolocation service (MaxMind-shaped JSON; the IP is appended).
+        // Omit to use the one WebService/reports/getgeodata.php uses.
+        // 'geoip_service_url' => 'http://.../lookup.php?ip=',
+
         // Database credentials (NOT exposed via API - filtered in getConfig.php)
         'db_host' => 'localhost',
         'db_name' => 'webos_catalog',

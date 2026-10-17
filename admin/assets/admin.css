@@ -209,6 +209,19 @@ body {
     padding: 20px;
 }
 
+/* Cards side by side, wrapping to as many columns as fit (one on a phone) */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr));
+    gap: 20px;
+    align-items: start;
+    margin-bottom: 20px;
+}
+
+.card-grid > .card {
+    margin-bottom: 0;
+}
+
 /* Tables */
 .admin-table {
     width: 100%;
