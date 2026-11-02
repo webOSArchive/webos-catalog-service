@@ -7,6 +7,7 @@
 $pageTitle = 'IPK Manager';
 require_once __DIR__ . '/includes/security.php';
 admin_require_any(['ipk.manage', 'ipk.view']); // view/download; upload is gated separately below
+admin_block_catalog_writes();
 require_once __DIR__ . '/../includes/AzureBlobService.php';
 require_once __DIR__ . '/../includes/AppRepository.php';
 

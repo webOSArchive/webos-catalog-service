@@ -27,6 +27,7 @@ class Capabilities {
         'categories.manage',  // manage categories
         'authors.manage',     // manage authors/vendors
         'logs.view',          // view logs / reports
+        'catalog.readonly',   // switch catalog read-only mode, and edit while it's on
     ];
 
     /** Role name -> capabilities granted. '*' means all capabilities. */

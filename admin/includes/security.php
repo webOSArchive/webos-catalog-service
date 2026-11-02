@@ -19,6 +19,7 @@
 define('ADMIN_BOOTSTRAP', true);
 
 require_once __DIR__ . '/../../includes/AccountRepository.php';
+require_once __DIR__ . '/../../includes/CatalogLock.php';
 
 // --- Isolated admin session -------------------------------------------------
 if (session_status() === PHP_SESSION_NONE) {
@@ -91,6 +92,24 @@ function admin_require_any(array $capabilities) {
 /** True for accounts that manage only their own apps and nothing else (developers). */
 function admin_is_owner_only() {
     return admin_has_capability('apps.own') && !admin_has_capability('apps.edit');
+}
+
+/**
+ * Call on every page that changes catalog data, after its permission checks.
+ * While read-only mode is on, stops the request before it writes anything:
+ * any POST, plus GET ?action= links (app-edit.php's related-app add/remove
+ * write on GET). Superadmins (catalog.readonly) pass, so they can do the
+ * maintenance through the admin pages. Viewing the page stays allowed.
+ */
+function admin_block_catalog_writes() {
+    if (!CatalogLock::isActive() || admin_has_capability('catalog.readonly')) {
+        return;
+    }
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' || isset($_GET['action'])) {
+        http_response_code(403);
+        die('The catalog is read-only for maintenance, so this change was not saved. ' .
+            '<a href="javascript:history.back()">Go back</a>');
+    }
 }
 
 // --- CSRF token helpers (for login + account management forms) --------------

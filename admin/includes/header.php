@@ -63,3 +63,12 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
         </div>
     </nav>
     <main class="admin-content">
+        <?php if (CatalogLock::isActive()): ?>
+        <div class="alert alert-warning">
+            <?php if (admin_has_capability('catalog.readonly')): ?>
+            <strong>Catalog read-only mode is on.</strong> Other accounts can't change the catalog. Your edits as a superadmin still save.
+            <?php else: ?>
+            <strong>The catalog is read-only for maintenance.</strong> You can browse it, but changes to apps, metadata, images, categories, vendors and IPKs won't be saved until maintenance ends.
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>

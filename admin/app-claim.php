@@ -13,6 +13,7 @@ require_once __DIR__ . '/../includes/Database.php';
 require_once __DIR__ . '/../includes/AppRepository.php';
 
 admin_require_capability('apps.own');
+admin_block_catalog_writes();
 
 $repo = new AppRepository();
 $myAccountId = (int) current_account()['id'];

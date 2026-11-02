@@ -59,6 +59,7 @@ App data is stored in MySQL. Key tables:
 | `MetadataRepository.php` | Detailed app metadata and images |
 | `LogRepository.php` | Download/update logging and reports |
 | `AccountRepository.php` | Accounts, roles, and device/web tokens (issue, verify, refresh, revoke); the username rules (`usernameError()`: 3-32 characters, starting with a letter, since the username is also the webOS Chat screen name); webOS Chat pass phrases (`chatKey()`, `newChatKey()`: three words from `chat-words.txt`, the EFF short word list, stored as is in `accounts.chat_key`, migration 0012) |
+| `CatalogLock.php` | Catalog read-only mode for maintenance: an empty flag file at `WebService/__rateLimit/catalog-read-only`, not a database row, so it survives a restore. See Admin UI |
 | `StorageRepository.php` | Per-account app KV storage backing `storage.php` (revisions, quota enforcement, account-deletion cascade via `deleteAccount()`) |
 | `UserMapRepository.php` | Opt-in webOS user map (migration 0013: `accounts.map_opt_in_at` / `map_precision`, `geo_ip_cache`, `geo_place_cache`). An account's location is the IP of its devices' newest update check since opting in (`update_check_logs.client_id` = nduid = `account_tokens.device_id`, last 12 months), geolocated by the same service as `reports/getgeodata.php`, then published only as a named place: the nearest large city from `large-cities.tsv` (GeoNames 100k+, rebuilt by `scripts/build-large-cities.php`), or a state/country center from OSM Nominatim. Never the IP's own coordinates |
 
@@ -100,6 +101,8 @@ CRUD interface for managing catalog data. Security is app-level: login (`admin/l
 | `account.php` | Self-service for the signed-in account: change username/password, see or replace the webOS Chat pass phrase (only once the username passes `usernameError()`), download or delete this account's app storage data (see StorageRepository), opt in or out of the webOS user map and pick its precision (nearest large city / state / country; see UserMapRepository) |
 | `accounts.php` | Superadmin account management: create accounts, assign/remove roles (`accounts.manage`), enable/disable, reset passwords, delete (once disabled) |
 | `vendors.php` | Manage vendors (`authors.manage`); underlying table is still `authors` |
+
+**Catalog read-only mode:** a superadmin switches it on the Dashboard (`catalog.readonly` capability). While on, `admin_block_catalog_writes()` rejects POSTs and `?action=` GETs for everyone else on `app-edit.php`, `metadata-edit.php`, `app-images.php`, `app-claim.php`, `categories.php`, `vendors.php` and `ipk-manager.php`; any new page that changes catalog data must call it too. Accounts, app storage and logs are not affected, and superadmins can still edit.
 
 ### Web Interface
 

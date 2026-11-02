@@ -33,6 +33,7 @@ if ($ownOnly) {
         die('Forbidden: you can only edit apps your account owns.');
     }
 }
+admin_block_catalog_writes();
 
 // Get suggested next ID for new apps
 $suggestedId = null;

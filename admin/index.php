@@ -12,6 +12,20 @@ if (!admin_has_capability('apps.edit')) {
     exit;
 }
 
+// Superadmin switch for catalog read-only mode
+$readOnlyError = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['catalog_read_only'])) {
+    admin_require_capability('catalog.readonly');
+    if (!csrf_validate()) {
+        $readOnlyError = 'Your session expired. Please try again.';
+    } elseif ($_POST['catalog_read_only'] === '1' ? CatalogLock::enable() : CatalogLock::disable()) {
+        header('Location: index.php');
+        exit;
+    } else {
+        $readOnlyError = 'Could not change read-only mode: the web user needs write access to WebService/__rateLimit.';
+    }
+}
+
 require_once __DIR__ . '/includes/dashboard-stats.php';
 $dashboard = admin_get_dashboard_stats();
 $stats = $dashboard['stats'];
@@ -26,6 +40,27 @@ include 'includes/header.php';
         <a href="app-edit.php" class="btn btn-primary">Add New App</a>
     </div>
 </div>
+
+<?php if ($readOnlyError !== ''): ?>
+<div class="alert alert-error"><?php echo htmlspecialchars($readOnlyError); ?></div>
+<?php endif; ?>
+
+<?php if (admin_has_capability('catalog.readonly')): ?>
+<?php $readOnlySince = CatalogLock::activeSince(); ?>
+<form method="post" class="card" style="margin-bottom:20px;">
+    <div class="card-body">
+        <?php echo csrf_field(); ?>
+        <input type="hidden" name="catalog_read_only" value="<?php echo $readOnlySince === null ? '1' : '0'; ?>">
+        <?php if ($readOnlySince === null): ?>
+        <p>The catalog is open for editing. Read-only mode stops everyone except superadmins from changing apps, metadata, images, categories, vendors and IPKs. Accounts, app storage and logs aren't affected.</p>
+        <button type="submit" class="btn btn-primary">Make Catalog Read-Only</button>
+        <?php else: ?>
+        <p>The catalog has been read-only since <?php echo htmlspecialchars(date('Y-m-d H:i', $readOnlySince)); ?>.</p>
+        <button type="submit" class="btn btn-primary">End Read-Only Mode</button>
+        <?php endif; ?>
+    </div>
+</form>
+<?php endif; ?>
 
 <div class="stats-grid">
     <div class="stat-card">

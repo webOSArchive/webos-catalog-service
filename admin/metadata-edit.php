@@ -28,6 +28,7 @@ if (admin_is_owner_only()) {
         die('Forbidden: you can only edit metadata for apps your account owns.');
     }
 }
+admin_block_catalog_writes();
 
 $app = $appRepo->getById($id);
 if (!$app) {

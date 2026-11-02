@@ -31,6 +31,7 @@ if (admin_is_owner_only() && (int)($app['owner_account_id'] ?? 0) !== (int) curr
     http_response_code(403);
     die('Forbidden: you can only manage images for apps your account owns.');
 }
+admin_block_catalog_writes();
 
 $errors  = [];
 $success = '';

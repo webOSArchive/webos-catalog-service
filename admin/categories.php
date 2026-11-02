@@ -4,6 +4,7 @@
  */
 require_once __DIR__ . '/includes/security.php';
 admin_require_capability('categories.manage');
+admin_block_catalog_writes();
 $pageTitle = 'Categories';
 require_once __DIR__ . '/../includes/Database.php';
 
