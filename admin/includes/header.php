@@ -64,7 +64,7 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
     </nav>
     <main class="admin-content">
         <?php if (CatalogLock::isActive()): ?>
-        <div class="alert alert-warning">
+        <div class="alert alert-warning alert-sticky">
             <?php if (admin_has_capability('catalog.readonly')): ?>
             <strong>Catalog read-only mode is on.</strong> Other accounts can't change the catalog. Your edits as a superadmin still save.
             <?php else: ?>

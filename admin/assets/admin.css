@@ -565,6 +565,15 @@ fieldset.features .feature-other {
     border: 1px solid #ffeeba;
 }
 
+/* Stays pinned under the sticky .admin-nav (60px tall, z-index 100) while the
+   page scrolls, and slides beneath the nav's open menu panel. */
+.alert-sticky {
+    position: sticky;
+    top: 60px;
+    z-index: 99;
+    padding: 8px 20px;
+}
+
 /* Pagination */
 .pagination {
     display: flex;
