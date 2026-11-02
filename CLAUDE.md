@@ -113,6 +113,10 @@ CRUD interface for managing catalog data. Security is app-level: login (`admin/l
 - `downloadProxy.php` - HTTPS proxy for HTTP package downloads
 - `feed.php` - RSS 2.0 "What's New" feed: apps in `recent` order (`app_metadata.last_modified_time`), so new and updated apps both appear; `?count=` (max 100), `?adult=1`. Backed by `AppRepository::getRecentChanges()`
 
+### Public Archive Export
+
+`scripts/export-archive.php <output-dir>` writes a dated bundle of the app records for preservation (one JSON file per app, CSV, SQLite, README, manifest), run from cron and uploaded to archive.org by hand. It holds no user data: only the tables and columns named in its `$EXPORT` list leave the database. A new column on an exported table raises a warning until it's added to `$EXPORT` or `$EXCLUDED_COLUMNS`, but a new table of app records must be added by hand. The bundle's README, which explains the fields, is written by the script, so update it there.
+
 ### Rate Limiting
 
 File-based tracking per IP in `__rateLimit/` directory.
