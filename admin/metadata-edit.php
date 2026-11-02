@@ -219,11 +219,11 @@ include 'includes/header.php';
 
             <div class="form-group">
                 <label>Last Historical Update</label>
-                <input type="text" readonly value="<?php
+                <div><?php
                     $lhu = $metadata['last_historical_update'] ?? '';
                     echo $lhu ? date('Y-m-d', strtotime($lhu)) : 'Unknown';
-                ?>">
-                <small>When the developer last submitted the app to HP or Palm, or the app's first date here if it's new to the catalog. Read-only.</small>
+                ?></div>
+                <small>When the developer last submitted the app to HP or Palm, or the app's first date here if it's new to the catalog.</small>
             </div>
 
             <div class="form-group">
