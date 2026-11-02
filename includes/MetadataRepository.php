@@ -145,6 +145,7 @@ class MetadataRepository {
             'webSuppressed' => (bool)$metadata['web_suppressed'],
             'islocationbased' => (bool)$metadata['is_location_based'],
             'lastModifiedTime' => $metadata['last_modified_time'],
+            'lastHistoricalUpdate' => $metadata['last_historical_update'] ?? null,
             'mediaLink' => $metadata['media_link'],
             'mediaIcon' => $metadata['media_icon'],
             'attributes' => $this->buildAttributes($metadata),
@@ -308,6 +309,7 @@ class MetadataRepository {
                 copyright, license_url, locale, app_size, install_size,
                 is_encrypted, adult_rating, web_suppressed, is_location_based,
                 dock_mode, universal_search, connectors, last_modified_time,
+                last_historical_update,
                 media_link, media_icon, price, currency, free, is_advertized,
                 filename, original_filename, star_rating, attributes
             ) VALUES (
@@ -316,6 +318,7 @@ class MetadataRepository {
                 ?, ?, ?, ?, ?,
                 ?, ?, ?, ?,
                 ?, ?, ?, ?,
+                ?,
                 ?, ?, ?, ?, ?, ?,
                 ?, ?, ?, ?
             )
@@ -382,6 +385,7 @@ class MetadataRepository {
             (int)($data['universalSearch'] ?? false),
             implode(',', self::normalizeConnectors($data['connectors'] ?? [])),
             $lastModified,
+            $lastModified, // last_historical_update: first insert only, never in ON DUPLICATE
             $data['mediaLink'] ?? null,
             $data['mediaIcon'] ?? null,
             $data['price'] ?? 0,

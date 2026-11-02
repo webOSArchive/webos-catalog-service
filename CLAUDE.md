@@ -81,7 +81,7 @@ App data is stored in MySQL. Key tables:
 The patched HP clients also self-update from static manifests at the domain root — `appcatalog-touchpad.json` and `appcatalog-phones.json` (latest `version`, `versionNote`, IPK `filename`) — served over **HTTP** as a compatibility fallback for stock devices that haven't taken the community OTA. Devices running the OTA have TLS 1.3 / full modern HTTPS support.
 
 **Sort Options** (for `getMuseumMaster.php` and web frontend):
-- `recent` (default) - By `app_metadata.last_modified_time` descending
+- `recent` (default) - By `app_metadata.last_modified_time` descending. This is the date of the app's latest change, including our own fixes; the catalog's historical date is `app_metadata.last_historical_update` (migration 0014, read-only in the admin UI, NULL when unknown, set by `MetadataRepository::upsert()` only when the row is first created)
 - `alpha` - Alphabetical by title
 - `recommended` - By `apps.recommendation_order` descending
 
