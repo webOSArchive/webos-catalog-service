@@ -17,6 +17,7 @@ WebService/config.php
 # Rate limiting files
 __rateLimit/
 WebService/__rateLimit/
+127.0.0.1.json
 
 # Generated files
 wanted.txt
