@@ -416,8 +416,6 @@ Some care is needed with both:
   read it as "never updated".
 - **Treat them as dates, not times.** They are stored as UTC, but the sources
   didn't reliably carry a timezone, so a date may be a day out.
-- **`2014-09-06 12:00:00` in `last_modified_time` is a placeholder**, filled in
-  during a 2026 data repair. It was never a catalog date.
 - **Times ending in `:04:48`** were made up by curators. In
   `last_modified_time` they mark an edit, not a real event.
 - **Some community apps' dates may be late.** Where the older records had
