@@ -16,8 +16,8 @@
 require_once __DIR__ . '/../includes/AppRepository.php';
 include("ratelimit.php");
 
-// Rate limit: 60 requests per hour for search
-checkRateLimit(60, 3600);
+// Rate limit: 300 requests per hour for search (interactive; counted per endpoint)
+checkRateLimit(300, 3600);
 
 header('Content-Type: application/json');
 

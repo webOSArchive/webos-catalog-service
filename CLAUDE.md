@@ -67,7 +67,7 @@ App data is stored in MySQL. Key tables:
 
 | Endpoint | Rate Limit | Purpose |
 |----------|------------|---------|
-| `getSearchResults.php` | 60/hour | App/author search |
+| `getSearchResults.php` | 300/hour | App/author search |
 | `getMuseumMaster.php` | 120/hour | Catalog listing. `provides=` filters by app feature for the App Catalog "Find More…" searches (Exhibition → `dockMode`, Just Type → `universalSearch`, Accounts → `connector/<CAPABILITY>`, e.g. `connector/CONTACTS`); comma-separated, an app matches any of them. Backed by `app_metadata.dock_mode` / `universal_search` / `connectors` (migration 0010), curated in `metadata-edit.php` under "Features"; `getMuseumDetails.php` composes `attributes.provides.{dockMode,universalSearch,connectors}` from the same columns, so the imported `attributes` JSON blob is no longer authoritative for those |
 | `getMuseumDetails.php` | 200/hour | App details with related apps |
 | `countAppDownload.php` | — | Logs a download to `download_logs` (no body returned). Accepts a numeric Museum ID (web) or a package Application ID (device clients); anything that doesn't resolve to a catalog app is dropped, which is what keeps scanner probes (`?appid=.env.local`) out of the logs |
@@ -119,7 +119,7 @@ CRUD interface for managing catalog data. Security is app-level: login (`admin/l
 
 ### Rate Limiting
 
-File-based tracking per IP in `__rateLimit/` directory.
+File-based tracking per IP *per endpoint* in `__rateLimit/` (`<ip>.<script>.json`), so one endpoint's traffic never counts against another's cap.
 
 ```php
 checkRateLimit(60, 3600);  // 60 requests per hour

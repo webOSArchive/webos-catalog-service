@@ -160,9 +160,11 @@ function checkRateLimit($limit = null, $window = null) {
         $rate_limiter = new RateLimit();
     }
     
-    $ip = $rate_limiter->getClientIP();
+    // Bucket per endpoint: each script's limit counts only its own requests,
+    // so browsing (getMuseumMaster, getMuseumDetails, ...) can't exhaust search.
+    $bucket = $rate_limiter->getClientIP() . '.' . basename($_SERVER['SCRIPT_NAME'] ?? 'unknown');
     
-    if ($rate_limiter->isRateLimited($ip, $limit, $window)) {
+    if ($rate_limiter->isRateLimited($bucket, $limit, $window)) {
         http_response_code(429);
         header('Content-Type: application/json');
         echo json_encode([
