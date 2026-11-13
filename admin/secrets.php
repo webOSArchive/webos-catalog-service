@@ -364,6 +364,18 @@ $actionLabels = [
 include 'includes/header.php';
 ?>
 
+<style>
+    .secret-notes {
+        max-width: 360px;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        overflow: hidden;
+        overflow-wrap: anywhere;
+    }
+</style>
+
 <div class="page-header">
     <h1>Secrets</h1>
     <?php if ($key): ?>
@@ -447,7 +459,7 @@ include 'includes/header.php';
     <div class="card-header"><h2><?php echo htmlspecialchars($viewEntry['name']); ?></h2></div>
     <div class="card-body">
         <?php if ($viewEntry['notes'] !== ''): ?>
-        <div style="white-space:pre-wrap;margin-bottom:12px;"><?php echo htmlspecialchars($viewEntry['notes']); ?></div>
+        <div style="white-space:pre-wrap;overflow-wrap:anywhere;margin-bottom:12px;"><?php echo htmlspecialchars($viewEntry['notes']); ?></div>
         <?php endif; ?>
         <p style="color:#777;font-size:13px;"><?php echo htmlspecialchars($viewEntry['filename']); ?> &middot; <?php echo vault_size($viewEntry['content_size']); ?></p>
         <?php if ($viewEntry['content'] === false): ?>
@@ -477,11 +489,14 @@ include 'includes/header.php';
             <?php foreach ($entries as $e): ?>
                 <tr>
                     <td><strong><?php echo htmlspecialchars($e['name']); ?></strong></td>
-                    <td style="max-width:360px;color:#555;font-size:13px;">
+                    <td style="color:#555;font-size:13px;">
                         <?php
-                        $short = mb_substr($e['notes'], 0, 140);
-                        echo nl2br(htmlspecialchars($short)) . (mb_strlen($e['notes']) > 140 ? '&hellip;' : '');
+                        // One flattened line, clamped to two rows by CSS; the full
+                        // notes are under View.
+                        $flat = trim(preg_replace('/\s+/u', ' ', $e['notes']));
+                        $short = mb_substr($flat, 0, 300);
                         ?>
+                        <div class="secret-notes" title="<?php echo htmlspecialchars(mb_substr($flat, 0, 1000), ENT_QUOTES); ?>"><?php echo htmlspecialchars($short) . (mb_strlen($flat) > 300 ? '&hellip;' : ''); ?></div>
                     </td>
                     <td style="font-size:13px;"><?php echo htmlspecialchars($e['filename']); ?><br><span style="color:#777;"><?php echo vault_size($e['content_size']); ?></span></td>
                     <td style="font-size:13px;"><?php echo htmlspecialchars($e['updated_at']); ?><br><span style="color:#777;">by <?php echo htmlspecialchars($accountNames[$e['updated_by']] ?? 'unknown'); ?></span></td>
