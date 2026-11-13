@@ -30,6 +30,7 @@ body {
     font-size: 1.25rem;
     font-weight: bold;
     margin-right: 40px;
+    flex-shrink: 0;
 }
 
 .nav-links {
@@ -98,6 +99,10 @@ body {
     background: rgba(255,255,255,0.9);
     border-radius: 2px;
 }
+
+/* Never wrap nav text: a brand or "View Site" breaking onto two lines would
+   squeeze the bar instead of overflowing it, so the hamburger never kicks in. */
+.admin-nav { white-space: nowrap; }
 
 /* While measuring, let the menu take its natural width so overflow is detectable */
 .admin-nav.nav-measure .nav-menu { flex: 0 0 auto; min-width: auto; }
