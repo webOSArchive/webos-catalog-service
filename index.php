@@ -133,14 +133,14 @@ echo file_get_contents("https://www.webosarchive.org/menu.php?docRoot=" . $docRo
     </div>
     <div id="hero">
       <a href="showMuseum.php"><img src="hero.png" width="480" border="0" style="border:0px" alt="<?php echo $title ?>" /></a>
-      <p style="font-size:1.1em">Catalog metadata is available on <?php echo "<a href='" . $github . "'>GitHub</a>"?> | <a href="http://appcatalog.webosarchive.org/WebService/reports/">View Stats</a></p>
-      <p style="font-size:0.98em"><i>Many items are still missing! If you have an old device or personal archive, check the <a href="wanted.txt">wanted</a> <a href="wanted.csv">list</a>, or run the <a href="http://appcatalog.webosarchive.org/app/webOSAppScanner">App Scanner</a> on your device, and <a href="mailto:webosarchive@gmail.com">email us</a> if you have any matches!</i></p>
+      <p style="font-size:1.1em"><img src="assets/fdroid.png">webOS Android Ports are <a href="https://stacks.webosarchive.org/feeds/fdroid/repo/">available on F-Droid</a></p>
+      <p style="font-size:0.98em"><i>Run the <a href="http://appcatalog.webosarchive.org/app/webOSAppScanner">App Scanner</a> to help us find <a href="wanted.csv">Missing apps</a> on your device.</i></p>
     </div>
   </div>
   <div id="footer">
     &copy; webOSArchive <?php echo date("Y"); ?>
     <div id="footer-links">
-    <a href="<?php echo $PROTOCOL . "://www.webosarchive.org/privacy.html"?>">Privacy Policy</a>
+    <a href="<?php echo $PROTOCOL . "://www.webosarchive.org/privacy.html"?>">Privacy Policy</a> | <a href="http://appcatalog.webosarchive.org/WebService/reports/">Usage Stats</a> | <a href="https://appcatalog.webosarchive.org/wanted.txt">Missing Apps</a> | <a href="https://github.com/webOSArchive/webos-catalog-service">GitHub</a>
     </div>
   </div>
   </td></tr></table>
