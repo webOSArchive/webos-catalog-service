@@ -28,6 +28,8 @@ class Capabilities {
         'authors.manage',     // manage authors/vendors
         'logs.view',          // view logs / reports
         'catalog.readonly',   // switch catalog read-only mode, and edit while it's on
+        'secrets.view',       // unlock the secrets vault, view + download entries
+        'secrets.manage',     // add/change/delete vault entries, set the vault password
     ];
 
     /** Role name -> capabilities granted. '*' means all capabilities. */
@@ -47,6 +49,11 @@ class Capabilities {
         // stays hidden/forbidden and admin/index.php redirects them to the
         // read-only admin/stats.php dashboard.
         'viewer'     => ['admin.access'],
+        // Community leaders trusted with the secrets vault (admin/secrets.php):
+        // signing keys, client IDs etc., for carrying on without the founder.
+        // Assigned alongside another role; opening the vault still needs the
+        // shared vault password. secrets.manage stays superadmin-only.
+        'trustee'    => ['admin.access', 'secrets.view'],
     ];
 
     /**

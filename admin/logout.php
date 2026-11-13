@@ -11,5 +11,9 @@ if (ini_get('session.use_cookies')) {
 }
 session_destroy();
 
+// Secrets vault wrapping key (admin/secrets.php); useless without the session,
+// but don't leave it lying around.
+setcookie('WOSVAULT', '', ['expires' => time() - 3600, 'path' => '/admin/', 'httponly' => true, 'samesite' => 'Strict']);
+
 header('Location: login.php');
 exit;

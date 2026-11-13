@@ -136,6 +136,7 @@ php scripts/create-account.php alice curator       # a curator
 | `curator` | Edit apps / categories / authors, moderate reviews |
 | `developer` | Submit and manage their own apps (create app → set its Package ID once under Edit Metadata → upload the IPK); gets full Logs (has `logs.view`) but the read-only Dashboard (no `apps.edit`) |
 | `viewer` | Read-only: Dashboard stats and Logs (IP-redacted) only, nothing else |
+| `trustee` | Can open the Secrets vault (signing keys, client IDs) with the shared vault password; assign alongside another role. Only superadmins can change vault entries |
 
 **Signing in:** every role above includes `admin.access`, so any of them can
 sign in at `/admin/login.php` (rate-limited, generic error on failure).
