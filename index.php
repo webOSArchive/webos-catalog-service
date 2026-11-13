@@ -10,6 +10,9 @@ if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
         $PROTOCOL = "http";
 }
 
+//Default the "Install on a Device" picker to Android for Android visitors
+$isAndroid = isset($_SERVER['HTTP_USER_AGENT']) && stripos($_SERVER['HTTP_USER_AGENT'], 'android') !== false;
+
 //App Details
 $title = "webOS App Catalog";
 $subtitle = " | webOS Archive";
@@ -115,9 +118,9 @@ echo file_get_contents("https://www.webosarchive.org/menu.php?docRoot=" . $docRo
         <br><br>
         <div style="font-weight:bold; margin-bottom:8px;">Install on a Device:
         <select id="selectOS" onchange="setOS(document.getElementById('selectOS').value);">
-          <option value="enyo" selected>HP webOS Tablet</option>
+          <option value="enyo"<?php if (!$isAndroid) echo ' selected'; ?>>HP webOS Tablet</option>
           <option value="mojo">Palm/HP webOS Phone</option>
-          <option value="android">Android 5+</option>
+          <option value="android"<?php if ($isAndroid) echo ' selected'; ?>>Android 5+</option>
         </select>
         </div>
         <p style="font-size:smaller" id="explain-enyo">HP TouchPad, TouchPad 4G or TouchPad Go running webOS 3.0.x. Note: <a href="http://www.webosarchive.org/pivot/2026/09/08/webos-3.1.0-community-edition-is-here/">webOS 3.1.0</a> has everything pre-installed.</p>
@@ -128,6 +131,9 @@ echo file_get_contents("https://www.webosarchive.org/menu.php?docRoot=" . $docRo
         <span id="show-enyo" style="display:block"><a class="download-link" href="http://stacks.webosarchive.org/feeds/modernize/ipkgs/com.palm.app.enyo-findapps_6.2.2931_all.ipk"><img src="assets/hp-appcatalog.png" style="vertical-align:middle;height:48px;width:48px;" alt="HP App Catalog for TouchPad" title="HP App Catalog for TouchPad"> 2) Restored App Catalog (Enyo)</a><br></span>
         <span id="show-mojo" style="display:none"><a class="download-link" href="http://stacks.webosarchive.org/feeds/modernize/ipkgs/com.palm.app.findapps_3.1.23302_all.ipk"><img src="assets/palm-appcatalog.png" style="vertical-align:middle;height:48px;width:48px;" alt="HP App Catalog" title="HP App Catalog for Phones"> 2) Restored App Catalog (Mojo)</a><br></span>
         <span id="show-android" style="display:none"><a class="download-link" href="https://www.webosarchive.org/lunacy"><img src="assets/lunacy.png" style="vertical-align:middle" alt="Lunacy for Android" title="Lunacy for Android" width="48" height="48"/> Lunacy for Android</a></span>        
+<?php if ($isAndroid) { ?>
+        <script>setOS("android");</script>
+<?php } ?>
         <p style="font-size:smaller"><a href="http://docs.webosarchive.org">Need More Help?</a></p>
       </div>
     </div>
