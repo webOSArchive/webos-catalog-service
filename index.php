@@ -78,13 +78,13 @@ if (strpos($outputObj["filename"], "://") === false) {
     function setOS(OSName) {
       document.getElementById("show-enyo").style.display = "none";
       document.getElementById("show-mojo").style.display = "none";
-      document.getElementById("show-luneos").style.display = "none";
+      document.getElementById("show-android").style.display = "none";
       document.getElementById("show-" + OSName).style.display ="block";
       document.getElementById("explain-enyo").style.display = "none";
       document.getElementById("explain-mojo").style.display = "none";
-      document.getElementById("explain-luneos").style.display = "none";
+      document.getElementById("explain-android").style.display = "none";
       document.getElementById("explain-" + OSName).style.display ="block";
-      if (OSName == "luneos")
+      if (OSName == "android")
           document.getElementById("show-preware").style.display ="none";
       else
           document.getElementById("show-preware").style.display ="block";
@@ -117,30 +117,30 @@ echo file_get_contents("https://www.webosarchive.org/menu.php?docRoot=" . $docRo
         <select id="selectOS" onchange="setOS(document.getElementById('selectOS').value);">
           <option value="enyo" selected>HP webOS Tablet</option>
           <option value="mojo">Palm/HP webOS Phone</option>
-          <option value="luneos">Other WebKit Devices</option>
+          <option value="android">Android 5+</option>
         </select>
         </div>
         <p style="font-size:smaller" id="explain-enyo">HP TouchPad, TouchPad 4G or TouchPad Go running webOS 3.0.x. Note: <a href="http://www.webosarchive.org/pivot/2026/09/08/webos-3.1.0-community-edition-is-here/">webOS 3.1.0</a> has everything pre-installed.</p>
         <p style="font-size:smaller; display:none;" id="explain-mojo">Palm Pre, Pre Plus, Pre2, Pixi; HP Veer or Pre3.</p>
-        <p style="font-size:smaller; display:none;" id="explain-luneos">Modern devices running <a href="http://www.webosarchive.org/pivot/author/webosports/">LuneOS</a> or the <a href="https://sdk.webosarchive.org">Enyo library</a> in WebKit (for dev/test purposes only.)</p>
+        <p style="font-size:smaller; display:none;" id="explain-android">Lunacy is a webOS environment for Android 5-17. It runs a wide range of webOS apps in an authentic webOS Launcher.</p>
 
         <span id="show-preware"><a class="download-link" href="http://docs.webosarchive.org/#step-5"><img src="assets/preware-icon.png" style="vertical-align:middle;height:48px;width:48px;" alt="Preware" title="Preware"> 1) Install Preware | Requires WOSQI + Java</a><br/></span>
         <span id="show-enyo" style="display:block"><a class="download-link" href="http://stacks.webosarchive.org/feeds/modernize/ipkgs/com.palm.app.enyo-findapps_6.2.2931_all.ipk"><img src="assets/hp-appcatalog.png" style="vertical-align:middle;height:48px;width:48px;" alt="HP App Catalog for TouchPad" title="HP App Catalog for TouchPad"> 2) Restored App Catalog (Enyo)</a><br></span>
         <span id="show-mojo" style="display:none"><a class="download-link" href="http://stacks.webosarchive.org/feeds/modernize/ipkgs/com.palm.app.findapps_3.1.23302_all.ipk"><img src="assets/palm-appcatalog.png" style="vertical-align:middle;height:48px;width:48px;" alt="HP App Catalog" title="HP App Catalog for Phones"> 2) Restored App Catalog (Mojo)</a><br></span>
-        <span id="show-luneos" style="display:none"><a class="download-link" href="<?php echo $use_uri?>"><img src="assets/app-museum.png" style="vertical-align:middle" alt="App Museum for LuneOS" title="App Museum for LuneOS" width="48" height="48"/> App Museum (WebKit/LuneOS)</a></span>
+        <span id="show-android" style="display:none"><a class="download-link" href="<?php echo $use_uri?>"><img src="assets/lunacy.png" style="vertical-align:middle" alt="Lunacy for Android" title="Lunacy for Android" width="48" height="48"/> Lunacy for Android</a></span>        
         <p style="font-size:smaller"><a href="http://docs.webosarchive.org">Need More Help?</a></p>
       </div>
     </div>
     <div id="hero">
       <a href="showMuseum.php"><img src="hero.png" width="480" border="0" style="border:0px" alt="<?php echo $title ?>" /></a>
-      <p style="font-size:1.1em"><img src="assets/fdroid.png">webOS Android Ports are <a href="https://stacks.webosarchive.org/feeds/fdroid/repo/">available on F-Droid</a></p>
-      <p style="font-size:0.98em"><i>Run the <a href="http://appcatalog.webosarchive.org/app/webOSAppScanner">App Scanner</a> to help us find <a href="wanted.csv">Missing apps</a> on your device.</i></p>
+      <p style="font-size:1.1em"><a href="https://stacks.webosarchive.org/feeds/fdroid/repo/"><img src="assets/fdroid.png"><br>Get webOS Android Ports on F-Droid</a>!</p>
+      <p style="font-size:0.98em"><i>Run <a href="http://appcatalog.webosarchive.org/app/webOSAppScanner">App Scanner</a> to help us find <a href="wanted.csv">Missing apps</a> on your device.</i></p>
     </div>
   </div>
   <div id="footer">
     &copy; webOSArchive <?php echo date("Y"); ?>
     <div id="footer-links">
-    <a href="<?php echo $PROTOCOL . "://www.webosarchive.org/privacy.html"?>">Privacy Policy</a> | <a href="http://appcatalog.webosarchive.org/WebService/reports/">Usage Stats</a> | <a href="https://appcatalog.webosarchive.org/wanted.txt">Missing Apps</a> | <a href="https://github.com/webOSArchive/webos-catalog-service">GitHub</a>
+    <a href="<?php echo $PROTOCOL . "://www.webosarchive.org/privacy.html"?>">Privacy Policy</a> <a href="http://appcatalog.webosarchive.org/WebService/reports/">Usage Stats</a> <a href="https://appcatalog.webosarchive.org/wanted.txt">Missing Apps</a> <a href="https://github.com/webOSArchive/webos-catalog-service">GitHub</a>
     </div>
   </div>
   </td></tr></table>
