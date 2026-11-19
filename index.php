@@ -35,6 +35,14 @@ if (strpos($outputObj["filename"], "://") === false) {
 } else {
   $use_uri = $outputObj["filename"];
 }
+
+//Restored HP App Catalog downloads come from the self-update manifests
+function manifestFilename($file, $fallback) {
+  $manifest = json_decode(@file_get_contents(__DIR__ . '/' . $file), true);
+  return !empty($manifest["filename"]) ? $manifest["filename"] : $fallback;
+}
+$enyo_uri = manifestFilename('appcatalog-touchpad.json', 'http://stacks.webosarchive.org/feeds/modernize/ipkgs/com.palm.app.enyo-findapps_6.3.3000_all.ipk');
+$mojo_uri = manifestFilename('appcatalog-phones.json', 'http://stacks.webosarchive.org/feeds/modernize/ipkgs/com.palm.app.findapps_3.1.23302_all.ipk');
 ?>
 <head>
   <meta charset="utf-8">
@@ -128,8 +136,8 @@ echo file_get_contents("https://www.webosarchive.org/menu.php?docRoot=" . $docRo
         <p style="font-size:smaller; display:none;" id="explain-android">Lunacy is a webOS environment for Android 5-17. It runs a wide range of webOS apps in an authentic webOS Launcher.</p>
 
         <span id="show-preware"><a class="download-link" href="http://docs.webosarchive.org/#step-5"><img src="assets/preware-icon.png" style="vertical-align:middle;height:48px;width:48px;" alt="Preware" title="Preware"> 1) Install Preware | Requires WOSQI + Java</a><br/></span>
-        <span id="show-enyo" style="display:block"><a class="download-link" href="http://stacks.webosarchive.org/feeds/modernize/ipkgs/com.palm.app.enyo-findapps_6.2.2931_all.ipk"><img src="assets/hp-appcatalog.png" style="vertical-align:middle;height:48px;width:48px;" alt="HP App Catalog for TouchPad" title="HP App Catalog for TouchPad"> 2) Restored App Catalog (Enyo)</a><br></span>
-        <span id="show-mojo" style="display:none"><a class="download-link" href="http://stacks.webosarchive.org/feeds/modernize/ipkgs/com.palm.app.findapps_3.1.23302_all.ipk"><img src="assets/palm-appcatalog.png" style="vertical-align:middle;height:48px;width:48px;" alt="HP App Catalog" title="HP App Catalog for Phones"> 2) Restored App Catalog (Mojo)</a><br></span>
+        <span id="show-enyo" style="display:block"><a class="download-link" href="<?php echo htmlspecialchars($enyo_uri); ?>"><img src="assets/hp-appcatalog.png" style="vertical-align:middle;height:48px;width:48px;" alt="HP App Catalog for TouchPad" title="HP App Catalog for TouchPad"> 2) Restored App Catalog (Enyo)</a><br></span>
+        <span id="show-mojo" style="display:none"><a class="download-link" href="<?php echo htmlspecialchars($mojo_uri); ?>"><img src="assets/palm-appcatalog.png" style="vertical-align:middle;height:48px;width:48px;" alt="HP App Catalog" title="HP App Catalog for Phones"> 2) Restored App Catalog (Mojo)</a><br></span>
         <span id="show-android" style="display:none"><a class="download-link" href="https://www.webosarchive.org/lunacy"><img src="assets/lunacy.png" style="vertical-align:middle" alt="Lunacy for Android" title="Lunacy for Android" width="48" height="48"/> Lunacy for Android</a></span>        
 <?php if ($isAndroid) { ?>
         <script>setOS("android");</script>
